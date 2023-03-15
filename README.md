@@ -27,7 +27,7 @@ samtools(v1.9) - http://www.htslib.org/download/
 * Estimated mutation rate  of the dataset in question. Can be in scientific notation. ex. 1e-8
 **Filter File:**
 * List of filters you wish to apply to the simulated dataset (format described below). ex. filter_file.txt
-Read Length:
+**Read Length:**
 Length of the reads used in the real dataset. ex. 100
 Coverage:
 Comma-delimited string of the coverages of the sire,dam,offspring. ex. “30,40,50”
