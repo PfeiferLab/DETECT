@@ -1,0 +1,12 @@
+Filter	Threshold	Total_Sites	Mutations	Variants	Sequencing_Errors
+original	N/A	10020	20	10000	0
+MVs	N/A	86	15	71	0
+DPLT	1.6	86	15	71	0
+DPGT	0.4	84	15	69	0
+ABGT	0.0	86	15	71	0
+ABLT	0.65	78	15	63	0
+AD	1.0	63	15	48	0
+GQ	15.0	19	15	4	0
+QUAL	120.0	84	15	69	0
+GATKBP	1.0	85	15	70	0
+Num Multihit Sites:0

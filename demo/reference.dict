@@ -1,0 +1,6 @@
+@HD	VN:1.6
+@SQ	SN:test_1	LN:1000000	M5:e454451465fec7fbe3a172fb75f1984d	UR:file:/home/mmilhave/DETECT/demo/reference.fa
+@SQ	SN:test_2	LN:1000000	M5:fc318edb6e24116d63d93bb0a8d7406a	UR:file:/home/mmilhave/DETECT/demo/reference.fa
+@SQ	SN:test_3	LN:1000000	M5:59316e18457ec6eb4028d1290b38a6bb	UR:file:/home/mmilhave/DETECT/demo/reference.fa
+@SQ	SN:test_4	LN:1000000	M5:f1724fb40a916942081b3a3031e1e8e7	UR:file:/home/mmilhave/DETECT/demo/reference.fa
+@SQ	SN:test_5	LN:1000000	M5:d8d9dfa0d119a7071e5bd892c84bb6da	UR:file:/home/mmilhave/DETECT/demo/reference.fa
