@@ -1,16 +1,15 @@
 # DETECT (DNM Extraction Through Empirical Cutoff Thresholds)
-
-## Description:
 DETECT is a simulation-based workflow that recommends filter thresholds in direct mutation rate estimation. By populating DNMs in a simulated trio at a specified mutation rate, we can determine the filter that isolates as many DNMs as possible in the simulation, while also limiting the number of False Positives(FPs). DETECT also takes variant datasets as input to provide an accurate estimation of FPs that the workflow then must discern from true DNMs. This has only been tested and is only functional on diploid, sexually reproducing organisms, but plans to allow asexual reproduction are being worked on.
 
-## Setting Up:
-### Environment Installation:
-`conda env create -n detect-env -f DETECT/detect_env.yml`  
-`source activate detect-env`  
-
+## Setting Up
+### Environment Installation
+```
+conda env create -n detect-env -f DETECT/detect_env.yml  
+source activate detect-env  
+```
 **Note:** the environment name(-n) can be whatever name you would like it to be
 
-### Required Software:
+### Required Software
 Parenthetical versions refer to the versions that DETECT was tested with. Older/newer versions may work as well:  
 python3 - https://www.python.org/  
 Mason(v2.0.9) - https://github.com/seqan/seqan/blob/master/apps/mason2/  
@@ -19,8 +18,8 @@ bwa(v0.7.17) - https://github.com/lh3/bwa
 samtools(v1.9) - http://www.htslib.org/download/  
 
 
-## Quickstart:
-### Required Inputs:
+## Quickstart
+### Required Inputs
 **Reference Genome:** Reference genome to be used in your real data workflow, where the simulated read data will come from. Must have a dictionary file (GATK CreateSequenceDictionary) and be bwa indexed (bwa index ) ex. reference.fa  
 
 **Mutation Rate:** Estimated mutation rate  of the dataset in question. Can be in scientific notation. ex. 1e-8  
@@ -32,7 +31,7 @@ samtools(v1.9) - http://www.htslib.org/download/
 **Coverage:** Comma-delimited string of the coverages of the sire,dam,offspring. ex. “30,40,50”  
 
 **Output File:** Output file name of consolidated filter recommendations.  
-### Optional Inputs:
+### Optional Inputs
 **Input Variants:** VCF file containing variants to be used as False Positives. Must have either --trio or --population specified. If --trio, --pedigree required, and only the trio can be in the VCF. Must be indexed (e.g. GATK IndexFeatureFile). If --population, DETECT will “create” an offspring from two random individuals’ haplotypes.  
 
 **Pedigree:** Comma delimited string of the names of sire, dam, and offspring in the VCF (ex. “dad,mom,junior”)  
@@ -74,6 +73,7 @@ ReadPosRankSumGT -2.5 1.5 0.5
 
 Available Filters are shown below. Idealized values are also put below for what a “gold standard” statistical value would be (ex. AB values should be around 0.5 for heterozygotes).  
 For filters that have a GT or LT this refers to the filter either being “greater than” or “less than”(ex. DPGT establishes the lower bound recommendation for depth filters, ABLT establishes the upper bound recommendation for allele balance filters, etc.):  
+
 **DPGT:** The lower bound of the depth filter, in scaled coverage (>=)  
 **DPLT:** The upper bound of depth filter, in scaled coverage (<=)  
 **ABGT:** Upper bound of proportion of ALT alleles to depth in child, 0.5 is ideal. (>=)  
