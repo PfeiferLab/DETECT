@@ -21,12 +21,12 @@ samtools(v1.9) - http://www.htslib.org/download/
 
 ## Quickstart:
 ### Required Inputs:
-**Reference Genome:**Reference genome to be used in your real data workflow, where the simulated read data will come from. Must have a dictionary file (GATK CreateSequenceDictionary) and be bwa indexed (bwa index ) ex. reference.fa  
-**Mutation Rate:**Estimated mutation rate  of the dataset in question. Can be in scientific notation. ex. 1e-8  
-**Filter File:**List of filters you wish to apply to the simulated dataset (format described below). ex. filter_file.txt  
-**Read Length:**Length of the reads used in the real dataset. ex. 100  
-**Coverage:**Comma-delimited string of the coverages of the sire,dam,offspring. ex. “30,40,50”  
-**Output File:**Output file name of consolidated filter recommendations.  
+**Reference Genome:** Reference genome to be used in your real data workflow, where the simulated read data will come from. Must have a dictionary file (GATK CreateSequenceDictionary) and be bwa indexed (bwa index ) ex. reference.fa  
+**Mutation Rate:** Estimated mutation rate  of the dataset in question. Can be in scientific notation. ex. 1e-8  
+**Filter File:** List of filters you wish to apply to the simulated dataset (format described below). ex. filter_file.txt  
+**Read Length:** Length of the reads used in the real dataset. ex. 100  
+**Coverage:** Comma-delimited string of the coverages of the sire,dam,offspring. ex. “30,40,50”  
+**Output File:** Output file name of consolidated filter recommendations.  
 
 ###Optional Inputs:  
 **Input Variants:**  
