@@ -1,4 +1,3 @@
-#~/.conda/envs/snakemake/bin/python
 import os
 cwd = os.path.abspath(os.path.dirname(__file__))
 SNAKEDIR = config["snakemake_dir"]
@@ -15,7 +14,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 wildcard_constraints:
     filter_threshold="-?\d+\.\d+",
-    indiv="|".join(list(config['names'].keys())).replace("_", "\_"), # this commands gets all possible value of names from config file and turns it into a regex
+    indiv="|".join(list(config['names'].keys())).replace("_", "\_"), 
     chromosome="|".join(list(config['chroms'].keys())).replace("_", "\_"),
     num="0|1"
 
@@ -426,18 +425,6 @@ rule AD_filter:
     shell:
         '{params.gatk} SelectVariants -V {input} --select \'vc.getGenotype(\"parent_1\").getAD().1 <= {wildcards.filter_threshold}\' --select \'vc.getGenotype(\"parent_2\").getAD().1 <= {wildcards.filter_threshold} \' --exclude-filtered true -O {output} '
 
-#rule GATKBP_filter:
-#    input:
-#        'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.vcf'
-#    output:
-#        gatkbp_output = 'pipeline/filters/GATKBP/all_chr_trio.downsampled.sorted.mark_dups.MV.GATKBP.vcf',
-#        gatkbp_pass_output = 'pipeline/filters/GATKBP/all_chr_trio.downsampled.sorted.mark_dups.MV.GATKBP.1.0.vcf'
-#    params:
-#        gatk = config["apps"]["gatk"]
-#    run:
-#        shell('{params.gatk} VariantFiltration -V {input} -filter \"QD < 2.0\" --filter-name \"QD2\" -filter \"SOR > 3.0\" --filter-name \"SOR3\" -filter \"FS > 60.0\" --filter-name \"FS60\" -filter \"MQRankSum < -12.5\" --filter-name \"MQRankSum-12.5\" -filter \"ReadPosRankSum < -8.0\" --filter-name \"ReadPosRankSum-8\" -O {output.gatkbp_output}')
-#        shell('{params.gatk} SelectVariants -V {output.gatkbp_output} --exclude-filtered true -O {output.gatkbp_pass_output}')
-
 rule QD_filter:
 	input:
 		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.vcf'
@@ -559,7 +546,7 @@ rule aggregate:
     params:
         vcfmerge = lambda x: 1 if 'input_variants' in config.keys() else 0,
         snakedir=SNAKEDIR,
-        config = config["working_directory"]+"/config/config.json", #["filter_file"],
+        config = config["working_directory"]+"/config/config.json", 
         work_dir= config["working_directory"]
     shell:
         'python {params.snakedir}/scripts/aggregate.py -i {params.config} -o {output} -v {params.vcfmerge} -m pipeline/mutations/multihit_count.txt -w {params.work_dir}'
