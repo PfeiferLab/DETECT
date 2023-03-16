@@ -33,7 +33,7 @@ samtools(v1.9) - http://www.htslib.org/download/
 
 **Output File:** Output file name of consolidated filter recommendations.  
 
-###Optional Inputs:  
+###Optional Inputs:
 **Input Variants:** VCF file containing variants to be used as False Positives. Must have either --trio or --population specified. If --trio, --pedigree required, and only the trio can be in the VCF. Must be indexed (e.g. GATK IndexFeatureFile). If --population, DETECT will “create” an offspring from two random individuals’ haplotypes.  
 
 **Pedigree:** Comma delimited string of the names of sire, dam, and offspring in the VCF (ex. “dad,mom,junior”)  
@@ -92,7 +92,7 @@ For filters that have a GT or LT this refers to the filter either being “great
 
 For a deeper explanation of each of the GATK Best Practices Hard Filter statistics, check here: https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants  
 
-##Demo Command/Job Submission:  
+##Demo Command/Job Submission:
 First, you must create the config file from which the workflow will read the user specifications:  
 ```
 python DETECT/run_pipeline.py \
@@ -121,14 +121,14 @@ sbatch -n1 --job-name demo_detect_superjob \
 -e DETECT/demo/demo_workdir/logs/{rulename}.{jobid}.err\" --forceall"  
 ```
 
-##My Job has run out of walltime!  
+##My Job has run out of walltime!
 In the case that your DETECT job has run out of walltime, do not worry! Snakemake will pick up where it left off.  
 Simply run this unlock command:  
 `snakemake --configfile <working_directory>/config/config.json -s <DETECT_directory>/DETECT/Snakefile --unlock`  
 
 And then resubmit your job. It should continue from the last completed step. If an error occurred in a step, please put a support ticket into the repository, and I will be happy to help ASAP.   
 
-##Best Practices:  
+##Best Practices:
 Once you have the filter recommendations, you may notice that the best filter is on one of the bounds of your parameter space (e.g. in the filter file above, you have a recommendation of 300 for QUAL). If this is the case, it is possible that there is a better filter beyond the bounds of your specifications, and thus it is recommended you expand your bounds and try again. Due to DETECT being implemented in snakemake, the workflow will only run the new filter thresholds.  
 
 ##Advanced Usage:
