@@ -31,7 +31,7 @@ samtools(v1.9) - http://www.htslib.org/download/
 
 **Coverage:** Comma-delimited string of the coverages of the sire,dam,offspring. ex. “30,40,50”  
 
-**Output File:** Output file name of consolidated filter recommendations.
+**Output File:** Output file name of consolidated filter recommendations.  
 ###Optional Inputs:
 **Input Variants:** VCF file containing variants to be used as False Positives. Must have either --trio or --population specified. If --trio, --pedigree required, and only the trio can be in the VCF. Must be indexed (e.g. GATK IndexFeatureFile). If --population, DETECT will “create” an offspring from two random individuals’ haplotypes.  
 
