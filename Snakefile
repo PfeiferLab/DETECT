@@ -384,7 +384,7 @@ rule ABGT_filter:
     params:
         gatk = config["apps"]["gatk"]
     shell:
-        '{params.gatk} SelectVariants -V {input} --select \'(vc.getGenotype(\"child\").getAD().1*1.0 / vc.getGenotype(\"child\").getDP()*1.0 ) >= {wildcards.filter_threshold} \' --exclude-filtered true -O {output}'
+        '{params.gatk} SelectVariants -V {input} --select \'vc.getGenotype(\"child\").getDP()*1.0 ) > 0.0 && ((vc.getGenotype(\"child\").getAD().1*1.0 / vc.getGenotype(\"child\").getDP()*1.0 ) >= {wildcards.filter_threshold}) \' --exclude-filtered true -O {output}'
 
 rule ABLT_filter:
     input:
@@ -394,7 +394,7 @@ rule ABLT_filter:
     params:
         gatk = config["apps"]["gatk"]
     shell:
-        '{params.gatk} SelectVariants -V {input} --select \'(vc.getGenotype(\"child\").getAD().1*1.0 / vc.getGenotype(\"child\").getDP()*1.0 ) <= {wildcards.filter_threshold} \' --exclude-filtered true -O {output}'
+        '{params.gatk} SelectVariants -V {input} --select \'vc.getGenotype(\"child\").getDP()*1.0 ) > 0.0 && ((vc.getGenotype(\"child\").getAD().1*1.0 / vc.getGenotype(\"child\").getDP()*1.0 ) <= {wildcards.filter_threshold}) \' --exclude-filtered true -O {output}'
 
 rule QUAL_filter:
     input:
