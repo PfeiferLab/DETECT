@@ -5,7 +5,7 @@ DETECT is a simulation-based workflow that recommends filter thresholds in direc
 
 ## Setting Up:
 ### Environment Installation:
-`conda env create -n detect-env -f DETECT/detect_env.yml`
+`conda env create -n detect-env -f DETECT/detect_env.yml\n`
 `source activate detect-env`
 
 **Note:** the environment name(-n) can be whatever name you would like it to be
@@ -22,38 +22,38 @@ samtools(v1.9) - http://www.htslib.org/download/
 ### Quickstart:
 #### Required Inputs:
 **Reference Genome:**
- * Reference genome to be used in your real data workflow, where the simulated read data will come from. Must have a dictionary file (GATK CreateSequenceDictionary) and be bwa indexed (bwa index ) ex. reference.fa
+* Reference genome to be used in your real data workflow, where the simulated read data will come from. Must have a dictionary file (GATK CreateSequenceDictionary) and be bwa indexed (bwa index ) ex. reference.fa
 **Mutation Rate:**
 * Estimated mutation rate  of the dataset in question. Can be in scientific notation. ex. 1e-8
 **Filter File:**
 * List of filters you wish to apply to the simulated dataset (format described below). ex. filter_file.txt
 **Read Length:**
-Length of the reads used in the real dataset. ex. 100
+* Length of the reads used in the real dataset. ex. 100
 **Coverage:**
-Comma-delimited string of the coverages of the sire,dam,offspring. ex. “30,40,50”
-Output File:
-Output file name of consolidated filter recommendations.
-Optional Inputs:
-Input Variants: 
-VCF file containing variants to be used as False Positives. Must have either --trio or --population specified. If --trio, --pedigree required, and only the trio can be in the VCF. Must be indexed (e.g. GATK IndexFeatureFile). If --population, DETECT will “create” an offspring from two random individuals’ haplotypes.
-Pedigree:
-Comma delimited string of the names of sire, dam, and offspring in the VCF (ex. “dad,mom,junior”)
-Fragment Length:
-Mean length of the fragment size distribution of the real data. Default: 300 (Mason Default)
-Fragment Length Standard Deviation:
-Standard deviation of the fragment size distribution of the real data. Default: 30 (Mason Default)
-Chromosome list:
-File of chromosome names to be simulated, one per line. Default: All contigs
-Path list:
-space delimited text file that shows the native paths of each of the required. DETECT will use the native command by default (e.g. “gatk” or “samtools”).
+* Comma-delimited string of the coverages of the sire,dam,offspring. ex. “30,40,50”
+**Output File:**
+* Output file name of consolidated filter recommendations.
+####Optional Inputs:
+**Input Variants:**
+* VCF file containing variants to be used as False Positives. Must have either --trio or --population specified. If --trio, --pedigree required, and only the trio can be in the VCF. Must be indexed (e.g. GATK IndexFeatureFile). If --population, DETECT will “create” an offspring from two random individuals’ haplotypes.
+**Pedigree:**
+* Comma delimited string of the names of sire, dam, and offspring in the VCF (ex. “dad,mom,junior”)
+**Fragment Length:**
+* Mean length of the fragment size distribution of the real data. Default: 300 (Mason Default)
+**Fragment Length Standard Deviation:**
+* Standard deviation of the fragment size distribution of the real data. Default: 30 (Mason Default)
+**Chromosome list:**
+* File of chromosome names to be simulated, one per line. Default: All contigs
+**Path list:**
+* Space-delimited text file that shows the native paths of each of the required. DETECT will use the native command by default (e.g. “gatk” or “samtools”).
 Example of path list:
-samtools /packages/apps/spack/18/opt/spack/gcc-12.1.0/samtools-1.9-arv/bin/samtools
-gatk /packages/apps/spack/18/opt/spack/gcc-11.2.0/gatk-4.2.6.1-3ds/bin/gatk
-mason_simulator ~/mason/bin/mason_simulator
-CPU count:
-The number of cpus you would like to run per job at maximum in multithreaded steps (Mapping reads and Sorting BAMs). 
-Sample Filter File:
-The filter file is a space delimited text file with the name of the filter in question, the minimum value, the maximum value, and the step size:
+`samtools /packages/apps/spack/18/opt/spack/gcc-12.1.0/samtools-1.9-arv/bin/samtools\n`
+`gatk /packages/apps/spack/18/opt/spack/gcc-11.2.0/gatk-4.2.6.1-3ds/bin/gatk\n`
+`mason_simulator ~/mason/bin/mason_simulator`
+**CPU count:**
+* The number of cpus you would like to run per job at maximum in multithreaded steps (Mapping reads and Sorting BAMs). 
+**Sample Filter File:**
+* The filter file is a space delimited text file with the name of the filter in question, the minimum value, the maximum value, and the step size:
 
 DPLT 1.0 3.0 0.2
 DPGT 0.2 1.0 0.2
