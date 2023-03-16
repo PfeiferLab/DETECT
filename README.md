@@ -11,28 +11,28 @@ DETECT is a simulation-based workflow that recommends filter thresholds in direc
 **Note:** the environment name(-n) can be whatever name you would like it to be
 
 ### Required Software:
-Parenthetical versions refer to the versions that DETECT was tested with. Older/newer versions may work as well.
-python3 - https://www.python.org/
-Mason(v2.0.9) - https://github.com/seqan/seqan/blob/master/apps/mason2/
-GATK4 - https://github.com/broadinstitute/gatk/releases
-bwa(v0.7.17) - https://github.com/lh3/bwa
-samtools(v1.9) - http://www.htslib.org/download/
+Parenthetical versions refer to the versions that DETECT was tested with. Older/newer versions may work as well:  
+python3 - https://www.python.org/  
+Mason(v2.0.9) - https://github.com/seqan/seqan/blob/master/apps/mason2/  
+GATK4 - https://github.com/broadinstitute/gatk/releases  
+bwa(v0.7.17) - https://github.com/lh3/bwa  
+samtools(v1.9) - http://www.htslib.org/download/  
 
 
 ## Quickstart:
 ### Required Inputs:
 **Reference Genome:**  
-* Reference genome to be used in your real data workflow, where the simulated read data will come from. Must have a dictionary file (GATK CreateSequenceDictionary) and be bwa indexed (bwa index ) ex. reference.fa  
+*  Reference genome to be used in your real data workflow, where the simulated read data will come from. Must have a dictionary file (GATK CreateSequenceDictionary) and be bwa indexed (bwa index ) ex. reference.fa  
 **Mutation Rate:**  
-* Estimated mutation rate  of the dataset in question. Can be in scientific notation. ex. 1e-8  
+*  Estimated mutation rate  of the dataset in question. Can be in scientific notation. ex. 1e-8  
 **Filter File:**  
-* List of filters you wish to apply to the simulated dataset (format described below). ex. filter_file.txt  
+*  List of filters you wish to apply to the simulated dataset (format described below). ex. filter_file.txt  
 **Read Length:**  
-* Length of the reads used in the real dataset. ex. 100  
+*  Length of the reads used in the real dataset. ex. 100  
 **Coverage:**  
-* Comma-delimited string of the coverages of the sire,dam,offspring. ex. “30,40,50”  
+*  Comma-delimited string of the coverages of the sire,dam,offspring. ex. “30,40,50”  
 **Output File:**  
-* Output file name of consolidated filter recommendations.  
+*  Output file name of consolidated filter recommendations.  
 
 ###Optional Inputs:  
 **Input Variants:**  
@@ -92,7 +92,8 @@ For filters that have a GT or LT this refers to the filter either being “great
 **ReadPosRankSumGT:** Read Position Rank Sum Test lower bound, compares whether the position of the variant on the REF/ALT reads are the same. 0 is ideal. (>=)  
 **ReadPosRankSumLT:** Read Position Rank Sum Test upper bound, compares whether the position of the variant on the REF/ALT reads are the same. 0 is ideal. (<=)  
 
-For a deeper explanation of each of the GATK Best Practices Hard Filter statistics, check here: https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants
+For a deeper explanation of each of the GATK Best Practices Hard Filter statistics, check here: https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants  
+
 ###Demo Command/Job Submission:  
 First, you must create the config file from which the workflow will read the user specifications:  
 ```
