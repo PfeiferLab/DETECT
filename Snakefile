@@ -203,16 +203,6 @@ rule SimulateReads:
     shell:
         '{params.mason} --read-name-prefix "simulated_{wildcards.run}" --seed $RANDOM --num-threads {threads} -ir {input.fa} {params.input_vars} --fragment-mean-size {params.read_fragmean} --illumina-read-length {params.read_length} -n {params.read_count} -o {output.r1} -or {output.r2}'
 
-#rule RenameReads:
-#	input:
-#		r1 = 'pipeline/reads/{chromosome}_{indiv}_{run}_R1.fq',
-#		r2 = 'pipeline/reads/{chromosome}_{indiv}_{run}_R2.fq'
-#	output:
-#		r1 = 'pipeline/reads/{chromosome}_{indiv}_{run}_renamed.R1.fq',
-#		r2 = 'pipeline/reads/{chromosome}_{indiv}_{run}_renamed.R2.fq'
-#	shell:
-#		"sed 's/simulated/simulated_{wildcards.run}/g' {input.r1} > {output.r1} && sed 's/simulated/simulated_{wildcards.run}/g' {input.r2} > {output.r2}"
-
 rule MapReadsDownsampleBam: 
 	input:
 		reference = config['reference_genome'],
