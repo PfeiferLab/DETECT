@@ -1,12 +1,14 @@
 # DETECT (DNM Extraction Through Empirical Cutoff Thresholds)
-DETECT is a simulation-based workflow that recommends filter thresholds in direct mutation rate estimation. By populating DNMs in a simulated trio at a specified mutation rate, we can determine the filter that isolates as many DNMs as possible in the simulation, while also limiting the number of False Positives(FPs). DETECT also takes variant datasets as input to provide an accurate estimation of FPs that the workflow then must discern from true DNMs. This has only been tested and is only functional on diploid, sexually reproducing organisms, but plans to allow asexual reproduction are being worked on.
+DETECT is a simulation-based workflow that recommends filter thresholds that can be used to directly estimate mutation rate. By populating DNMs in a simulated trio at a specified mutation rate, we can determine the filter that isolates as many DNMs as possible in the simulation, while also limiting the number of False Positives(FPs). These filter thresholds can then be applied to a real dataset. DETECT has many options to tailor the simulation to real datasets, including sequencing technology, coverage and variant datasets as input. This has only been tested and is only functional on diploid, sexually reproducing organisms.
 
 ## Setting Up
 ### Environment Installation
 ```
+git clone https://github.com/PfeiferLab/DETECT.git
 conda env create -n detect-env -f DETECT/detect_env.yml  
 source activate detect-env  
 ```
+
 **Note:** the environment name(-n) can be whatever name you would like it to be
 
 ### Required Software
@@ -16,7 +18,6 @@ Mason(v2.0.9) - https://github.com/seqan/seqan/blob/master/apps/mason2/
 GATK4 - https://github.com/broadinstitute/gatk/releases  
 bwa(v0.7.17) - https://github.com/lh3/bwa  
 samtools(v1.9) - http://www.htslib.org/download/  
-
 
 ## Quickstart
 ### Required Inputs
@@ -46,11 +47,13 @@ samtools(v1.9) - http://www.htslib.org/download/
 
 **Path list:** Space-delimited text file that shows the native paths of each of the required. DETECT will use the native command by default (e.g. “gatk” or “samtools”).  
 Example of path list:  
+
 ```
 samtools /packages/apps/spack/18/opt/spack/gcc-12.1.0/samtools-1.9-arv/bin/samtools
 gatk /packages/apps/spack/18/opt/spack/gcc-11.2.0/gatk-4.2.6.1-3ds/bin/gatk  
 mason_simulator ~/mason/bin/mason_simulator
 ```  
+
 **Filter File:** The filter file is a space delimited text file with the name of the filter in question, the minimum value, the maximum value, and the step size:  
 
 Example of filter file:  
@@ -107,6 +110,7 @@ python DETECT/run_pipeline.py \
 -CL DETECT/demo/chrom_list.txt \
 --cpus 12 -SP ~/app_list.txt -WD DETECT/demo/demo_workdir/
 ```
+
 Then, you can submit the snakemake job that will submit all subjobs. Note that this is more of a template, and the command may need to be altered to run on your cluster based on its SLURM configuration:   
 ```
 sbatch -n1 --job-name demo_detect_superjob \
