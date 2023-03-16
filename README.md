@@ -119,14 +119,16 @@ sbatch -n1 --job-name demo_detect_superjob \
 --latency-wait 60 --keep-target-files --rerun-incomplete --cluster \
 \" sbatch -n {threads} --mem={resources.mem_mb} -t 01:00:00 \
 -o DETECT/demo/demo_workdir/logs/{rulename}.{jobid}.out \
--e DETECT/demo/demo_workdir/logs/{rulename}.{jobid}.err\" --forceall"
+-e DETECT/demo/demo_workdir/logs/{rulename}.{jobid}.err\" --forceall"  
 ```
+
 ###My Job has run out of walltime!  
 In the case that your DETECT job has run out of walltime, do not worry! Snakemake will pick up where it left off.  
-Simply run this unlock command:
+Simply run this unlock command:  
 `snakemake --configfile <working_directory>/config/config.json -s <DETECT_directory>/DETECT/Snakefile --unlock`  
 
-And then resubmit your job. It should continue from the last completed step. If an error occurred in a step, please put a support ticket into the repository, and I will be happy to help ASAP.  
+And then resubmit your job. It should continue from the last completed step. If an error occurred in a step, please put a support ticket into the repository, and I will be happy to help ASAP.   
+
 ###Best Practices:  
 Once you have the filter recommendations, you may notice that the best filter is on one of the bounds of your parameter space (e.g. in the filter file above, you have a recommendation of 300 for QUAL). If this is the case, it is possible that there is a better filter beyond the bounds of your specifications, and thus it is recommended you expand your bounds and try again. Due to DETECT being implemented in snakemake, the workflow will only run the new filter thresholds.  
 
