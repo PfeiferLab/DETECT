@@ -48,9 +48,11 @@ samtools(v1.9) - http://www.htslib.org/download/
 **Path list:**  
 * Space-delimited text file that shows the native paths of each of the required. DETECT will use the native command by default (e.g. “gatk” or “samtools”).  
 Example of path list:  
-`samtools /packages/apps/spack/18/opt/spack/gcc-12.1.0/samtools-1.9-arv/bin/samtools`  
-`gatk /packages/apps/spack/18/opt/spack/gcc-11.2.0/gatk-4.2.6.1-3ds/bin/gatk`  
-`mason_simulator ~/mason/bin/mason_simulator`  
+```
+samtools /packages/apps/spack/18/opt/spack/gcc-12.1.0/samtools-1.9-arv/bin/samtools
+gatk /packages/apps/spack/18/opt/spack/gcc-11.2.0/gatk-4.2.6.1-3ds/bin/gatk  
+mason_simulator ~/mason/bin/mason_simulator
+```  
 **CPU count:**  
 * The number of cpus you would like to run per job at maximum in multithreaded steps (Mapping reads and Sorting BAMs).  
 **Sample Filter File:**  
@@ -88,8 +90,8 @@ For filters that have a GT or LT this refers to the filter either being “great
 **ReadPosRankSumLT:** Read Position Rank Sum Test upper bound, compares whether the position of the variant on the REF/ALT reads are the same. 0 is ideal. (<=)  
 
 For a deeper explanation of each of the GATK Best Practices Hard Filter statistics, check here: https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants
-###Demo Command/Job Submission:
-First, you must create the config file from which the workflow will read the user specifications:
+###Demo Command/Job Submission:  
+First, you must create the config file from which the workflow will read the user specifications:  
 `python DETECT/run_pipeline.py \`  
 `-R DETECT/demo/reference.fa \`  
 `-F DETECT/demo/filter_file.txt \`  
