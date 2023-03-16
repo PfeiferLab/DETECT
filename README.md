@@ -5,8 +5,8 @@ DETECT is a simulation-based workflow that recommends filter thresholds in direc
 
 ## Setting Up:
 ### Environment Installation:
-`conda env create -n detect-env -f DETECT/detect_env.yml\n`
-`source activate detect-env`
+`conda env create -n detect-env -f DETECT/detect_env.yml`  
+`source activate detect-env`  
 
 **Note:** the environment name(-n) can be whatever name you would like it to be
 
@@ -21,10 +21,10 @@ samtools(v1.9) - http://www.htslib.org/download/
 
 ### Quickstart:
 #### Required Inputs:
-**Reference Genome:**
+**Reference Genome:**  
 * Reference genome to be used in your real data workflow, where the simulated read data will come from. Must have a dictionary file (GATK CreateSequenceDictionary) and be bwa indexed (bwa index ) ex. reference.fa
 **Mutation Rate:**
-* Estimated mutation rate  of the dataset in question. Can be in scientific notation. ex. 1e-8
+* Estimated mutation rate  of the dataset in question. Can be in scientific notation. ex. 1e-8\
 **Filter File:**
 * List of filters you wish to apply to the simulated dataset (format described below). ex. filter_file.txt
 **Read Length:**
@@ -33,6 +33,7 @@ samtools(v1.9) - http://www.htslib.org/download/
 * Comma-delimited string of the coverages of the sire,dam,offspring. ex. “30,40,50”
 **Output File:**
 * Output file name of consolidated filter recommendations.
+
 ####Optional Inputs:
 **Input Variants:**
 * VCF file containing variants to be used as False Positives. Must have either --trio or --population specified. If --trio, --pedigree required, and only the trio can be in the VCF. Must be indexed (e.g. GATK IndexFeatureFile). If --population, DETECT will “create” an offspring from two random individuals’ haplotypes.
