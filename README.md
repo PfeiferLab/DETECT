@@ -106,7 +106,7 @@ python DETECT/run_pipeline.py \
 -C "10,20,30" \
 -RL 100 -FL 300 -SD 30 \
 -CL DETECT/demo/chrom_list.txt \
---cpus 12 -SP ~/app_list.txt -WD DETECT/demo/demo_workdir/  
+--cpus 12 -SP ~/app_list.txt -WD DETECT/demo/demo_workdir/
 ```
 Then, you can submit the snakemake job that will submit all subjobs. Note that this is more of a template, and the command may need to be altered to run on your cluster based on its SLURM configuration:   
 ```
@@ -118,7 +118,7 @@ sbatch -n1 --job-name demo_detect_superjob \
 --latency-wait 60 --keep-target-files --rerun-incomplete --cluster \
 \" sbatch -n {threads} --mem={resources.mem_mb} -t 01:00:00 \
 -o DETECT/demo/demo_workdir/logs/{rulename}.{jobid}.out \
--e DETECT/demo/demo_workdir/logs/{rulename}.{jobid}.err\" --forceall"  
+-e DETECT/demo/demo_workdir/logs/{rulename}.{jobid}.err\" --forceall"
 ```
 
 ##My Job has run out of walltime!
@@ -130,6 +130,5 @@ And then resubmit your job. It should continue from the last completed step. If 
 
 ##Best Practices:
 Once you have the filter recommendations, you may notice that the best filter is on one of the bounds of your parameter space (e.g. in the filter file above, you have a recommendation of 300 for QUAL). If this is the case, it is possible that there is a better filter beyond the bounds of your specifications, and thus it is recommended you expand your bounds and try again. Due to DETECT being implemented in snakemake, the workflow will only run the new filter thresholds.  
-
 ##Advanced Usage:
 If you are familiar with the structure of JSON files, DETECT takes a JSON file as its input. For an example of an input file, see DETECT/demo/demo_workdit/config/config.json for a template guide. 
