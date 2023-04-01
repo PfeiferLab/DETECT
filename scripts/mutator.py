@@ -24,6 +24,7 @@ parser.add_argument("-u","--mutation-rate",dest="mutation_rate",help="The input 
 parser.add_argument("-o","--output-VCF",dest="output_file",help="Output VCF file.")
 parser.add_argument("-p","--pedigree",dest="pedigree",help="comma delimited string for dam,sire,offspring")
 parser.add_argument("-c","--chromosomes",dest="chroms",help="comma delimited string of chromosomes desired to be mutated.")
+parser.add_argument("-n","--num",dest="num",help="the number to add to the end.")
 args = parser.parse_args()
 
 input_file = SeqIO.parse(open(args.input_file),'fasta')
@@ -32,6 +33,7 @@ mutation_file = open(args.output_file,'w')
 pedigree_list = args.pedigree.strip().split(",")
 chrom_list = args.chroms.strip().split(",")
 input_vcf = args.input_vcf
+num=args.num
 
 ab_mean=0.50
 ab_sd=0
@@ -143,10 +145,10 @@ for item in input_file:
             #    print("final line:"+str(header)+"\t"+str(pos+1)+"\t.\t"+reference_allele+"\t"+alt+"\t1000\tPASS\tMT=1\tGT\t"+final_gt)
                 present_vars[(header,pos)][2] = 1
             else:
-                while mutation == "" or mutation.upper() == genome_1_seq[pos].upper():
+                while mutation == "" or mutation.upper() == genome_1_seq[pos-1].upper():
                     mutation = random.choice(seq)
                 alt = mutation
-                reference_allele = genome_1_seq[pos].upper()
+                reference_allele = genome_1_seq[pos-1].upper()
                 present_vars[(header,pos)] = [[reference_allele,alt],["0|0","0|0",random.choice(["0|1","1|0"])],1]
                 #present_vars[(header,pos)][1][0] = "0/0"
                 #present_vars[(header,pos)][1][1] = "0/0"
@@ -174,9 +176,9 @@ for key in sorted(present_vars.keys(),key=lambda element: (element[0],element[1]
     mutation_file.write(key[0]+'\t'+str(key[1])+'\t'+'.'+'\t'+ref+'\t'+alt+'\t'+'1000'+'\t'+'PASS'+'\t'+'MT='+str(mut)+'\t'+'GT'+'\t'+gt+'\n')
 print("mulihits:"+str(multihit_count))
 
-try:                                                                            
-    multihit_file = open('pipeline/mutations/multihit_count.txt','w')
-    multihit_file.write(str(multihit_count)) 
-except:                                                                         
-    print("did not write multihit file")
+                                                            
+multihit_file = open('pipeline/mutations/multihit_count.'+str(num)+'.txt','w')
+multihit_file.write(str(multihit_count)) 
+                                                                         
+
 

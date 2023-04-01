@@ -24,6 +24,8 @@ optional_args.add_argument("--trio",action="store_true",help="Specifies if the i
 optional_args.add_argument("--population",action="store_true",help="Specifies if the input VCF is population variation data. Either --trio or --population required if -V is specified. Default: None",required = False)
 optional_args.add_argument("-WD","--working-directory",dest="working_directory",help="working directory in which to produce files. WARNING, depending on the coverage and size of genome, this workflow may take up significant space. Default: current directory",default=".",required=False)
 optional_args.add_argument("--cpus",dest="cpu_count",help="The max number of CPUs you would like to use per job in the workflow. Default: 1",default=1,required=False)
+optional_args.add_argument("--num-iterations",dest="num_iterations",help="The number of iterations you would like this to run, to get an idea of the distribution of recommended filters.",default=10,required=False)
+
 args = parser.parse_args()
 
 #Set argparse Variables
@@ -40,6 +42,7 @@ coverages = args.coverages
 pedigree = args.pedigree
 chrom_list = os.path.abspath(args.chrom_list)
 path_list = os.path.abspath(args.path_list)
+num_iterations=args.num_iterations
 working_directory = os.path.abspath(args.working_directory)
 
 try:
@@ -55,6 +58,9 @@ if not os.path.exists(log_dir):
 #Create Working Directory if not already created
 if not os.path.exists(working_directory):
     os.system("mkdir "+working_directory)
+
+#Adding --num-iterations
+output['num_iterations'] = num_iterations
 
 # Adding -WD
 output["working_directory"] = working_directory
@@ -116,7 +122,9 @@ for line in open_dict_file:
                 output["chroms"][chrom_name] = chrom_length
         else:
             output["chroms"][chrom_name] = chrom_length
-
+if len(output["chroms"].keys()) == 0:
+    print("No Chromosomes were added. This means your chromosome list does not match any of the chromosomes in your dictionary file.")
+    sys.exit()
 
 #Adding -P
 pedigree = pedigree.strip().split(",")
