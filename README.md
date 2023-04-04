@@ -33,17 +33,18 @@ samtools(v1.9) - http://www.htslib.org/download/
 
 **Output File:** Output file name of consolidated filter recommendations.  
 ### Optional Inputs
-**Input Variants:** VCF file containing variants to be used as False Positives. Must have either --trio or --population specified. If --trio, --pedigree required, and only the trio can be in the VCF. Must be indexed (e.g. GATK IndexFeatureFile). If --population, DETECT will “create” an offspring from two random individuals’ haplotypes.  
+**Input Variants:** VCF file containing variants to be used as False Positives. Must have either --trio or --population specified. If --trio, --pedigree required, and only the trio can be in the VCF. If --population, DETECT will “create” an offspring from two random individuals’ haplotypes. Must be indexed (e.g. GATK IndexFeatureFile). 
 
-**Pedigree:** Comma delimited string of the names of sire, dam, and offspring in the VCF (ex. “dad,mom,junior”)  
+**Pedigree:** Comma delimited string of the names of sire, dam, and offspring in the VCF. Required if trio VCF provided. (ex. “dad,mom,junior”)  
 
-**Fragment Length:** Mean length of the fragment size distribution of the real data. Default: 300 (Mason Default)  
+**Fragment Length:** Mean length of the fragment size distribution of the real data. Default: 300. (Mason Default)  
 
 **Fragment Length Standard Deviation:** Standard deviation of the fragment size distribution of the real data. Default: 30 (Mason Default)  
-
-**Chromosome list:** File of chromosome names to be simulated, one per line. Default: All contigs  
+**Chromosome list:** File of chromosome names to be simulated, one per line. Default: All contigs.  
 
 **CPU count:** The number of cpus you would like to run per job at maximum in multithreaded steps (Mapping reads and Sorting BAMs).
+
+**Number of Iterations:** The number of simulations you wish to perform. Default: 10.
 
 **Path list:** Space-delimited text file that shows the native paths of each of the required. DETECT will use the native command by default (e.g. “gatk” or “samtools”).  
 Example of path list:  
