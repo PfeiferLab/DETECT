@@ -98,7 +98,7 @@ For a deeper explanation of each of the GATK Best Practices Hard Filter statisti
 ## Demo Command/Job Submission:
 First, you must create the config file from which the workflow will read the user specifications:  
 ```
-python DETECT/run_pipeline.py \
+python DETECT/create_config.py \
 -R DETECT/demo/reference.fa \
 -F DETECT/demo/filter_file.txt \
 -U 2e-6 \
