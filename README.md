@@ -78,20 +78,20 @@ ReadPosRankSumGT -2.5 1.5 0.5
 Available Filters are shown below. Idealized values are also put below for what a “gold standard” statistical value would be (ex. AB values should be around 0.5 for heterozygotes).  
 For filters that have a GT or LT this refers to the filter either being “greater than” or “less than”(ex. DPGT establishes the lower bound recommendation for depth filters, ABLT establishes the upper bound recommendation for allele balance filters, etc.):  
 
-**DPGT:** The lower bound of the depth filter, in scaled coverage (>=)  
-**DPLT:** The upper bound of depth filter, in scaled coverage (<=)  
-**ABGT:** Upper bound of proportion of ALT alleles to depth in child, 0.5 is ideal. (>=)  
-**ABLT:** Lower bound of proportion of ALT alleles to depth in child, 0.5 is ideal. (<=)  
-**AD:** Allele Depth of ALT allele in parents, 0 is ideal. (<=)  
-**GQ:** Scaled Likelihood of genotype (>=)  
-**QUAL:** Scaled likelihood of variation (>=)  
-**QD:** Scaled Quality by Depth, Part of GATK Best Practices Hard Filter(>=)  
-**FS:** Fisher Strand Test, checking for forward/reverse strand bias in heterozygotes. Part of GATK Best Practices Hard Filter, 0 is ideal. (<=)  
-**SOR:** Strand Odds Ratio, checking for forward/reverse strange bias. part of GATK Best Practices Hard Filter. 0 is ideal. (<=)  
+**DPGT:** Lower bound of the depth filter, in scaled coverage ($\ge$)  
+**DPLT:** Upper bound of depth filter, in scaled coverage ($\le$)  
+**ABGT:** Lower bound of proportion of ALT alleles to depth in child, 0.5 is ideal. ($\ge$)  
+**ABLT:** Upper bound of proportion of ALT alleles to depth in child, 0.5 is ideal. ($\le$)  
+**AD:** Allele Depth of ALT allele in parents, 0 is ideal. ($\le$)  
+**GQ:** Scaled Likelihood of genotype ($\ge$)  
+**QUAL:** Scaled likelihood of variation ($\ge$)  
+**QD:** Scaled Quality by Depth, Part of GATK Best Practices Hard Filter($\ge$)  
+**FS:** Fisher Strand Test, checking for forward/reverse strand bias in heterozygotes. Part of GATK Best Practices Hard Filter, 0 is ideal. ($\le$)  
+**SOR:** Strand Odds Ratio, checking for forward/reverse strange bias. part of GATK Best Practices Hard Filter. 0 is ideal. ($\le$)  
 **MQRankSumGT:** Mapping Quality Rank Sum Test lower bound, compares mapping quality between the REF/ALT alleles. 0 is ideal. (>=)  
-**MQRankSumLT:** Mapping Quality Rank Sum Test upper bound, compares mapping quality between the REF/ALT alleles. 0 is ideal. (<=)  
-**ReadPosRankSumGT:** Read Position Rank Sum Test lower bound, compares whether the position of the variant on the REF/ALT reads are the same. 0 is ideal. (>=)  
-**ReadPosRankSumLT:** Read Position Rank Sum Test upper bound, compares whether the position of the variant on the REF/ALT reads are the same. 0 is ideal. (<=)  
+**MQRankSumLT:** Mapping Quality Rank Sum Test upper bound, compares mapping quality between the REF/ALT alleles. 0 is ideal. ($\le$)  
+**ReadPosRankSumGT:** Read Position Rank Sum Test lower bound, compares whether the position of the variant on the REF/ALT reads are the same. 0 is ideal. ($\ge$)  
+**ReadPosRankSumLT:** Read Position Rank Sum Test upper bound, compares whether the position of the variant on the REF/ALT reads are the same. 0 is ideal. ($\le$)  
 
 For a deeper explanation of each of the GATK Best Practices Hard Filter statistics, check here: https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants  
 
