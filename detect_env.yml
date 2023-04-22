@@ -26,12 +26,9 @@ dependencies:
   - bwa=0.7.17=h7132678_9
   - bzip2=1.0.8=h7f98852_4
   - c-ares=1.18.1=h7f98852_0
-  - ca-certificates=2022.12.7=ha878542_0
   - cached-property=1.5.2=hd8ed1ab_1
   - cached_property=1.5.2=pyha770c72_1
   - cachetools=5.2.0=pyhd8ed1ab_0
-  - certifi=2022.12.7=pyhd8ed1ab_0
-  - cffi=1.15.1=py310h255011f_3
   - charset-normalizer=2.1.1=pyhd8ed1ab_0
   - click=8.1.3=unix_pyhd8ed1ab_2
   - cloudpickle=2.2.0=pyhd8ed1ab_0
@@ -142,7 +139,6 @@ dependencies:
   - nomkl=1.0=h5ca1d4c_0
   - oauth2client=4.1.3=py_0
   - openjpeg=2.5.0=h7d73246_1
-  - openssl=3.0.8=h0b41bf4_0
   - packaging=21.3=pyhd8ed1ab_0
   - paramiko=2.12.0=pyhd8ed1ab_0
   - partd=1.3.0=pyhd8ed1ab_0
@@ -234,6 +230,8 @@ dependencies:
   - zlib=1.2.13=h166bdaf_4
   - zstd=1.5.2=h6239696_4
   - pip:
+      - certifi==2022.12.7
+      - cffi==1.15.1 
       - aiohttp==3.8.3
       - biopython==1.79
       - contourpy==1.0.6
