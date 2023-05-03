@@ -9,7 +9,7 @@ conda env create -n detect-env -f DETECT/detect_env.yml
 source activate detect-env  
 ```
 
-**Note:** the environment name(-n) can be whatever name you would like it to be
+**Note:** This environment does not install all dependencies. Please read below to see what other softwares need to be installed.
 
 ### Required Software
 Parenthetical versions refer to the versions that DETECT was tested with. Older/newer versions may work as well:  
