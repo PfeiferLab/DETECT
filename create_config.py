@@ -41,7 +41,6 @@ output_file = os.path.abspath(args.output_file)
 coverages = args.coverages 
 pedigree = args.pedigree
 chrom_list = os.path.abspath(args.chrom_list)
-path_list = os.path.abspath(args.path_list)
 num_iterations=args.num_iterations
 working_directory = os.path.abspath(args.working_directory)
 
@@ -154,15 +153,19 @@ for line in filter_file:
 
 #Adding apps 
 output["apps"] = {}
-for line in open(path_list):
-    fields = line.strip().split()
-    output["apps"][fields[0]] = fields[1]
-
 deps = ["bwa","mason_simulator","python","samtools","gatk"]
-for dep in deps:
-    if dep not in output["apps"].keys():
-        output["apps"][dep] = dep
+try:
+    path_list = os.path.abspath(args.path_list)
+    for line in open(path_list):
+        fields = line.strip().split()
+        output["apps"][fields[0]] = fields[1]
 
+    for dep in deps:
+        if dep not in output["apps"].keys():
+            output["apps"][dep] = dep
+except:
+    for dep in deps:
+        output["apps"][dep] = dep
 #Adding -V                                                                      
 if args.input_variants != "NONE":                                                    
     output["input_variants"] = input_variants                                   
