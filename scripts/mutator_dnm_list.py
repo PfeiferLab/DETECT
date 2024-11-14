@@ -1,4 +1,3 @@
-import os
 import random
 from sys import argv
 from Bio import Seq
@@ -29,11 +28,7 @@ parser.add_argument("-n","--num",dest="num",help="the number to add to the end."
 args = parser.parse_args()
 
 input_file = SeqIO.parse(open(args.input_file),'fasta')
-try:
-    dnm_file = open(os.path.abspath(args.mutation_rate))
-except:
-    mutation_rate = float(args.mutation_rate)
-    dnm_file = -1
+mutation_rate = float(args.mutation_rate)
 mutation_file = open(args.output_file,'w')
 pedigree_list = args.pedigree.strip().split(",")
 chrom_list = args.chroms.strip().split(",")
@@ -77,45 +72,31 @@ if type(input_vcf) == str and input_vcf != "NONE":
 #print("p1_index:"+str(p1_index))
 #print("p2_index:"+str(p2_index))
 #print("ch_index:"+str(ch_index))
-input_dnm_dict = {}
-num_mutations=0
-if not isinstance(dnm_file,int):
-    print("reading in DNM file")
-    for line in dnm_file:
-        if "#" not in line:
-            num_mutations+=1
-            fields = line.split()
-            chrom = fields[0]
-            pos = fields[1]
-            #input("Adding in "+str(chrom)+","+str(pos))
-            if chrom not in input_dnm_dict.keys():
-                input_dnm_dict[chrom]=[]
-            input_dnm_dict[chrom].append(int(pos))
-    print("num mutations:"+str(num_mutations))
+
 multihit_count=0
 for item in input_file:
     genome_1_seq = item.seq
     header = item.id
     if header in chrom_list:
+        mut_pos = []
         total_len+=len(genome_1_seq)
+        mean = 2 * mutation_rate * len(genome_1_seq)
+        print("mean",mean)
+        num_mutations = np.random.poisson(lam=mean)
+       
+        #if random.random() < 0.5:
+        #    num_mutations = int(math.ceil(random.normalvariate(mean,math.sqrt(mean))))
+        #else:
+        #    num_mutations = int(math.floor(random.normalvariate(mean,math.sqrt(mean))))
+        print("num_mutations:"+str(num_mutations))
+        mutation = ""
         contig_lines.append("##contig=<ID="+header+",length="+str(len(genome_1_seq))+'>\n')
-        if isinstance(mutation_file,str):
-            mut_pos = []
-            mean = 2 * mutation_rate * len(genome_1_seq)
-            print("mean",mean)
-            num_mutations = np.random.poisson(lam=mean) 
-            print("num_mutations:"+str(num_mutations))
-            mutation = ""
-            mutations = random.sample(range(1,len(genome_1_seq)+1),k=num_mutations)
-        else:
-            try:
-                mutations = input_dnm_dict[header]
-            except:
-                continue
+        mutations = random.sample(range(1,len(genome_1_seq)+1),k=num_mutations)
         mutations.sort()
-        #input(header+"\t"+str(mutations))
+    #    print(mutations)
         for pos in mutations:
             mutation = ""
+            #input((header,pos))
             if (header,pos) in present_vars.keys():
                 multihit_count+=1
                 print("MULTIHIT:"+str(header)+" "+str(pos))#str(present_vars[(header,pos)]))
@@ -156,15 +137,14 @@ for item in input_file:
                 else:
                     print("PROBLEM. CH_GT IS NOT BIALLELIC GENOTYPE YOU WOULD EXPECT")
                     sys.exit()
-                final_gt = '\t'.join(present_vars[(header,pos)][1])
-                final_gt=present_vars[(header,pos)][1][0]+'\t'+present_vars[(header,pos)][1][1]+'\t'+present_vars[(header,pos)][1][2]
+                #final_gt = '\t'.join(present_vars[(header,pos)][1])
+                #final_gt=present_vars[(header,pos)][1][0]+'\t'+present_vars[(header,pos)][1][1]+'\t'+present_vars[(header,pos)][1][2]
              #   print("mutation:"+mutation)
-                reference_allele = ref
-                alt = present_vars[(header,pos)][0][1]
-                print("final line:"+str(header)+"\t"+str(pos+1)+"\t.\t"+reference_allele+"\t"+alt+"\t1000\tPASS\tMT=1\tGT\t"+final_gt)
+                #reference_allele = ref
+                #alt = present_vars[(header,pos)][0][1]
+            #    print("final line:"+str(header)+"\t"+str(pos+1)+"\t.\t"+reference_allele+"\t"+alt+"\t1000\tPASS\tMT=1\tGT\t"+final_gt)
                 present_vars[(header,pos)][2] = 1
             else:
-                print("Not found in present variant list:"+str(header)+'\t'+str(pos))
                 while mutation == "" or mutation.upper() == genome_1_seq[pos-1].upper():
                     mutation = random.choice(seq)
                 alt = mutation
@@ -174,18 +154,14 @@ for item in input_file:
                 #present_vars[(header,pos)][1][1] = "0/0"
                 #present_vars[(header,pos)][1][2] = "0/1"
             #present_vars[(header,pos)][2] = 1
-            mutation_lines.append(str(header)+"\t"+str(pos+1)+"\t.\t"+reference_allele+"\t"+alt+"\t1000\tPASS\tAF="+str(final_gt.count("1")/6.0)+";MT=1\tGT\t"+final_gt+"\n")
-            mutation_lines.append(str(header)+"\t"+str(pos+1)+"\t.\t"+reference_allele+"\t"+alt+"\t1000\tPASS\tMT=1\tGT\t"+final_gt+"\n")
+            #mutation_lines.append(str(header)+"\t"+str(pos+1)+"\t.\t"+reference_allele+"\t"+alt+"\t1000\tPASS\tAF="+str(final_gt.count("1")/6.0)+";MT=1\tGT\t"+final_gt+"\n")
+            #mutation_lines.append(str(header)+"\t"+str(pos+1)+"\t.\t"+reference_allele+"\t"+alt+"\t1000\tPASS\tMT=1\tGT\t"+final_gt+"\n")
 
 #print(str(genome_1_seq))
 
 mutation_file.write("##fileformat=VCFv4.2\n")                               
 #mutation_file.write("##INFO=<ID=AF,Number=A,Type=Float,Description=\"Allele Frequency among genotypes, for each ALT allele, in the same order as listed\">\n")
-
-try:
-    mutation_file.write("##INFO=<ID=ST,Number=A,Type=Float,Description=\"input mu:"+str(mutation_rate)+"\tmu_calculation:"+str(float(num_mutations)/total_len)+"\">\n")
-except:
-    mutation_file.write("##INFO=<ID=ST,Number=A,Type=Float,Description=\"number_of_mutations:"+str(num_mutations)+"\tmu_calculation:"+str(float(num_mutations)/total_len)+"\">\n")
+mutation_file.write("##INFO=<ID=ST,Number=A,Type=Float,Description=\"input mu:"+str(mutation_rate)+"\tmu_calculation:"+str(float(num_mutations)/total_len)+"\">\n")
 mutation_file.write("##INFO=<ID=MT,Number=A,Type=Integer,Description=\"Whether the site is a mutation or not; 1: Yes, 0: No\">\n")
 mutation_file.write("##FORMAT=<ID=GT,Number=A,Type=Float,Description=\"Genotype\""+">\n")
 for line in contig_lines:

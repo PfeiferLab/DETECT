@@ -11,7 +11,7 @@ output_file = open(args.output_file,'w')
 chrom = args.chrom
 
 for line in input_file:
-    if '##contig' in line and chrom not in line:
+    if '##contig' in line and chrom+"," not in line:
         continue
     else:
         output_file.write(line)

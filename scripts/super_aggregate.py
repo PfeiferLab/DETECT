@@ -13,32 +13,32 @@ iter_list = [str(x) for x in np.arange(1,int(args.num_iterations)+1)]
 output_file = open(args.output_file,'w')
 
 
-header_line = 'Filter'+'\t'+'Average'+'\t'+'Variance'+'\t'+'\t'.join(iter_list)
+header_line = 'Filter'+'\t'+'min/max'+'\t'+'Average'+'\t'+'Variance'+'\t'+'\t'.join(iter_list)
 output_file.write(header_line+'\n')
 
 iter_dict = {}
 
-for item in iter_list:
-    input_file = open('pipeline/outputs/output_'+item+'.txt')
+for run in iter_list:
+    input_file = open('pipeline/run_outputs/run'+run+'.statistics.txt')
     for line in input_file:
-        if "Threshold" not in line and "original" not in line and "MVs" not in line and "Multihit" not in line:
+        if "FilterName" not in line:
             fields = line.strip().split()
-            filter_name=fields[0]
-            recommended_value = float(fields[1])
+            filter_name=fields[1]
+            bound=fields[2]
+            print(iter_dict)
+            recommended_value = float(fields[3])
             if filter_name not in iter_dict.keys():
-                iter_dict[filter_name] =[]
-            iter_dict[filter_name].append(recommended_value)
-        
-        if "Multihit" in line:
-            fields = line.strip().split(":")
-            if fields[0] not in iter_dict.keys():
-                iter_dict[fields[0]] =[]
-            iter_dict[fields[0]].append(float(fields[1]))
-for key in iter_dict.keys():
-    print(iter_dict[key])
-    mean=statistics.mean(iter_dict[key])
-    if args.num_iterations != "1":
-        variance=statistics.variance(iter_dict[key])
-    else:
-        variance=0
-    output_file.write(key+'\t'+str(mean)+'\t'+str(variance)+'\t'+'\t'.join([str(x) for x in iter_dict[key]])+'\n')
+                iter_dict[filter_name] = {}
+            if bound not in iter_dict[filter_name].keys():
+                iter_dict[filter_name][bound] = []
+
+            iter_dict[filter_name][bound].append(recommended_value)
+for filtername in iter_dict.keys():
+    for bound in iter_dict[filtername].keys():
+        print(iter_dict[filtername][bound])
+        mean=statistics.mean(iter_dict[filtername][bound])
+        if args.num_iterations != "1":
+            variance=statistics.variance(iter_dict[filtername][bound])
+        else:
+            variance=0
+        output_file.write(filtername+'\t'+bound+'\t'+str(mean)+'\t'+str(variance)+'\t'+'\t'.join([str(x) for x in iter_dict[filtername][bound]])+'\n')

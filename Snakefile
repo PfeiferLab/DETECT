@@ -1,10 +1,12 @@
 #!/usr/bin/env snakemake
 import os
+import numpy as np
 cwd = os.path.abspath(os.path.dirname(__file__))
 SNAKEDIR = config["snakemake_dir"]
 workdir: config["working_directory"]
+tmpdir: config["working_directory"]
 num_chroms = len(config["chroms"].keys())
-read_cutoff = 5e6
+read_cutoff = 1e6
 #TODO Clean up shell commands
 
 
@@ -14,32 +16,28 @@ from numpy import random
 pp = pprint.PrettyPrinter(indent=4)
 
 wildcard_constraints:
-    filter_threshold="-?\d+\.\d+",
     indiv="|".join(list(config['names'].keys())).replace("_", "\_"), 
     chromosome="|".join(list(config['chroms'].keys())).replace("_", "\_"),
-    num="0|1",
-    iter='1|2|3|4|5|6|7|8|9|10'
-def get_all_input():
-    target_list = ['pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.mutations.vcf']
-    filters = get_filters()
-    for filter in filters:
-    	for iter in range(1,int(config['num_iterations'])+1):
-        	target_list += expand('pipeline/filters/{filter}/all_chr_trio.downsampled.sorted.mark_dups.MV.{filter}.{filter_threshold}.{{iter}}.mutations.vcf', filter_threshold = numpy.round(numpy.arange(float(config["filters"][filter]["min"]),float(config["filters"][filter]["max"])+float(config["filters"][filter]["step"])/2,float(config["filters"][filter]["step"])),2),filter=filter),
-        	target_list += expand('pipeline/filters/{filter}/all_chr_trio.downsampled.sorted.mark_dups.MV.{filter}.{filter_threshold}.{{iter}}.vcf', filter_threshold = numpy.round(numpy.arange(float(config["filters"][filter]["min"]),float(config["filters"][filter]["max"])+float(config["filters"][filter]["step"])/2,float(config["filters"][filter]["step"])),2),filter=filter),
-        	if 'input_variants' in config.keys():
-            		target_list += expand('pipeline/filters/{filter}/all_chr_trio.downsampled.sorted.mark_dups.MV.{filter}.{filter_threshold}.{{iter}}.polymorphisms.vcf', filter_threshold = numpy.round(numpy.arange(float(config["filters"][filter]["min"]),float(config["filters"][filter]["max"])+float(config["filters"][filter]["step"])/2,float(config["filters"][filter]["step"])),2),filter=filter)
-    if 'input_variants' in config.keys():
-        target_list.append('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.polymorphisms.vcf')
-    return target_list
+    genome="0|1",
+    iter='|'.join([str(x) for x in numpy.arange(1,9999)]),
+    run="|".join([str(x) for x in numpy.arange(1,9999)])
 
-def get_all_super_input():
-	target_list = []
-	target_list += expand('pipeline/output/final_{iter}',iter = range(1,int(config['num_iterations'])+1))
-	return ",".join(target_list)
+#def get_all_input():
+#    target_list = ['pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.mutations.vcf']
+#    filters = get_filters()
+#    for filter in filters:
+#    	for iter in range(1,int(config['num_iterations'])+1):
+#        	target_list += expand('pipeline/filters/{filter}/all_chr_trio.downsampled.sorted.mark_dups.MV.{filter}.{filter_threshold}.{{iter}}.mutations.vcf', filter_threshold = numpy.round(numpy.arange(float(config["filters"][filter]["min"]),float(config["filters"][filter]["max"])+float(config["filters"][filter]["step"])/2,float(config["filters"][filter]["step"])),2),filter=filter),
+#        	if 'input_variants' in config.keys():
+#            		target_list += expand('pipeline/filters/{filter}/all_chr_trio.downsampled.sorted.mark_dups.MV.{filter}.{filter_threshold}.{{iter}}.polymorphisms.vcf', filter_threshold = numpy.round(numpy.arange(float(config["filters"][filter]["min"]),float(config["filters"][filter]["max"])+float(config["filters"][filter]["step"])/2,float(config["filters"][filter]["step"])),2),filter=filter)
+#    if 'input_variants' in config.keys():
+#        target_list.append('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.polymorphisms.vcf')
+#    return target_list
 
-def get_filters():
-    filters = config['filters']
-    return filters.keys()
+#def get_all_super_input():
+#	target_list = []
+#	target_list += expand('pipeline/output/final_{iter}',iter = range(1,int(config['num_iterations'])+1))
+#	return ",".join(target_list)
 
 def get_Mutate_input(wildcards):
 	if config["trio"]:
@@ -59,54 +57,40 @@ def format_simulate_variants(wildcards,input):
 	else:
 		return ''
 
-def get_par1_threshold(wildcards):
-    return numpy.round(float(wildcards.filter_threshold) * float(config["coverages"]["parent_1"]),2)
-
-def get_par2_threshold(wildcards):
-    return numpy.round(float(wildcards.filter_threshold) * float(config["coverages"]["parent_2"]),2)
-
-def get_chd_threshold(wildcards):
-    return numpy.round(float(wildcards.filter_threshold) * float(config["coverages"]["child"]),2)
+def get_mem_mb(wildcards,attempt,input):
+	return 64000 #min(max(attempt*(150 *1024),input.size_mb* 1024),307200)
 
 def format_input(wildcards, input):
     return [f'-I {a}' for a in input]
+
+def format_merge_input(wildcards, input):
+	return[f'{a}' for a in input]
+
+def format_samtofastq_input(wildcards):
+	if wildcards.indiv == 'child':
+		return 'pipeline/reads/child_{iter}.golden.mutated.bam'
+	else:
+		return 'pipeline/reads/{indiv}_{iter}.golden.bam'
 
 def format_genotype(wildcards,input):
     return [f'--variant {a}' for a in input]
 
 def get_read_count(wildcards): 
     read_length = float(config["read_length"])
-    chrom_length = float(config["chroms"][wildcards.chromosome])
+    chrom_length = float(sum([int(x) for x in config["chroms"].values()]))
     coverage = float(config["coverages"][wildcards.indiv])
     return int(round(((chrom_length*coverage)/read_length)*1.2)/2) 
 
-def get_run_count(wildcards):
-    read_count = get_read_count(wildcards)
-    to_make = expand('pipeline/sorted_bams/{chrom}_{indiv}_{run}.downsampled.sorted.{iter}.bam', chrom=wildcards.chromosome, indiv=wildcards.indiv, run=numpy.arange(1, int((read_count / read_cutoff)+1 +1)),iter=wildcards.iter)
-    return to_make
-
-#def get_seeds(wildcards):
-#	return numpy.random.randint(1,10000,1)[0]
 
 def get_reads_per_run(wildcards):
     read_count = get_read_count(wildcards)
-    num_runs = int((read_count / read_cutoff)+1)
-    runs = int(read_count/num_runs)
-    return runs
+    num_runs = 16
+    num_reads = int(read_count/num_runs)
+    return num_reads
 
 rule all:
     input:
         config['output_file']
-
-rule SplitFasta:
-    input:
-        fa = config['reference_genome']
-    output:
-        fa = 'pipeline/split_ref/{chromosome}.fa'
-    params:
-        samtools = config["apps"]["samtools"]
-    shell:
-        '{params.samtools} faidx {input.fa} {wildcards.chromosome} > {output.fa}'
 
 rule RenameInputTrioVCF:
 	input:
@@ -120,210 +104,316 @@ rule RenameInputTrioVCF:
 		python = config["apps"]["python"],
 		snakedir = SNAKEDIR
 	shell:
-		'{params.python} {params.snakedir}/scripts/rename_samples.py {input.input_file}  \"{params.p1},{params.p2},{params.ch}\" > {output}'
+		'{params.python} {params.snakedir}/scripts/rename_samples.py {input.input_file}  \"{params.p1},{params.p2},{params.ch}\" > {output} && gatk IndexFeatureFile -I {output}'
 
 rule Mutate:                                                                    
     input:                                                                      
         fa = config['reference_genome'],
-        vcf = get_Mutate_input if 'input_variants' in config.keys() else [] 
+		
     output:                                                                     
-        muts='pipeline/mutations/all_mutations.{iter}.vcf',
-	multihit='pipeline/mutations/multihit_count.{iter}.txt'
+        muts='pipeline/mutations/input_mutations.{iter}.phased.vcf',
+#	multihit='pipeline/mutations/multihit_count.{iter}.txt'
     params:                                                                     
-        mu  = config['mu'],                                                     
+    	mu  = config['dnm_file'] if config['dnm_file'] != "False" else config['mu'],
+	script = 'mutator.py' if config['dnm_file'] != 'False'	else 'mutator_no_dnm_list.py',
         python = config["apps"]["python"],                                      
         chroms = ",".join(list(config["chroms"].keys())),                       
-        vcfmerge = format_vcfmerge, 
+        #vcfmerge = format_vcfmerge, 
         snakedir = SNAKEDIR,
 	gatk = config["apps"]["gatk"]                                                     
     resources:
-        mem_mb = 8000
-    run:                                                                      
-        shell('{params.python} {params.snakedir}/scripts/mutator.py -i {input.fa} {params.vcfmerge} -u {params.mu} -p \"parent_1,parent_2,child\" -c \"{params.chroms}\" -n {wildcards.iter} -o {output.muts}')
-	shell('{params.gatk} IndexFeatureFile -I {output.muts}')
+        mem_mb = 8000,
+	runtime='15m'
+    shell:                                                                      
+        '{params.python} {params.snakedir}/scripts/{params.script} -i {input.fa} -u {params.mu} -p \"parent_1,parent_2,child\" -c \"{params.chroms}\" -n {wildcards.iter} -o {output.muts}; '
+	'{params.gatk} IndexFeatureFile -I {output.muts}'
+#rule PhaseMutations:
+#	input:
+#		'pipeline/mutations/all_mutations.{iter}.vcf'
+#	output:
+#		'pipeline/mutations/all_mutations.{iter}.phased.vcf'
+#	params:
+#		snakedir=SNAKEDIR
+#	conda: 'DETECT_053124_env_2.yml'
+#	shell:
+#		'beagle ped={params.snakedir}/trio.ped gt={input} out=pipeline/mutations/all_mutations.{iter}.phased && gunzip pipeline/mutations/all_mutations.{iter}.phased.vcf.gz'
 
-rule FilterMutations:
-    input:
-        'pipeline/mutations/all_mutations.{iter}.vcf'
-    output:
-        'pipeline/mutations/mutations.{iter}.vcf'
-    params:
-        gatk = config["apps"]["gatk"]
-    shell:
-        '{params.gatk} SelectVariants -V {input} --select "MT==1" -O {output}'
+#rule FilterMutations:
+#    input:
+#        'pipeline/mutations/all_mutations.{iter}.phased.vcf'
+#    output:
+#        'pipeline/mutations/mutations.{iter}.phased.vcf'
+#    params:
+#        gatk = config["apps"]["gatk"]
+#    resources:
+#        runtime='15m'
+#    retries: 20
+#    shell:
+#       '{params.gatk} SelectVariants -V {input} --select "MT==1" -O {output}'
 
-rule FilterPolymorphisms:
-    input:
-        'pipeline/mutations/all_mutations.{iter}.vcf'
-    params:
-        gatk = config["apps"]["gatk"]
-    output:
-        'pipeline/mutations/polymorphisms.{iter}.vcf'
-    shell:
-        '{params.gatk} SelectVariants -V {input} --select "MT==0" -O {output}'
-
-rule SplitInputMutations:
+rule ReformatMutations:
 	input:
-		input_file = 'pipeline/mutations/all_mutations.{iter}.vcf',
+		'pipeline/mutations/input_mutations.{iter}.phased.vcf'
 	output:
-		'pipeline/mutations/{chromosome}.mutations.{iter}.vcf'
+		'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
 	params:
-		gatk = config["apps"]["gatk"]
+		snakedir=config["snakemake_dir"],
+		python=config['apps']['python'],
+		gatk=config['apps']['gatk']
+	resources:
+		runtime='15m'
 	shell:
-		'{params.gatk} SelectVariants -V {input.input_file} -L {wildcards.chromosome} -O {output}'
+		'{params.python} {params.snakedir}/scripts/reformat_vcf.py {input} > {output} && gatk IndexFeatureFile -I {input}'
 
-rule RemoveMutationContigs:
-    input:
-        'pipeline/mutations/{chromosome}.mutations.{iter}.vcf'
-    output:
-        'pipeline/mutations/{chromosome}.mutations.one_contig.{iter}.vcf'
-    params:
-        python = config["apps"]["python"],
-        snakedir = SNAKEDIR
-    shell:
-        '{params.python} {params.snakedir}/scripts/remove_contigs.py -i {input} -c {wildcards.chromosome} -o {output}'
+#rule FilterPolymorphisms:
+#    input:
+#        'pipeline/mutations/all_mutations.{iter}.phased.vcf'
+#    params:
+#        gatk = config["apps"]["gatk"]
+#    output:
+#        'pipeline/mutations/polymorphisms.{iter}.phased.vcf'
+#    resources:
+#        runtime='15m'
+#    shell:
+#        '{params.gatk} SelectVariants -V {input} --select "MT==0" -O {output}'
 
-rule splitVCFInd:
-    input:
-        'pipeline/mutations/{chromosome}.mutations.one_contig.{iter}.vcf'
-    output:
-        'pipeline/individual_variants/{chromosome}_{indiv}.merged_variants.{iter}.vcf'
-    params:
-        gatk = config["apps"]["gatk"]
-    shell:
-        '{params.gatk} IndexFeatureFile -I {input} && {params.gatk} SelectVariants -V {input} --sample-name {wildcards.indiv} -O {output}'
+#rule SplitInputMutations:
+#	input:
+#		input_file = 'pipeline/mutations/all_mutations.{iter}.phased.vcf',
+#	output:
+#		'pipeline/mutations/{chromosome}.mutations.{iter}.vcf'
+#	params:
+#		gatk = config["apps"]["gatk"]
+#	resources:
+#		runtime='15m'
+#	shell:
+#		'{params.gatk} SelectVariants -V {input.input_file} -L {wildcards.chromosome} -O {output}'
+
+rule splitVCF:
+	input:
+		muts='pipeline/input_variants/input_trio.renamed.vcf'#config['input_variants'] #pipeline/mutations/all_mutations.{iter}.phased.vcf'
+	output:
+		'pipeline/mutations/polymorphisms.{chromosome}.phased.vcf'
+	resources:
+		runtime='15m'
+	retries: 20
+	shell:
+		'gatk SelectVariants -V {input} -L {wildcards.chromosome} -O {output} && gatk IndexFeatureFile -I {output}'
+
+rule VCFtoFasta:
+	input:
+		ref=config['reference_genome'],
+		vcf='pipeline/mutations/polymorphisms.{chromosome}.phased.vcf'
+	output:
+	#2_parent_1_chr8:1.fa 
+		'pipeline/ref/{indiv}_{chromosome}:{genome}.fasta' #expand('pipeline/ref/{{iter}}_{indiv}_{{chromosome}}:{genome}.fa',indiv=config['names'],genome=[0,1]) #format_split_vcf_fasta 'pipeline/ref/{indiv}_{iter}_{genome}.fa'#Akira_tm_autosomal.snp.noMV.recode.pass.0.fa'
+	params:
+		ref = config['reference_genome'],
+		
+	#conda: 'DETECT_053124_env.yml'
+	resources:
+		runtime='15m'
+	shell:
+		'mkdir -p pipeline/ref && cd pipeline/ref && vcf2fasta -f {input.ref} ../mutations/polymorphisms.{wildcards.chromosome}.phased.vcf'
+
+rule MergeFastas:
+	input:
+		expand('pipeline/ref/{{indiv}}_{chromosome}:{{genome}}.fasta',chromosome=config['chroms'].keys())
+	output:
+		'pipeline/ref/{indiv}_renamed.{genome}.fa'
+	shell:
+		'cat {input} | sed "s/:{wildcards.genome}//g; s/{wildcards.indiv}_//g" > {output}'
 
 rule SimulateReads:
     input:
-        fa = 'pipeline/split_ref/{chromosome}.fa',
-        vcf = 'pipeline/individual_variants/{chromosome}_{indiv}.merged_variants.{iter}.vcf' if 'input_variants' in config.keys() else [] 
+    	fa = 'pipeline/ref/{indiv}_renamed.{genome}.fa',
     output:
-        r1 = 'pipeline/reads/{chromosome}_{indiv}_{run}_{iter}.R1.fq', 
-        r2 = 'pipeline/reads/{chromosome}_{indiv}_{run}_{iter}.R2.fq',
+        r1 = temp('pipeline/reads/{indiv}_{run}_{iter}_{genome}.golden.R1.fq'), 
+        r2 = temp('pipeline/reads/{indiv}_{run}_{iter}_{genome}.golden.R2.fq'),
+	golden_bam = 'pipeline/reads/{indiv}_{run}_{iter}_{genome}.golden.bam'
     params:
         read_length = config['read_length'],
         read_fragmean = config['read_fragment'],
         mason = config["apps"]["mason_simulator"],
         read_count = get_reads_per_run,
-        input_vars = format_simulate_variants, 
+    retries: 20
+    resources:
+    	mem_mb=get_mem_mb,
+	runtime='4h'
     threads:
         int(config['num_cores'])
     shell:
-        '{params.mason} --read-name-prefix "simulated_{wildcards.run}" --seed $RANDOM --num-threads {threads} -ir {input.fa} {params.input_vars} --fragment-mean-size {params.read_fragmean} --illumina-read-length {params.read_length} -n {params.read_count} -o {output.r1} -or {output.r2}'
+        '{params.mason} --read-name-prefix "simulated_{wildcards.indiv}_{wildcards.run}_{wildcards.iter}_{wildcards.genome}" --seed $RANDOM --num-threads {threads} -ir {input.fa} --fragment-mean-size {params.read_fragmean} --illumina-read-length {params.read_length} -n {params.read_count} -o {output.r1} -or {output.r2} -oa {output.golden_bam}' 
 
-rule MapReadsDownsampleBam: 
+rule MergeGoldenBam:
+	input:
+		expand('pipeline/reads/{{indiv}}_{run}_{{iter}}_{genome}.golden.bam',run=numpy.arange(1,9,1),genome=[0,1])
+	params:
+		input_list = format_merge_input,
+		samtools=config['apps']['samtools']
+		#gatk=config['apps']['gatk']
+	output:
+		'pipeline/reads/{indiv}_{iter}.golden.bam'
+	shell:
+		'{params.samtools} merge {output} {params.input_list}'
+		#'{params.gatk} MergeSamFiles {params.input_list} -O {output}'
+
+rule MutateGoldenBam:
+	input:
+		bam='pipeline/reads/child_{iter}.golden.bam',
+		vcf='pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
+	output:
+		'pipeline/reads/child_{iter}.golden.mutated.bam'
+	params:
+		gatk=config['apps']['gatk']
+	shell:
+		'java -jar ~/jvarkit/dist/biostar404363.jar -p {input.vcf} -o {output} {input.bam}'
+
+rule SamToFastq:
+	input:
+		format_samtofastq_input
+	output:
+		fq1='pipeline/reads/{indiv}_{iter}.R1.fq',
+		fq2='pipeline/reads/{indiv}_{iter}.R2.fq'
+	params:
+		gatk=config['apps']['gatk']
+	shell:
+		'{params.gatk} SamToFastq -I {input} -F {output.fq1} -F2 {output.fq2}'
+
+rule MapReads: 
 	input:
 		reference = config['reference_genome'],
-		fq1 = 'pipeline/reads/{chromosome}_{indiv}_{run}_{iter}.R1.fq', 
-		fq2 = 'pipeline/reads/{chromosome}_{indiv}_{run}_{iter}.R2.fq'
+		fq1 = 'pipeline/reads/{indiv}_{iter}.R1.fq', 
+		fq2 = 'pipeline/reads/{indiv}_{iter}.R2.fq',
 	threads:
 		int(config['num_cores'])
 	output:
-		'pipeline/sorted_bams/{chromosome}_{indiv}_{run}.downsampled.{iter}.bam'
+		'pipeline/sorted_bams/{indiv}.{iter}.bam'
 	params:
 		bwa = config["apps"]["bwa"],
 		samtools = config['apps']['samtools']
 	resources:
-		mem_mb = 2000 * int(config['num_cores'])
+		mem_mb = 2000 * int(config['num_cores']),
+		runtime='12h'
 	shell:
-		'{params.bwa} mem -t {threads} -R \"@RG\\tID:{wildcards.chromosome}_{wildcards.run}\\tSM:{wildcards.indiv}\\tPL:ILLUMINA\" {input.reference}  {input.fq1} {input.fq2} | {params.samtools} view -@ {threads} -h -b -s 0.83333333 - > {output}'
+		'{params.bwa} mem -t {threads} -R \"@RG\\tID:{wildcards.indiv}_{wildcards.iter}\\tSM:{wildcards.indiv}\\tPL:ILLUMINA\" {input.reference}  {input.fq1} {input.fq2} | samtools view -b - > {output} '
 
-rule SortBam:
+rule DownsampleBam:
 	input:
-		'pipeline/sorted_bams/{chromosome}_{indiv}_{run}.downsampled.{iter}.bam'
+		'pipeline/sorted_bams/{indiv}.{iter}.bam'
 	output:
-		'pipeline/sorted_bams/{chromosome}_{indiv}_{run}.downsampled.sorted.{iter}.bam'
+		'pipeline/sorted_bams/{indiv}.downsampled.{iter}.bam'
 	params:
 		samtools = config['apps']['samtools']
+	threads:
+		int(config['num_cores'])
 	resources:
-		mem_mb = 2000 * int(config['num_cores'])
+		mem_mb = 2000 * int(config['num_cores']),
+		runtime='4h'
+	
 	shell:
-		'{params.samtools} sort -@ {threads} {input} > {output}'
+		'{params.samtools} view -@ {threads} -b -s 0.83333333 {input} > {output}'
 
-rule MergeBAMs:
+rule SortBam:
     input:
-        get_run_count
+        'pipeline/sorted_bams/{indiv}.downsampled.{iter}.bam'
     output:
-        'pipeline/sorted_bams/{chromosome}_{indiv}.downsampled.sorted.{iter}.bam'
+        'pipeline/sorted_bams/{indiv}.downsampled.sorted.{iter}.bam'
     params:
-        formatted = format_input,
-        gatk = config["apps"]["gatk"]
+        gatk = config['apps']['gatk'],
     resources:
-        mem_mb = 8000
+        mem_mb=get_mem_mb
+    threads: 12
     shell:
-        '{params.gatk} MergeSamFiles {params.formatted} -O {output}'
-
+        'gatk SortSam --java-options "-Xmx{resources.mem_mb}m" -I {input} --TMP_DIR pipeline/sorted_bams/ -O {output} -SO coordinate '
+	
 
 rule MarkDuplicates: 
     input:
-        'pipeline/sorted_bams/{chromosome}_{indiv}.downsampled.sorted.{iter}.bam'
+        'pipeline/sorted_bams/{indiv}.downsampled.sorted.{iter}.bam'
     output:
-        output_bam = 'pipeline/mark_dups/{chromosome}_{indiv}.downsampled.sorted.mark_dups.{iter}.bam',
-        output_metrics = 'pipeline/mark_dups/{chromosome}_{indiv}.downsampled.sorted.mark_dups.metrics.{iter}.txt'
+        output_bam = 'pipeline/mark_dups/{indiv}.downsampled.sorted.mark_dups.{iter}.bam',
+        output_metrics = 'pipeline/mark_dups/{indiv}.downsampled.sorted.mark_dups.metrics.{iter}.txt'
     params:
         gatk = config['apps']['gatk']
+    retries: 20
+    resources:
+    	runtime='1d',
+        mem_mb=get_mem_mb,
     shell:
-        '{params.gatk} MarkDuplicates -I {input} -O {output.output_bam} -M {output.output_metrics}  --CREATE_INDEX true'
+        '{params.gatk} --java-options "-Xmx{resources.mem_mb}m" MarkDuplicates -I {input} -O {output.output_bam} -M {output.output_metrics}  --TMP_DIR pipeline/mark_dups/ --CREATE_INDEX true'
 
 rule BQSR:
 	input:
-		bam = lambda x: 'pipeline/mark_dups/{chromosome}_{indiv}.downsampled.sorted.mark_dups.{iter}.bam' if 'input_variants' in config.keys() else [],
+		bam = lambda x: 'pipeline/mark_dups/{indiv}.downsampled.sorted.mark_dups.{iter}.bam' if 'input_variants' in config.keys() else [],
 		known_variants = lambda x: config['input_variants'] if 'input_variants' in config.keys() else [],
 		reference = config['reference_genome']
 	output:
-		'pipeline/BQSR/{chromosome}_{indiv}.downsampled.sorted.mark_dups.BQSR.{iter}.txt'
+		'pipeline/BQSR/{indiv}.downsampled.sorted.mark_dups.BQSR.{iter}.txt'
 	params:
 		gatk = config['apps']['gatk']
+	resources:
+		tmpdir='pipeline/BQSR/'
 	shell:
-		'{params.gatk} BaseRecalibrator -R {input.reference} -I {input.bam} --known-sites {input.known_variants} -O {output}'
+		'{params.gatk} BaseRecalibrator -R {input.reference} -I {input.bam} --known-sites {input.known_variants} --tmp-dir {resources.tmpdir} -O {output}'
 rule ApplyBQSR:
 	input:
-		bam = lambda x: 'pipeline/mark_dups/{chromosome}_{indiv}.downsampled.sorted.mark_dups.{iter}.bam' if 'input_variants' in config.keys() else [],
+		bam = lambda x: 'pipeline/mark_dups/{indiv}.downsampled.sorted.mark_dups.{iter}.bam' if 'input_variants' in config.keys() else [],
 		reference = config['reference_genome'],
-		recal = 'pipeline/BQSR/{chromosome}_{indiv}.downsampled.sorted.mark_dups.BQSR.{iter}.txt'
+		recal = 'pipeline/BQSR/{indiv}.downsampled.sorted.mark_dups.BQSR.{iter}.txt'
 	output:
-		'pipeline/BQSR/{chromosome}_{indiv}.downsampled.sorted.mark_dups.BQSR.{iter}.bam'
+		temp('pipeline/BQSR/{indiv}.downsampled.sorted.mark_dups.BQSR.{iter}.bam')
 	params:
 		gatk = config['apps']['gatk']
+	resources:
+		tmpdir='pipeline/BQSR/'
 	shell:
-		'{params.gatk} ApplyBQSR -I {input.bam} -R {input.reference} --bqsr-recal-file {input.recal} -O {output}'
+		'{params.gatk} ApplyBQSR -I {input.bam} -R {input.reference} --bqsr-recal-file {input.recal} --tmp-dir {resources.tmpdir} -O {output}'
 
 
 
 rule CallVariants:
     input:
         reference = config['reference_genome'],
-        input_bam = lambda x: 'pipeline/BQSR/{chromosome}_{indiv}.downsampled.sorted.mark_dups.BQSR.{iter}.bam' if 'input_variants' in config.keys() else 'pipeline/mark_dups/{chromosome}_{indiv}.downsampled.sorted.mark_dups.{iter}.bam'
+        input_bam = lambda x: 'pipeline/BQSR/{indiv}.downsampled.sorted.mark_dups.BQSR.{iter}.bam' if 'input_variants' in config.keys() else 'pipeline/mark_dups/{chromosome}_{indiv}.downsampled.sorted.mark_dups.{iter}.bam'
     output:
-        output_vcf = 'pipeline/call_variants/{chromosome}_{indiv}.downsampled.sorted.mark_dups.{iter}.g.vcf',
+        output_vcf = temp('pipeline/call_variants/{chromosome}_{indiv}.downsampled.sorted.mark_dups.{iter}.g.vcf'),
+	reassembled_bam = 'pipeline/call_variants/{chromosome}_{indiv}.downsampled.sorted.mark_dups.{iter}.reassembled.bam'
     params:
         gatk = config["apps"]["gatk"]
+    resources:
+    	tmpdir='pipeline/call_variants/',
+	runtime='1d',
+	mem_mb=get_mem_mb
     shell:
-        '{params.gatk} HaplotypeCaller -R {input.reference}  -I {input.input_bam}  -ERC BP_RESOLUTION --minimum-mapping-quality 40 --max-reads-per-alignment-start 0 --pcr-indel-model NONE -O {output.output_vcf} -L {wildcards.chromosome}'
-
-rule MergeCalls:
-    input:
-        p1 = 'pipeline/call_variants/{chromosome}_parent_1.downsampled.sorted.mark_dups.{iter}.g.vcf',
-        p2 = 'pipeline/call_variants/{chromosome}_parent_2.downsampled.sorted.mark_dups.{iter}.g.vcf',
-        ch = 'pipeline/call_variants/{chromosome}_child.downsampled.sorted.mark_dups.{iter}.g.vcf' 
-    output:
-        outdir = directory('pipeline/GBDImport/{chromosome}_{iter}')
-    params:
-        gatk = config["apps"]["gatk"]
-    shell:
-        '{params.gatk} GenomicsDBImport -V {input.p1} -V {input.p2} -V {input.ch} --genomicsdb-workspace-path {output.outdir} -L {wildcards.chromosome}'
+        '{params.gatk} --java-options "-Xmx{resources.mem_mb}m" HaplotypeCaller -R {input.reference}  -I {input.input_bam}  -ERC GVCF --minimum-mapping-quality 40 --max-reads-per-alignment-start 0 --pcr-indel-model NONE -O {output.output_vcf} -L {wildcards.chromosome} --tmp-dir {resources.tmpdir} -bamout {output.reassembled_bam}'
 
 rule GenotypeVariants:
     input:
-        indir='pipeline/GBDImport/{chromosome}_{iter}'
+        p1_vcf='pipeline/call_variants/{chromosome}_parent_1.downsampled.sorted.mark_dups.{iter}.g.vcf',
+	p2_vcf='pipeline/call_variants/{chromosome}_parent_2.downsampled.sorted.mark_dups.{iter}.g.vcf',
+	ch_vcf='pipeline/call_variants/{chromosome}_child.downsampled.sorted.mark_dups.{iter}.g.vcf'
     output:
         'pipeline/genotype_variants/{chromosome}_trio.downsampled.sorted.mark_dups.{iter}.vcf'
-        
     params:
         reference = config['reference_genome'],
         gatk = config["apps"]["gatk"]
+    resources:
+    	tmpdir='pipeline/genotype_variants/',
+	runtime='1d'
     shell:
-        '{params.gatk} GenotypeGVCFs -R {params.reference} -V gendb://{input.indir} -A StrandOddsRatio -A MappingQualityRankSumTest -A ReadPosRankSumTest -A QualByDepth -A FisherStrand -O {output}'
+        'apptainer exec --bind \"/scratch/mmilhave/\" /scratch/mmilhave/DNM-Coverage_RERUN/images/gatk3_3.7.sif gatk \
+-T GenotypeGVCFs \
+-R /scratch/mmilhave/refs/panTro6.fa \
+--variant {input.p1_vcf} \
+--variant {input.p2_vcf} \
+--variant {input.ch_vcf} \
+-A StrandOddsRatio \
+-A MappingQualityRankSumTest \
+-A ReadPosRankSumTest \
+-A QualByDepth \
+-A FisherStrand \
+--out {output}'
 
 rule IsolateMVs:
     input:
@@ -332,7 +422,8 @@ rule IsolateMVs:
         'pipeline/MV/{chromosome}_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
     params:
         gatk = config['apps']['gatk']
-        
+    resources:
+        runtime='15m' 
     shell:
         '{params.gatk} SelectVariants -V {input} --restrict-alleles-to BIALLELIC --select-type-to-include SNP --exclude-filtered true --exclude-non-variants true -select \'AN==6\' --select \'vc.getGenotype("parent_1").isHomRef()\' --select \'vc.getGenotype("parent_2").isHomRef()\' --select \'vc.getGenotype("child").isHet()\' -O {output}'
 
@@ -344,218 +435,110 @@ rule MergeMVVCFs:
     params:
         formatted = format_input,
         gatk = config["apps"]["gatk"]
+    resources:
+        runtime='15m'
     run:
         shell('{params.gatk} MergeVcfs {params.formatted} -O {output}')
-
-rule DPGT_filter:
-    input:
-        'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-    output:
-        'pipeline/filters/DPGT/all_chr_trio.downsampled.sorted.mark_dups.MV.DPGT.{filter_threshold}.{iter}.vcf'
-    params:
-        parent1_threshold = get_par1_threshold,
-        parent2_threshold = get_par2_threshold,
-        child_threshold = get_chd_threshold,
-        gatk = config["apps"]["gatk"]
-    shell:
-        '{params.gatk} SelectVariants -V {input} --select \'vc.getGenotype(\"parent_1\").getDP() >= {params.parent1_threshold}\' --select \'vc.getGenotype(\"parent_2\").getDP() >= {params.parent2_threshold}\' --select \'vc.getGenotype(\"child\").getDP() >= {params.child_threshold}\' --exclude-filtered true -O {output}'
-
-rule DPLT_filter:
-    input:
-        'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-    output:
-        'pipeline/filters/DPLT/all_chr_trio.downsampled.sorted.mark_dups.MV.DPLT.{filter_threshold}.{iter}.vcf'
-    params:        
-        parent1_threshold = get_par1_threshold,
-        parent2_threshold = get_par2_threshold,
-        child_threshold = get_chd_threshold,
-        gatk = config["apps"]["gatk"]
-    shell:                                                                      
-        '{params.gatk} SelectVariants -V {input} --select \'vc.getGenotype(\"parent_1\").getDP() <= {params.parent1_threshold}\' --select \'vc.getGenotype(\"parent_2\").getDP() <= {params.parent2_threshold}\' --select \'vc.getGenotype(\"child\").getDP() <= {params.child_threshold}\' --exclude-filtered true -O {output} '
- 
-rule ABGT_filter:
-    input:
-        'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-    output:
-        'pipeline/filters/ABGT/all_chr_trio.downsampled.sorted.mark_dups.MV.ABGT.{filter_threshold}.{iter}.vcf'
-    params:
-        gatk = config["apps"]["gatk"]
-    shell:
-        '{params.gatk} SelectVariants -V {input} --select \'vc.getGenotype(\"child\").getDP() > 0 && ((vc.getGenotype(\"child\").getAD().1*1.0 / vc.getGenotype(\"child\").getDP()*1.0 ) >= {wildcards.filter_threshold}) \' --exclude-filtered true -O {output}'
-
-rule ABLT_filter:
-    input:
-        'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-    output:
-        'pipeline/filters/ABLT/all_chr_trio.downsampled.sorted.mark_dups.MV.ABLT.{filter_threshold}.{iter}.vcf'
-    params:
-        gatk = config["apps"]["gatk"]
-    shell:
-        '{params.gatk} SelectVariants -V {input} --select \'vc.getGenotype(\"child\").getDP() > 0 && ((vc.getGenotype(\"child\").getAD().1*1.0 / vc.getGenotype(\"child\").getDP()*1.0 ) <= {wildcards.filter_threshold}) \' --exclude-filtered true -O {output}'
-
-rule QUAL_filter:
-    input:
-        'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-    output:
-        'pipeline/filters/QUAL/all_chr_trio.downsampled.sorted.mark_dups.MV.QUAL.{filter_threshold}.{iter}.vcf'
-    params:
-        gatk = config["apps"]["gatk"]
-    shell:
-        '{params.gatk} SelectVariants -V {input} --select \"QUAL >= {wildcards.filter_threshold}\"  --exclude-filtered true -O {output}'
-
-rule GQ_filter:
-    input:
-        'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-    output:
-        'pipeline/filters/GQ/all_chr_trio.downsampled.sorted.mark_dups.MV.GQ.{filter_threshold}.{iter}.vcf'
-    params:
-        gatk = config["apps"]["gatk"]
-    shell:
-        '{params.gatk} SelectVariants -V {input} --select \'vc.getGenotype(\"parent_1\").getGQ() >= {wildcards.filter_threshold}\' --select \'vc.getGenotype(\"parent_2\").getGQ() >= {wildcards.filter_threshold}\' --select \'vc.getGenotype(\"child\").getGQ() >= {wildcards.filter_threshold}\' --exclude-filtered true -O {output} '
-
-rule AD_filter:
-    input:
-        'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-    output:
-        'pipeline/filters/AD/all_chr_trio.downsampled.sorted.mark_dups.MV.AD.{filter_threshold}.{iter}.vcf'
-    params:
-        gatk = config["apps"]["gatk"]
-    shell:
-        '{params.gatk} SelectVariants -V {input} --select \'vc.getGenotype(\"parent_1\").getAD().1 <= {wildcards.filter_threshold}\' --select \'vc.getGenotype(\"parent_2\").getAD().1 <= {wildcards.filter_threshold} \' --exclude-filtered true -O {output} '
-
-rule QD_filter:
-	input:
-		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-	output:
-		'pipeline/filters/QD/all_chr_trio.downsampled.sorted.mark_dups.MV.QD.{filter_threshold}.{iter}.vcf'
-	params:
-		gatk = config["apps"]["gatk"]
-	shell:
-		'{params.gatk} SelectVariants -V {input} --select "QD >= {wildcards.filter_threshold}" -O {output}'
-
-rule FS_filter:
-	input:
-		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-	output:
-		'pipeline/filters/FS/all_chr_trio.downsampled.sorted.mark_dups.MV.FS.{filter_threshold}.{iter}.vcf'
-	params:
-		gatk = config["apps"]["gatk"]
-	shell:
-		'{params.gatk} SelectVariants -V {input} --select "FS <= {wildcards.filter_threshold}" -O {output}'
-
-rule SOR_filter:
-	input:
-		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-	output:
-		'pipeline/filters/SOR/all_chr_trio.downsampled.sorted.mark_dups.MV.SOR.{filter_threshold}.{iter}.vcf'
-	params:
-		gatk = config["apps"]["gatk"]
-	shell:
-		'{params.gatk} SelectVariants -V {input} --select "SOR <= {wildcards.filter_threshold}" -O {output}'
-
-rule MQRankSum_GT_filter:
-	input:
-		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-	output:
-		'pipeline/filters/MQRankSumGT/all_chr_trio.downsampled.sorted.mark_dups.MV.MQRankSumGT.{filter_threshold}.{iter}.vcf'	
-	params:
-		gatk = config["apps"]["gatk"]
-	shell:
-		'{params.gatk} SelectVariants -V {input} --select "MQRankSum >= {wildcards.filter_threshold}" -O {output}'
-
-rule MQRankSum_LT_filter:
-	input:
-		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-	output:
-		'pipeline/filters/MQRankSumLT/all_chr_trio.downsampled.sorted.mark_dups.MV.MQRankSumLT.{filter_threshold}.{iter}.vcf'
-	params:
-		gatk = config["apps"]["gatk"]
-	shell:
-		'{params.gatk} SelectVariants -V {input} --select "MQRankSum <= {wildcards.filter_threshold}" -O {output}'
-
-rule ReadPosRankSum_GT_filter:
-	input:
-		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-	output:
-		'pipeline/filters/ReadPosRankSumGT/all_chr_trio.downsampled.sorted.mark_dups.MV.ReadPosRankSumGT.{filter_threshold}.{iter}.vcf'
-	params:
-		gatk = config["apps"]["gatk"]
-	shell:
-		'{params.gatk} SelectVariants -V {input} --select "ReadPosRankSum >= {wildcards.filter_threshold}" -O {output}'
-
-rule ReadPosRankSum_LT_filter:
-	input:
-		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf'
-	output:
-		'pipeline/filters/ReadPosRankSumLT/all_chr_trio.downsampled.sorted.mark_dups.MV.ReadPosRankSumLT.{filter_threshold}.{iter}.vcf'
-	params:
-		gatk = config["apps"]["gatk"]
-	shell:
-		'{params.gatk} SelectVariants -V {input} --select "ReadPosRankSum <= {wildcards.filter_threshold}" -O {output}'
 
 rule get_MV_muts:
 	input:
 		vcf = 'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf',
-		muts = 'pipeline/mutations/mutations.{iter}.vcf'
+		muts = 'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
 	output:
 		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.mutations.vcf'
 	params:
 		gatk = config["apps"]["gatk"]
+	resources:
+		runtime='15m'
 	shell:
 		'{params.gatk} SelectVariants -V {input.vcf} --concordance {input.muts} -O {output}'
+
+rule get_muts_table:
+	input:
+		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.mutations.vcf'
+	output:
+		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.mutations.table'
+	params:
+		gatk=config["apps"]["gatk"]
+	resources:
+		runtime='15m'
+	shell:
+		'{params.gatk} VariantsToTable -V {input} -F CHROM -F POS -F QUAL -F BaseQRankSum -F MQRankSum -F ReadPosRankSum -F SOR -F FS -F QD -GF AD -GF DP -GF GQ -O {output}'
 
 rule get_MV_vars:
 	input:
 		vcf = 'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf',
-		xvars = lambda x: 'pipeline/mutations/polymorphisms.{iter}.vcf' if 'input_variants' in config.keys() else 0
+		poly_vcf = config['input_variants']
 	output:
 		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.polymorphisms.vcf'
 	params:
 		gatk = config["apps"]["gatk"]
+	resources:
+		runtime='15m'
 	shell:
-		'{params.gatk} SelectVariants -V {input.vcf} --concordance {input.xvars} -O {output}'
-rule get_muts:
-    input:
-        vcf = 'pipeline/filters/{filter}/all_chr_trio.downsampled.sorted.mark_dups.MV.{filter}.{filter_threshold}.{iter}.vcf',
-        muts = 'pipeline/mutations/mutations.{iter}.vcf'
-    output:
-        'pipeline/filters/{filter}/all_chr_trio.downsampled.sorted.mark_dups.MV.{filter}.{filter_threshold}.{iter}.mutations.vcf'
-    params:
-        gatk = config["apps"]["gatk"]
-    shell:
-        '{params.gatk} SelectVariants -V {input.vcf} --concordance {input.muts} -O {output}'
+		'{params.gatk} SelectVariants -V {input.vcf} --concordance {input.poly_vcf} -O {output}'
 
-rule get_vars:
-    input:
-        vcf = 'pipeline/filters/{filter}/all_chr_trio.downsampled.sorted.mark_dups.MV.{filter}.{filter_threshold}.{iter}.vcf',
-        xvars = lambda x: 'pipeline/mutations/polymorphisms.{iter}.vcf' if 'input_variants' in config.keys() else 0
-    output:
-        'pipeline/filters/{filter}/all_chr_trio.downsampled.sorted.mark_dups.MV.{filter}.{filter_threshold}.{iter}.polymorphisms.vcf'
-    params:
-        gatk = config["apps"]["gatk"]
-    shell:
-        '{params.gatk} SelectVariants -V {input.vcf} --concordance {input.xvars} -O {output}'
+rule get_vars_table:
+	input:
+		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.polymorphisms.vcf'
+	output:
+		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.polymorphisms.table'
+	params:
+		gatk = config["apps"]["gatk"]
+	resources:
+		runtime='15m'
+	shell:
+		'{params.gatk} VariantsToTable -V {input} -F CHROM -F POS -F QUAL -F BaseQRankSum -F MQRankSum -F ReadPosRankSum -F SOR -F FS -F QD -GF AD -GF DP -GF GQ -O {output}'
 
-rule aggregate:
-    input:
-        get_all_input(),
-	'pipeline/mutations/multihit_count.{iter}.txt'	
-    output:
-        'pipeline/outputs/output_{iter}.txt'
-    params:
-        vcfmerge = lambda x: 1 if 'input_variants' in config.keys() else 0,
-        snakedir=SNAKEDIR,
-        config = config["working_directory"]+"/config/config.json", 
-        work_dir= config["working_directory"]
-    shell:
-        'python {params.snakedir}/scripts/aggregate.py -i {params.config} -o {output} -v {params.vcfmerge} -m pipeline/mutations/multihit_count.{wildcards.iter}.txt -w {params.work_dir} -n {wildcards.iter}'
+rule get_MV_errors:
+	input:
+		vcf = 'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf',
+                xvars = lambda x: 'pipeline/mutations/polymorphisms.{iter}.phased.vcf' if 'input_variants' in config.keys() else 0,
+		muts = 'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
+	output:
+		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.errors.vcf'
+	params:
+		gatk = config["apps"]["gatk"]
+	resources:
+		runtime='15m'
+	shell:
+		'{params.gatk} SelectVariants -V {input.vcf} --discordance {input.muts} -O pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{wildcards.iter}.nomuts.vcf && {params.gatk} SelectVariants -V pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{wildcards.iter}.nomuts.vcf --discordance {input.xvars} -O {output}'
+
+rule get_errors_table:
+	input:
+		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.errors.vcf'
+	output:
+		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.errors.table'
+	params:
+		gatk = config["apps"]["gatk"]
+	resources:
+		runtime='15m'
+	shell:
+		'{params.gatk} VariantsToTable -V {input} -F CHROM -F POS -F QUAL -F BaseQRankSum -F MQRankSum -F ReadPosRankSum -F SOR -F FS -F QD -GF AD -GF DP -GF GQ -O {output}'
+
+rule get_recommended_stats:
+	input:
+		mut_table = expand('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.mutations.table',iter=np.arange(1,int(config['num_iterations'])+1)),
+		vars_table = expand('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.polymorphisms.table',iter=np.arange(1,int(config['num_iterations'])+1)),
+		err_table = expand('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.errors.table',iter=np.arange(1,int(config['num_iterations'])+1))
+	output:
+		'pipeline/run_outputs/run.{iter}.statistics.txt'
+		
+	params:
+		work_dir = config['working_directory'],
+		snakedir=SNAKEDIR,
+		num_iterations=config["num_iterations"]
+	shell:
+		'python {params.snakedir}/scripts/get_recommended_stats.py -n {wildcards.iter}  -o {output}'
 
 rule super_aggregate:
 	input:
-		expand('pipeline/outputs/output_{iter}.txt',iter = range(1,int(config['num_iterations'])+1))
+		expand('pipeline/run_outputs/run{iter}.statistics.txt',iter = range(1,int(config['num_iterations'])+1))
 		#get_super_aggregate_input()
 	output:
 		config['output_file']
+	resources:
+		runtime='15m'
 	params:
 		snakedir=SNAKEDIR,
 		num_runs=config['num_iterations']

@@ -4,3 +4,7 @@ demo/demo_workdir/.snakemake/*
 *.swp
 *.err
 *.out
+*.vcf
+*.idx
+*.bam
+*.ped

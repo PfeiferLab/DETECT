@@ -1,0 +1,1337 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 100
+Job stats:
+job                      count
+---------------------  -------
+ApplyBQSR                   30
+BQSR                        30
+CallVariants               690
+DownsampleBam               30
+FilterMutations              3
+FilterPolymorphisms          3
+GenotypeVariants           230
+IsolateMVs                 230
+MapReads                    30
+MarkDuplicates              30
+MergeFastas                 18
+MergeGoldenBam              30
+MergeMVVCFs                 10
+MutateGoldenBam             10
+SamToFastq                  30
+SimulateReads              480
+SortBam                     30
+VCFtoFasta                 378
+all                          1
+get_MV_errors               10
+get_MV_muts                 10
+get_MV_vars                 10
+get_errors_table            10
+get_muts_table              10
+get_recommended_stats       10
+get_vars_table              10
+splitVCF                    63
+super_aggregate              1
+total                     2427
+
+Select jobs to execute...
+
+[Sun Oct  6 21:47:43 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.1.fa
+    output: pipeline/reads/child_4_4_1.golden.R1.fq, pipeline/reads/child_4_4_1.golden.R2.fq, pipeline/reads/child_4_4_1.golden.bam
+    jobid: 1341
+    reason: Forced execution
+    wildcards: indiv=child, run=4, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_4_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_4_4_1.golden.R1.fq -or pipeline/reads/child_4_4_1.golden.R2.fq -oa pipeline/reads/child_4_4_1.golden.bam && rm pipeline/reads/child_4_4_1.golden.R1.fq && rm pipeline/reads/child_4_4_1.golden.R2.fq
+Submitted job 1341 with external jobid 'Submitted batch job 19228362'.
+
+[Sun Oct  6 21:47:44 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_6_8_0.golden.R1.fq, pipeline/reads/parent_1_6_8_0.golden.R2.fq, pipeline/reads/parent_1_6_8_0.golden.bam
+    jobid: 2661
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=6, iter=8, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_6_8_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_6_8_0.golden.R1.fq -or pipeline/reads/parent_1_6_8_0.golden.R2.fq -oa pipeline/reads/parent_1_6_8_0.golden.bam && rm pipeline/reads/parent_1_6_8_0.golden.R1.fq && rm pipeline/reads/parent_1_6_8_0.golden.R2.fq
+Submitted job 2661 with external jobid 'Submitted batch job 19228363'.
+
+[Sun Oct  6 21:47:44 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.1.fa
+    output: pipeline/reads/child_1_4_1.golden.R1.fq, pipeline/reads/child_1_4_1.golden.R2.fq, pipeline/reads/child_1_4_1.golden.bam
+    jobid: 1311
+    reason: Forced execution
+    wildcards: indiv=child, run=1, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_1_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_1_4_1.golden.R1.fq -or pipeline/reads/child_1_4_1.golden.R2.fq -oa pipeline/reads/child_1_4_1.golden.bam && rm pipeline/reads/child_1_4_1.golden.R1.fq && rm pipeline/reads/child_1_4_1.golden.R2.fq
+Submitted job 1311 with external jobid 'Submitted batch job 19228364'.
+
+[Sun Oct  6 21:47:44 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_3_4_0.golden.R1.fq, pipeline/reads/parent_1_3_4_0.golden.R2.fq, pipeline/reads/parent_1_3_4_0.golden.bam
+    jobid: 1191
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=3, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_3_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_3_4_0.golden.R1.fq -or pipeline/reads/parent_1_3_4_0.golden.R2.fq -oa pipeline/reads/parent_1_3_4_0.golden.bam && rm pipeline/reads/parent_1_3_4_0.golden.R1.fq && rm pipeline/reads/parent_1_3_4_0.golden.R2.fq
+Submitted job 1191 with external jobid 'Submitted batch job 19228365'.
+
+[Sun Oct  6 21:47:45 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_8_10_1.golden.R1.fq, pipeline/reads/parent_2_8_10_1.golden.R2.fq, pipeline/reads/parent_2_8_10_1.golden.bam
+    jobid: 3471
+    reason: Forced execution
+    wildcards: indiv=parent_2, run=8, iter=10, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_2_8_10_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_parent_2_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_2_8_10_1.golden.R1.fq -or pipeline/reads/parent_2_8_10_1.golden.R2.fq -oa pipeline/reads/parent_2_8_10_1.golden.bam && rm pipeline/reads/parent_2_8_10_1.golden.R1.fq && rm pipeline/reads/parent_2_8_10_1.golden.R2.fq
+Submitted job 3471 with external jobid 'Submitted batch job 19228366'.
+
+[Sun Oct  6 21:47:45 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_child_renamed.1.fa
+    output: pipeline/reads/child_7_8_1.golden.R1.fq, pipeline/reads/child_7_8_1.golden.R2.fq, pipeline/reads/child_7_8_1.golden.bam
+    jobid: 2811
+    reason: Forced execution
+    wildcards: indiv=child, run=7, iter=8, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_7_8_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_7_8_1.golden.R1.fq -or pipeline/reads/child_7_8_1.golden.R2.fq -oa pipeline/reads/child_7_8_1.golden.bam && rm pipeline/reads/child_7_8_1.golden.R1.fq && rm pipeline/reads/child_7_8_1.golden.R2.fq
+Submitted job 2811 with external jobid 'Submitted batch job 19228367'.
+
+[Sun Oct  6 21:47:46 2024]
+rule SimulateReads:
+    input: pipeline/ref/9_child_renamed.1.fa
+    output: pipeline/reads/child_4_9_1.golden.R1.fq, pipeline/reads/child_4_9_1.golden.R2.fq, pipeline/reads/child_4_9_1.golden.bam
+    jobid: 3171
+    reason: Missing output files: pipeline/reads/child_4_9_1.golden.bam
+    wildcards: indiv=child, run=4, iter=9, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_4_9_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/9_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_4_9_1.golden.R1.fq -or pipeline/reads/child_4_9_1.golden.R2.fq -oa pipeline/reads/child_4_9_1.golden.bam && rm pipeline/reads/child_4_9_1.golden.R1.fq && rm pipeline/reads/child_4_9_1.golden.R2.fq
+Submitted job 3171 with external jobid 'Submitted batch job 19228368'.
+
+[Sun Oct  6 21:47:46 2024]
+rule SimulateReads:
+    input: pipeline/ref/9_child_renamed.1.fa
+    output: pipeline/reads/child_1_9_1.golden.R1.fq, pipeline/reads/child_1_9_1.golden.R2.fq, pipeline/reads/child_1_9_1.golden.bam
+    jobid: 3141
+    reason: Forced execution
+    wildcards: indiv=child, run=1, iter=9, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_1_9_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/9_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_1_9_1.golden.R1.fq -or pipeline/reads/child_1_9_1.golden.R2.fq -oa pipeline/reads/child_1_9_1.golden.bam && rm pipeline/reads/child_1_9_1.golden.R1.fq && rm pipeline/reads/child_1_9_1.golden.R2.fq
+Submitted job 3141 with external jobid 'Submitted batch job 19228369'.
+
+[Sun Oct  6 21:47:46 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.0.fa
+    output: pipeline/reads/child_5_4_0.golden.R1.fq, pipeline/reads/child_5_4_0.golden.R2.fq, pipeline/reads/child_5_4_0.golden.bam
+    jobid: 1342
+    reason: Forced execution
+    wildcards: indiv=child, run=5, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_5_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_5_4_0.golden.R1.fq -or pipeline/reads/child_5_4_0.golden.R2.fq -oa pipeline/reads/child_5_4_0.golden.bam && rm pipeline/reads/child_5_4_0.golden.R1.fq && rm pipeline/reads/child_5_4_0.golden.R2.fq
+Submitted job 1342 with external jobid 'Submitted batch job 19228370'.
+
+[Sun Oct  6 21:47:47 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.0.fa
+    output: pipeline/reads/child_2_5_0.golden.R1.fq, pipeline/reads/child_2_5_0.golden.R2.fq, pipeline/reads/child_2_5_0.golden.bam
+    jobid: 1702
+    reason: Forced execution
+    wildcards: indiv=child, run=2, iter=5, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_2_5_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_2_5_0.golden.R1.fq -or pipeline/reads/child_2_5_0.golden.R2.fq -oa pipeline/reads/child_2_5_0.golden.bam && rm pipeline/reads/child_2_5_0.golden.R1.fq && rm pipeline/reads/child_2_5_0.golden.R2.fq
+Submitted job 1702 with external jobid 'Submitted batch job 19228371'.
+
+[Sun Oct  6 21:47:47 2024]
+rule SimulateReads:
+    input: pipeline/ref/9_child_renamed.0.fa
+    output: pipeline/reads/child_5_9_0.golden.R1.fq, pipeline/reads/child_5_9_0.golden.R2.fq, pipeline/reads/child_5_9_0.golden.bam
+    jobid: 3172
+    reason: Forced execution
+    wildcards: indiv=child, run=5, iter=9, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_5_9_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/9_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_5_9_0.golden.R1.fq -or pipeline/reads/child_5_9_0.golden.R2.fq -oa pipeline/reads/child_5_9_0.golden.bam && rm pipeline/reads/child_5_9_0.golden.R1.fq && rm pipeline/reads/child_5_9_0.golden.R2.fq
+Submitted job 3172 with external jobid 'Submitted batch job 19228372'.
+
+[Sun Oct  6 21:47:47 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.0.fa
+    output: pipeline/reads/child_2_10_0.golden.R1.fq, pipeline/reads/child_2_10_0.golden.R2.fq, pipeline/reads/child_2_10_0.golden.bam
+    jobid: 3532
+    reason: Forced execution
+    wildcards: indiv=child, run=2, iter=10, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_2_10_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_2_10_0.golden.R1.fq -or pipeline/reads/child_2_10_0.golden.R2.fq -oa pipeline/reads/child_2_10_0.golden.bam && rm pipeline/reads/child_2_10_0.golden.R1.fq && rm pipeline/reads/child_2_10_0.golden.R2.fq
+Submitted job 3532 with external jobid 'Submitted batch job 19228373'.
+
+[Sun Oct  6 21:47:48 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_3_4_1.golden.R1.fq, pipeline/reads/parent_1_3_4_1.golden.R2.fq, pipeline/reads/parent_1_3_4_1.golden.bam
+    jobid: 1192
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=3, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_3_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_3_4_1.golden.R1.fq -or pipeline/reads/parent_1_3_4_1.golden.R2.fq -oa pipeline/reads/parent_1_3_4_1.golden.bam && rm pipeline/reads/parent_1_3_4_1.golden.R1.fq && rm pipeline/reads/parent_1_3_4_1.golden.R2.fq
+Submitted job 1192 with external jobid 'Submitted batch job 19228374'.
+
+[Sun Oct  6 21:47:48 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_child_renamed.0.fa
+    output: pipeline/reads/child_8_8_0.golden.R1.fq, pipeline/reads/child_8_8_0.golden.R2.fq, pipeline/reads/child_8_8_0.golden.bam
+    jobid: 2812
+    reason: Forced execution
+    wildcards: indiv=child, run=8, iter=8, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_8_8_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_8_8_0.golden.R1.fq -or pipeline/reads/child_8_8_0.golden.R2.fq -oa pipeline/reads/child_8_8_0.golden.bam && rm pipeline/reads/child_8_8_0.golden.R1.fq && rm pipeline/reads/child_8_8_0.golden.R2.fq
+Submitted job 2812 with external jobid 'Submitted batch job 19228375'.
+
+[Sun Oct  6 21:47:48 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_6_8_1.golden.R1.fq, pipeline/reads/parent_1_6_8_1.golden.R2.fq, pipeline/reads/parent_1_6_8_1.golden.bam
+    jobid: 2662
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=6, iter=8, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_6_8_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_6_8_1.golden.R1.fq -or pipeline/reads/parent_1_6_8_1.golden.R2.fq -oa pipeline/reads/parent_1_6_8_1.golden.bam && rm pipeline/reads/parent_1_6_8_1.golden.R1.fq && rm pipeline/reads/parent_1_6_8_1.golden.R2.fq
+Submitted job 2662 with external jobid 'Submitted batch job 19228376'.
+
+[Sun Oct  6 21:47:48 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.1.fa
+    output: pipeline/reads/child_5_4_1.golden.R1.fq, pipeline/reads/child_5_4_1.golden.R2.fq, pipeline/reads/child_5_4_1.golden.bam
+    jobid: 1343
+    reason: Forced execution
+    wildcards: indiv=child, run=5, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_5_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_5_4_1.golden.R1.fq -or pipeline/reads/child_5_4_1.golden.R2.fq -oa pipeline/reads/child_5_4_1.golden.bam && rm pipeline/reads/child_5_4_1.golden.R1.fq && rm pipeline/reads/child_5_4_1.golden.R2.fq
+Submitted job 1343 with external jobid 'Submitted batch job 19228377'.
+
+[Sun Oct  6 21:47:49 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.1.fa
+    output: pipeline/reads/child_2_5_1.golden.R1.fq, pipeline/reads/child_2_5_1.golden.R2.fq, pipeline/reads/child_2_5_1.golden.bam
+    jobid: 1703
+    reason: Forced execution
+    wildcards: indiv=child, run=2, iter=5, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_2_5_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_2_5_1.golden.R1.fq -or pipeline/reads/child_2_5_1.golden.R2.fq -oa pipeline/reads/child_2_5_1.golden.bam && rm pipeline/reads/child_2_5_1.golden.R1.fq && rm pipeline/reads/child_2_5_1.golden.R2.fq
+Submitted job 1703 with external jobid 'Submitted batch job 19228378'.
+
+[Sun Oct  6 21:47:49 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.1.fa
+    output: pipeline/reads/child_2_10_1.golden.R1.fq, pipeline/reads/child_2_10_1.golden.R2.fq, pipeline/reads/child_2_10_1.golden.bam
+    jobid: 3533
+    reason: Forced execution
+    wildcards: indiv=child, run=2, iter=10, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_2_10_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_2_10_1.golden.R1.fq -or pipeline/reads/child_2_10_1.golden.R2.fq -oa pipeline/reads/child_2_10_1.golden.bam && rm pipeline/reads/child_2_10_1.golden.R1.fq && rm pipeline/reads/child_2_10_1.golden.R2.fq
+Submitted job 3533 with external jobid 'Submitted batch job 19228379'.
+
+[Sun Oct  6 21:47:49 2024]
+rule SimulateReads:
+    input: pipeline/ref/9_child_renamed.1.fa
+    output: pipeline/reads/child_5_9_1.golden.R1.fq, pipeline/reads/child_5_9_1.golden.R2.fq, pipeline/reads/child_5_9_1.golden.bam
+    jobid: 3173
+    reason: Missing output files: pipeline/reads/child_5_9_1.golden.bam
+    wildcards: indiv=child, run=5, iter=9, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_5_9_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/9_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_5_9_1.golden.R1.fq -or pipeline/reads/child_5_9_1.golden.R2.fq -oa pipeline/reads/child_5_9_1.golden.bam && rm pipeline/reads/child_5_9_1.golden.R1.fq && rm pipeline/reads/child_5_9_1.golden.R2.fq
+Submitted job 3173 with external jobid 'Submitted batch job 19228380'.
+
+[Sun Oct  6 21:47:50 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_4_4_0.golden.R1.fq, pipeline/reads/parent_1_4_4_0.golden.R2.fq, pipeline/reads/parent_1_4_4_0.golden.bam
+    jobid: 1193
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=4, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_4_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_4_4_0.golden.R1.fq -or pipeline/reads/parent_1_4_4_0.golden.R2.fq -oa pipeline/reads/parent_1_4_4_0.golden.bam && rm pipeline/reads/parent_1_4_4_0.golden.R1.fq && rm pipeline/reads/parent_1_4_4_0.golden.R2.fq
+Submitted job 1193 with external jobid 'Submitted batch job 19228381'.
+
+[Sun Oct  6 21:47:50 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_child_renamed.1.fa
+    output: pipeline/reads/child_8_8_1.golden.R1.fq, pipeline/reads/child_8_8_1.golden.R2.fq, pipeline/reads/child_8_8_1.golden.bam
+    jobid: 2813
+    reason: Forced execution
+    wildcards: indiv=child, run=8, iter=8, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_8_8_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_8_8_1.golden.R1.fq -or pipeline/reads/child_8_8_1.golden.R2.fq -oa pipeline/reads/child_8_8_1.golden.bam && rm pipeline/reads/child_8_8_1.golden.R1.fq && rm pipeline/reads/child_8_8_1.golden.R2.fq
+Submitted job 2813 with external jobid 'Submitted batch job 19228382'.
+
+[Sun Oct  6 21:47:50 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_7_8_0.golden.R1.fq, pipeline/reads/parent_1_7_8_0.golden.R2.fq, pipeline/reads/parent_1_7_8_0.golden.bam
+    jobid: 2663
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=7, iter=8, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_7_8_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_7_8_0.golden.R1.fq -or pipeline/reads/parent_1_7_8_0.golden.R2.fq -oa pipeline/reads/parent_1_7_8_0.golden.bam && rm pipeline/reads/parent_1_7_8_0.golden.R1.fq && rm pipeline/reads/parent_1_7_8_0.golden.R2.fq
+Submitted job 2663 with external jobid 'Submitted batch job 19228383'.
+
+[Sun Oct  6 21:47:51 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.0.fa
+    output: pipeline/reads/child_6_4_0.golden.R1.fq, pipeline/reads/child_6_4_0.golden.R2.fq, pipeline/reads/child_6_4_0.golden.bam
+    jobid: 1344
+    reason: Forced execution
+    wildcards: indiv=child, run=6, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_6_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_6_4_0.golden.R1.fq -or pipeline/reads/child_6_4_0.golden.R2.fq -oa pipeline/reads/child_6_4_0.golden.bam && rm pipeline/reads/child_6_4_0.golden.R1.fq && rm pipeline/reads/child_6_4_0.golden.R2.fq
+Submitted job 1344 with external jobid 'Submitted batch job 19228384'.
+
+[Sun Oct  6 21:47:51 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_1_4_1.golden.R1.fq, pipeline/reads/parent_1_1_4_1.golden.R2.fq, pipeline/reads/parent_1_1_4_1.golden.bam
+    jobid: 1164
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=1, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_1_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_1_4_1.golden.R1.fq -or pipeline/reads/parent_1_1_4_1.golden.R2.fq -oa pipeline/reads/parent_1_1_4_1.golden.bam && rm pipeline/reads/parent_1_1_4_1.golden.R1.fq && rm pipeline/reads/parent_1_1_4_1.golden.R2.fq
+Submitted job 1164 with external jobid 'Submitted batch job 19228385'.
+
+[Sun Oct  6 21:47:51 2024]
+rule SimulateReads:
+    input: pipeline/ref/9_child_renamed.0.fa
+    output: pipeline/reads/child_6_9_0.golden.R1.fq, pipeline/reads/child_6_9_0.golden.R2.fq, pipeline/reads/child_6_9_0.golden.bam
+    jobid: 3174
+    reason: Forced execution
+    wildcards: indiv=child, run=6, iter=9, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_6_9_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/9_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_6_9_0.golden.R1.fq -or pipeline/reads/child_6_9_0.golden.R2.fq -oa pipeline/reads/child_6_9_0.golden.bam && rm pipeline/reads/child_6_9_0.golden.R1.fq && rm pipeline/reads/child_6_9_0.golden.R2.fq
+Submitted job 3174 with external jobid 'Submitted batch job 19228386'.
+
+[Sun Oct  6 21:47:51 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.0.fa
+    output: pipeline/reads/child_3_10_0.golden.R1.fq, pipeline/reads/child_3_10_0.golden.R2.fq, pipeline/reads/child_3_10_0.golden.bam
+    jobid: 3534
+    reason: Missing output files: pipeline/reads/child_3_10_0.golden.bam
+    wildcards: indiv=child, run=3, iter=10, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_3_10_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_3_10_0.golden.R1.fq -or pipeline/reads/child_3_10_0.golden.R2.fq -oa pipeline/reads/child_3_10_0.golden.bam && rm pipeline/reads/child_3_10_0.golden.R1.fq && rm pipeline/reads/child_3_10_0.golden.R2.fq
+Submitted job 3534 with external jobid 'Submitted batch job 19228387'.
+
+[Sun Oct  6 21:47:52 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_4_4_1.golden.R1.fq, pipeline/reads/parent_1_4_4_1.golden.R2.fq, pipeline/reads/parent_1_4_4_1.golden.bam
+    jobid: 1194
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=4, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_4_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_4_4_1.golden.R1.fq -or pipeline/reads/parent_1_4_4_1.golden.R2.fq -oa pipeline/reads/parent_1_4_4_1.golden.bam && rm pipeline/reads/parent_1_4_4_1.golden.R1.fq && rm pipeline/reads/parent_1_4_4_1.golden.R2.fq
+Submitted job 1194 with external jobid 'Submitted batch job 19228388'.
+
+[Sun Oct  6 21:47:52 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.0.fa
+    output: pipeline/reads/child_3_5_0.golden.R1.fq, pipeline/reads/child_3_5_0.golden.R2.fq, pipeline/reads/child_3_5_0.golden.bam
+    jobid: 1704
+    reason: Forced execution
+    wildcards: indiv=child, run=3, iter=5, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_3_5_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_3_5_0.golden.R1.fq -or pipeline/reads/child_3_5_0.golden.R2.fq -oa pipeline/reads/child_3_5_0.golden.bam && rm pipeline/reads/child_3_5_0.golden.R1.fq && rm pipeline/reads/child_3_5_0.golden.R2.fq
+Submitted job 1704 with external jobid 'Submitted batch job 19228389'.
+
+[Sun Oct  6 21:47:52 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_7_8_1.golden.R1.fq, pipeline/reads/parent_1_7_8_1.golden.R2.fq, pipeline/reads/parent_1_7_8_1.golden.bam
+    jobid: 2664
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=7, iter=8, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_7_8_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_7_8_1.golden.R1.fq -or pipeline/reads/parent_1_7_8_1.golden.R2.fq -oa pipeline/reads/parent_1_7_8_1.golden.bam && rm pipeline/reads/parent_1_7_8_1.golden.R1.fq && rm pipeline/reads/parent_1_7_8_1.golden.R2.fq
+Submitted job 2664 with external jobid 'Submitted batch job 19228390'.
+
+[Sun Oct  6 21:47:53 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.1.fa
+    output: pipeline/reads/child_6_4_1.golden.R1.fq, pipeline/reads/child_6_4_1.golden.R2.fq, pipeline/reads/child_6_4_1.golden.bam
+    jobid: 1345
+    reason: Forced execution
+    wildcards: indiv=child, run=6, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_6_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_6_4_1.golden.R1.fq -or pipeline/reads/child_6_4_1.golden.R2.fq -oa pipeline/reads/child_6_4_1.golden.bam && rm pipeline/reads/child_6_4_1.golden.R1.fq && rm pipeline/reads/child_6_4_1.golden.R2.fq
+Submitted job 1345 with external jobid 'Submitted batch job 19228391'.
+
+[Sun Oct  6 21:47:53 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_8_8_0.golden.R1.fq, pipeline/reads/parent_1_8_8_0.golden.R2.fq, pipeline/reads/parent_1_8_8_0.golden.bam
+    jobid: 2665
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=8, iter=8, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_8_8_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_8_8_0.golden.R1.fq -or pipeline/reads/parent_1_8_8_0.golden.R2.fq -oa pipeline/reads/parent_1_8_8_0.golden.bam && rm pipeline/reads/parent_1_8_8_0.golden.R1.fq && rm pipeline/reads/parent_1_8_8_0.golden.R2.fq
+Submitted job 2665 with external jobid 'Submitted batch job 19228392'.
+
+[Sun Oct  6 21:47:53 2024]
+rule SimulateReads:
+    input: pipeline/ref/9_child_renamed.1.fa
+    output: pipeline/reads/child_6_9_1.golden.R1.fq, pipeline/reads/child_6_9_1.golden.R2.fq, pipeline/reads/child_6_9_1.golden.bam
+    jobid: 3175
+    reason: Missing output files: pipeline/reads/child_6_9_1.golden.bam
+    wildcards: indiv=child, run=6, iter=9, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_6_9_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/9_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_6_9_1.golden.R1.fq -or pipeline/reads/child_6_9_1.golden.R2.fq -oa pipeline/reads/child_6_9_1.golden.bam && rm pipeline/reads/child_6_9_1.golden.R1.fq && rm pipeline/reads/child_6_9_1.golden.R2.fq
+Submitted job 3175 with external jobid 'Submitted batch job 19228393'.
+
+[Sun Oct  6 21:47:53 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.1.fa
+    output: pipeline/reads/child_3_10_1.golden.R1.fq, pipeline/reads/child_3_10_1.golden.R2.fq, pipeline/reads/child_3_10_1.golden.bam
+    jobid: 3535
+    reason: Missing output files: pipeline/reads/child_3_10_1.golden.bam
+    wildcards: indiv=child, run=3, iter=10, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_3_10_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_3_10_1.golden.R1.fq -or pipeline/reads/child_3_10_1.golden.R2.fq -oa pipeline/reads/child_3_10_1.golden.bam && rm pipeline/reads/child_3_10_1.golden.R1.fq && rm pipeline/reads/child_3_10_1.golden.R2.fq
+Submitted job 3535 with external jobid 'Submitted batch job 19228394'.
+
+[Sun Oct  6 21:47:53 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_5_4_0.golden.R1.fq, pipeline/reads/parent_1_5_4_0.golden.R2.fq, pipeline/reads/parent_1_5_4_0.golden.bam
+    jobid: 1195
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=5, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_5_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_5_4_0.golden.R1.fq -or pipeline/reads/parent_1_5_4_0.golden.R2.fq -oa pipeline/reads/parent_1_5_4_0.golden.bam && rm pipeline/reads/parent_1_5_4_0.golden.R1.fq && rm pipeline/reads/parent_1_5_4_0.golden.R2.fq
+Submitted job 1195 with external jobid 'Submitted batch job 19228395'.
+
+[Sun Oct  6 21:47:54 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.1.fa
+    output: pipeline/reads/child_3_5_1.golden.R1.fq, pipeline/reads/child_3_5_1.golden.R2.fq, pipeline/reads/child_3_5_1.golden.bam
+    jobid: 1705
+    reason: Missing output files: pipeline/reads/child_3_5_1.golden.bam
+    wildcards: indiv=child, run=3, iter=5, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_3_5_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_3_5_1.golden.R1.fq -or pipeline/reads/child_3_5_1.golden.R2.fq -oa pipeline/reads/child_3_5_1.golden.bam && rm pipeline/reads/child_3_5_1.golden.R1.fq && rm pipeline/reads/child_3_5_1.golden.R2.fq
+Submitted job 1705 with external jobid 'Submitted batch job 19228396'.
+
+[Sun Oct  6 21:47:54 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.0.fa
+    output: pipeline/reads/child_7_4_0.golden.R1.fq, pipeline/reads/child_7_4_0.golden.R2.fq, pipeline/reads/child_7_4_0.golden.bam
+    jobid: 1346
+    reason: Forced execution
+    wildcards: indiv=child, run=7, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_7_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_7_4_0.golden.R1.fq -or pipeline/reads/child_7_4_0.golden.R2.fq -oa pipeline/reads/child_7_4_0.golden.bam && rm pipeline/reads/child_7_4_0.golden.R1.fq && rm pipeline/reads/child_7_4_0.golden.R2.fq
+Submitted job 1346 with external jobid 'Submitted batch job 19228397'.
+
+[Sun Oct  6 21:47:54 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_8_8_1.golden.R1.fq, pipeline/reads/parent_1_8_8_1.golden.R2.fq, pipeline/reads/parent_1_8_8_1.golden.bam
+    jobid: 2666
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=8, iter=8, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_8_8_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_8_8_1.golden.R1.fq -or pipeline/reads/parent_1_8_8_1.golden.R2.fq -oa pipeline/reads/parent_1_8_8_1.golden.bam && rm pipeline/reads/parent_1_8_8_1.golden.R1.fq && rm pipeline/reads/parent_1_8_8_1.golden.R2.fq
+Submitted job 2666 with external jobid 'Submitted batch job 19228398'.
+
+[Sun Oct  6 21:47:54 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.0.fa
+    output: pipeline/reads/child_4_10_0.golden.R1.fq, pipeline/reads/child_4_10_0.golden.R2.fq, pipeline/reads/child_4_10_0.golden.bam
+    jobid: 3536
+    reason: Missing output files: pipeline/reads/child_4_10_0.golden.bam
+    wildcards: indiv=child, run=4, iter=10, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_4_10_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_4_10_0.golden.R1.fq -or pipeline/reads/child_4_10_0.golden.R2.fq -oa pipeline/reads/child_4_10_0.golden.bam && rm pipeline/reads/child_4_10_0.golden.R1.fq && rm pipeline/reads/child_4_10_0.golden.R2.fq
+Submitted job 3536 with external jobid 'Submitted batch job 19228399'.
+
+[Sun Oct  6 21:47:54 2024]
+rule SimulateReads:
+    input: pipeline/ref/9_child_renamed.0.fa
+    output: pipeline/reads/child_7_9_0.golden.R1.fq, pipeline/reads/child_7_9_0.golden.R2.fq, pipeline/reads/child_7_9_0.golden.bam
+    jobid: 3176
+    reason: Forced execution
+    wildcards: indiv=child, run=7, iter=9, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_7_9_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/9_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_7_9_0.golden.R1.fq -or pipeline/reads/child_7_9_0.golden.R2.fq -oa pipeline/reads/child_7_9_0.golden.bam && rm pipeline/reads/child_7_9_0.golden.R1.fq && rm pipeline/reads/child_7_9_0.golden.R2.fq
+Submitted job 3176 with external jobid 'Submitted batch job 19228400'.
+
+[Sun Oct  6 21:47:54 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_5_4_1.golden.R1.fq, pipeline/reads/parent_1_5_4_1.golden.R2.fq, pipeline/reads/parent_1_5_4_1.golden.bam
+    jobid: 1196
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=5, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_5_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_5_4_1.golden.R1.fq -or pipeline/reads/parent_1_5_4_1.golden.R2.fq -oa pipeline/reads/parent_1_5_4_1.golden.bam && rm pipeline/reads/parent_1_5_4_1.golden.R1.fq && rm pipeline/reads/parent_1_5_4_1.golden.R2.fq
+Submitted job 1196 with external jobid 'Submitted batch job 19228401'.
+
+[Sun Oct  6 21:47:55 2024]
+rule SimulateReads:
+    input: pipeline/ref/9_child_renamed.0.fa
+    output: pipeline/reads/child_1_9_0.golden.R1.fq, pipeline/reads/child_1_9_0.golden.R2.fq, pipeline/reads/child_1_9_0.golden.bam
+    jobid: 3116
+    reason: Forced execution
+    wildcards: indiv=child, run=1, iter=9, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_1_9_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/9_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_1_9_0.golden.R1.fq -or pipeline/reads/child_1_9_0.golden.R2.fq -oa pipeline/reads/child_1_9_0.golden.bam && rm pipeline/reads/child_1_9_0.golden.R1.fq && rm pipeline/reads/child_1_9_0.golden.R2.fq
+Submitted job 3116 with external jobid 'Submitted batch job 19228402'.
+
+[Sun Oct  6 21:47:55 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.0.fa
+    output: pipeline/reads/child_4_5_0.golden.R1.fq, pipeline/reads/child_4_5_0.golden.R2.fq, pipeline/reads/child_4_5_0.golden.bam
+    jobid: 1706
+    reason: Missing output files: pipeline/reads/child_4_5_0.golden.bam
+    wildcards: indiv=child, run=4, iter=5, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_4_5_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_4_5_0.golden.R1.fq -or pipeline/reads/child_4_5_0.golden.R2.fq -oa pipeline/reads/child_4_5_0.golden.bam && rm pipeline/reads/child_4_5_0.golden.R1.fq && rm pipeline/reads/child_4_5_0.golden.R2.fq
+Submitted job 1706 with external jobid 'Submitted batch job 19228403'.
+
+[Sun Oct  6 21:47:55 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.1.fa
+    output: pipeline/reads/child_7_4_1.golden.R1.fq, pipeline/reads/child_7_4_1.golden.R2.fq, pipeline/reads/child_7_4_1.golden.bam
+    jobid: 1347
+    reason: Forced execution
+    wildcards: indiv=child, run=7, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_7_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_7_4_1.golden.R1.fq -or pipeline/reads/child_7_4_1.golden.R2.fq -oa pipeline/reads/child_7_4_1.golden.bam && rm pipeline/reads/child_7_4_1.golden.R1.fq && rm pipeline/reads/child_7_4_1.golden.R2.fq
+Submitted job 1347 with external jobid 'Submitted batch job 19228404'.
+
+[Sun Oct  6 21:47:55 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.1.fa
+    output: pipeline/reads/child_1_10_1.golden.R1.fq, pipeline/reads/child_1_10_1.golden.R2.fq, pipeline/reads/child_1_10_1.golden.bam
+    jobid: 3507
+    reason: Forced execution
+    wildcards: indiv=child, run=1, iter=10, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_1_10_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_1_10_1.golden.R1.fq -or pipeline/reads/child_1_10_1.golden.R2.fq -oa pipeline/reads/child_1_10_1.golden.bam && rm pipeline/reads/child_1_10_1.golden.R1.fq && rm pipeline/reads/child_1_10_1.golden.R2.fq
+Submitted job 3507 with external jobid 'Submitted batch job 19228405'.
+
+[Sun Oct  6 21:47:55 2024]
+rule SimulateReads:
+    input: pipeline/ref/9_child_renamed.1.fa
+    output: pipeline/reads/child_7_9_1.golden.R1.fq, pipeline/reads/child_7_9_1.golden.R2.fq, pipeline/reads/child_7_9_1.golden.bam
+    jobid: 3177
+    reason: Missing output files: pipeline/reads/child_7_9_1.golden.bam
+    wildcards: indiv=child, run=7, iter=9, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_7_9_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/9_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_7_9_1.golden.R1.fq -or pipeline/reads/child_7_9_1.golden.R2.fq -oa pipeline/reads/child_7_9_1.golden.bam && rm pipeline/reads/child_7_9_1.golden.R1.fq && rm pipeline/reads/child_7_9_1.golden.R2.fq
+Submitted job 3177 with external jobid 'Submitted batch job 19228406'.
+
+[Sun Oct  6 21:47:55 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.1.fa
+    output: pipeline/reads/child_4_10_1.golden.R1.fq, pipeline/reads/child_4_10_1.golden.R2.fq, pipeline/reads/child_4_10_1.golden.bam
+    jobid: 3537
+    reason: Missing output files: pipeline/reads/child_4_10_1.golden.bam
+    wildcards: indiv=child, run=4, iter=10, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_4_10_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_4_10_1.golden.R1.fq -or pipeline/reads/child_4_10_1.golden.R2.fq -oa pipeline/reads/child_4_10_1.golden.bam && rm pipeline/reads/child_4_10_1.golden.R1.fq && rm pipeline/reads/child_4_10_1.golden.R2.fq
+Submitted job 3537 with external jobid 'Submitted batch job 19228407'.
+
+[Sun Oct  6 21:47:56 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_6_4_0.golden.R1.fq, pipeline/reads/parent_1_6_4_0.golden.R2.fq, pipeline/reads/parent_1_6_4_0.golden.bam
+    jobid: 1197
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=6, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_6_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_6_4_0.golden.R1.fq -or pipeline/reads/parent_1_6_4_0.golden.R2.fq -oa pipeline/reads/parent_1_6_4_0.golden.bam && rm pipeline/reads/parent_1_6_4_0.golden.R1.fq && rm pipeline/reads/parent_1_6_4_0.golden.R2.fq
+Submitted job 1197 with external jobid 'Submitted batch job 19228408'.
+
+[Sun Oct  6 21:47:56 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.1.fa
+    output: pipeline/reads/child_1_5_1.golden.R1.fq, pipeline/reads/child_1_5_1.golden.R2.fq, pipeline/reads/child_1_5_1.golden.bam
+    jobid: 1677
+    reason: Missing output files: pipeline/reads/child_1_5_1.golden.bam
+    wildcards: indiv=child, run=1, iter=5, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_1_5_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_1_5_1.golden.R1.fq -or pipeline/reads/child_1_5_1.golden.R2.fq -oa pipeline/reads/child_1_5_1.golden.bam && rm pipeline/reads/child_1_5_1.golden.R1.fq && rm pipeline/reads/child_1_5_1.golden.R2.fq
+Submitted job 1677 with external jobid 'Submitted batch job 19228409'.
+
+[Sun Oct  6 21:47:58 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.1.fa
+    output: pipeline/reads/child_4_5_1.golden.R1.fq, pipeline/reads/child_4_5_1.golden.R2.fq, pipeline/reads/child_4_5_1.golden.bam
+    jobid: 1707
+    reason: Missing output files: pipeline/reads/child_4_5_1.golden.bam
+    wildcards: indiv=child, run=4, iter=5, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_4_5_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_4_5_1.golden.R1.fq -or pipeline/reads/child_4_5_1.golden.R2.fq -oa pipeline/reads/child_4_5_1.golden.bam && rm pipeline/reads/child_4_5_1.golden.R1.fq && rm pipeline/reads/child_4_5_1.golden.R2.fq
+Submitted job 1707 with external jobid 'Submitted batch job 19228410'.
+
+[Sun Oct  6 21:48:01 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.0.fa
+    output: pipeline/reads/child_8_4_0.golden.R1.fq, pipeline/reads/child_8_4_0.golden.R2.fq, pipeline/reads/child_8_4_0.golden.bam
+    jobid: 1348
+    reason: Forced execution
+    wildcards: indiv=child, run=8, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_8_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_8_4_0.golden.R1.fq -or pipeline/reads/child_8_4_0.golden.R2.fq -oa pipeline/reads/child_8_4_0.golden.bam && rm pipeline/reads/child_8_4_0.golden.R1.fq && rm pipeline/reads/child_8_4_0.golden.R2.fq
+Submitted job 1348 with external jobid 'Submitted batch job 19228411'.
+
+[Sun Oct  6 21:48:01 2024]
+rule SimulateReads:
+    input: pipeline/ref/6_child_renamed.0.fa
+    output: pipeline/reads/child_2_6_0.golden.R1.fq, pipeline/reads/child_2_6_0.golden.R2.fq, pipeline/reads/child_2_6_0.golden.bam
+    jobid: 2068
+    reason: Forced execution
+    wildcards: indiv=child, run=2, iter=6, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_2_6_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/6_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_2_6_0.golden.R1.fq -or pipeline/reads/child_2_6_0.golden.R2.fq -oa pipeline/reads/child_2_6_0.golden.bam && rm pipeline/reads/child_2_6_0.golden.R1.fq && rm pipeline/reads/child_2_6_0.golden.R2.fq
+Submitted job 2068 with external jobid 'Submitted batch job 19228412'.
+
+[Sun Oct  6 21:48:01 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_6_4_1.golden.R1.fq, pipeline/reads/parent_1_6_4_1.golden.R2.fq, pipeline/reads/parent_1_6_4_1.golden.bam
+    jobid: 1198
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=6, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_6_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_6_4_1.golden.R1.fq -or pipeline/reads/parent_1_6_4_1.golden.R2.fq -oa pipeline/reads/parent_1_6_4_1.golden.bam && rm pipeline/reads/parent_1_6_4_1.golden.R1.fq && rm pipeline/reads/parent_1_6_4_1.golden.R2.fq
+Submitted job 1198 with external jobid 'Submitted batch job 19228413'.
+
+[Sun Oct  6 21:48:03 2024]
+rule SimulateReads:
+    input: pipeline/ref/9_child_renamed.0.fa
+    output: pipeline/reads/child_8_9_0.golden.R1.fq, pipeline/reads/child_8_9_0.golden.R2.fq, pipeline/reads/child_8_9_0.golden.bam
+    jobid: 3178
+    reason: Forced execution
+    wildcards: indiv=child, run=8, iter=9, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_8_9_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/9_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_8_9_0.golden.R1.fq -or pipeline/reads/child_8_9_0.golden.R2.fq -oa pipeline/reads/child_8_9_0.golden.bam && rm pipeline/reads/child_8_9_0.golden.R1.fq && rm pipeline/reads/child_8_9_0.golden.R2.fq
+Submitted job 3178 with external jobid 'Submitted batch job 19228414'.
+
+[Sun Oct  6 21:48:03 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.0.fa
+    output: pipeline/reads/child_5_10_0.golden.R1.fq, pipeline/reads/child_5_10_0.golden.R2.fq, pipeline/reads/child_5_10_0.golden.bam
+    jobid: 3538
+    reason: Missing output files: pipeline/reads/child_5_10_0.golden.bam
+    wildcards: indiv=child, run=5, iter=10, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_5_10_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_5_10_0.golden.R1.fq -or pipeline/reads/child_5_10_0.golden.R2.fq -oa pipeline/reads/child_5_10_0.golden.bam && rm pipeline/reads/child_5_10_0.golden.R1.fq && rm pipeline/reads/child_5_10_0.golden.R2.fq
+Submitted job 3538 with external jobid 'Submitted batch job 19228421'.
+
+[Sun Oct  6 21:48:06 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.0.fa
+    output: pipeline/reads/child_5_5_0.golden.R1.fq, pipeline/reads/child_5_5_0.golden.R2.fq, pipeline/reads/child_5_5_0.golden.bam
+    jobid: 1708
+    reason: Missing output files: pipeline/reads/child_5_5_0.golden.bam
+    wildcards: indiv=child, run=5, iter=5, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_5_5_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_5_5_0.golden.R1.fq -or pipeline/reads/child_5_5_0.golden.R2.fq -oa pipeline/reads/child_5_5_0.golden.bam && rm pipeline/reads/child_5_5_0.golden.R1.fq && rm pipeline/reads/child_5_5_0.golden.R2.fq
+Submitted job 1708 with external jobid 'Submitted batch job 19228423'.
+
+[Sun Oct  6 21:48:06 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.1.fa
+    output: pipeline/reads/child_8_4_1.golden.R1.fq, pipeline/reads/child_8_4_1.golden.R2.fq, pipeline/reads/child_8_4_1.golden.bam
+    jobid: 1349
+    reason: Forced execution
+    wildcards: indiv=child, run=8, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_8_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_8_4_1.golden.R1.fq -or pipeline/reads/child_8_4_1.golden.R2.fq -oa pipeline/reads/child_8_4_1.golden.bam && rm pipeline/reads/child_8_4_1.golden.R1.fq && rm pipeline/reads/child_8_4_1.golden.R2.fq
+Submitted job 1349 with external jobid 'Submitted batch job 19228424'.
+
+[Sun Oct  6 21:48:06 2024]
+rule SimulateReads:
+    input: pipeline/ref/6_child_renamed.1.fa
+    output: pipeline/reads/child_2_6_1.golden.R1.fq, pipeline/reads/child_2_6_1.golden.R2.fq, pipeline/reads/child_2_6_1.golden.bam
+    jobid: 2069
+    reason: Forced execution
+    wildcards: indiv=child, run=2, iter=6, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_2_6_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/6_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_2_6_1.golden.R1.fq -or pipeline/reads/child_2_6_1.golden.R2.fq -oa pipeline/reads/child_2_6_1.golden.bam && rm pipeline/reads/child_2_6_1.golden.R1.fq && rm pipeline/reads/child_2_6_1.golden.R2.fq
+Submitted job 2069 with external jobid 'Submitted batch job 19228426'.
+
+[Sun Oct  6 21:48:06 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_1_8_0.golden.R1.fq, pipeline/reads/parent_1_1_8_0.golden.R2.fq, pipeline/reads/parent_1_1_8_0.golden.bam
+    jobid: 2579
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=1, iter=8, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_1_8_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_1_8_0.golden.R1.fq -or pipeline/reads/parent_1_1_8_0.golden.R2.fq -oa pipeline/reads/parent_1_1_8_0.golden.bam && rm pipeline/reads/parent_1_1_8_0.golden.R1.fq && rm pipeline/reads/parent_1_1_8_0.golden.R2.fq
+Submitted job 2579 with external jobid 'Submitted batch job 19228427'.
+
+[Sun Oct  6 21:48:08 2024]
+rule SimulateReads:
+    input: pipeline/ref/9_child_renamed.1.fa
+    output: pipeline/reads/child_8_9_1.golden.R1.fq, pipeline/reads/child_8_9_1.golden.R2.fq, pipeline/reads/child_8_9_1.golden.bam
+    jobid: 3179
+    reason: Missing output files: pipeline/reads/child_8_9_1.golden.bam
+    wildcards: indiv=child, run=8, iter=9, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_8_9_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/9_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_8_9_1.golden.R1.fq -or pipeline/reads/child_8_9_1.golden.R2.fq -oa pipeline/reads/child_8_9_1.golden.bam && rm pipeline/reads/child_8_9_1.golden.R1.fq && rm pipeline/reads/child_8_9_1.golden.R2.fq
+Submitted job 3179 with external jobid 'Submitted batch job 19228428'.
+
+[Sun Oct  6 21:48:11 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.1.fa
+    output: pipeline/reads/child_5_10_1.golden.R1.fq, pipeline/reads/child_5_10_1.golden.R2.fq, pipeline/reads/child_5_10_1.golden.bam
+    jobid: 3539
+    reason: Missing output files: pipeline/reads/child_5_10_1.golden.bam
+    wildcards: indiv=child, run=5, iter=10, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_5_10_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_5_10_1.golden.R1.fq -or pipeline/reads/child_5_10_1.golden.R2.fq -oa pipeline/reads/child_5_10_1.golden.bam && rm pipeline/reads/child_5_10_1.golden.R1.fq && rm pipeline/reads/child_5_10_1.golden.R2.fq
+Submitted job 3539 with external jobid 'Submitted batch job 19228429'.
+
+[Sun Oct  6 21:48:11 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_7_4_0.golden.R1.fq, pipeline/reads/parent_1_7_4_0.golden.R2.fq, pipeline/reads/parent_1_7_4_0.golden.bam
+    jobid: 1199
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=7, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_7_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_7_4_0.golden.R1.fq -or pipeline/reads/parent_1_7_4_0.golden.R2.fq -oa pipeline/reads/parent_1_7_4_0.golden.bam && rm pipeline/reads/parent_1_7_4_0.golden.R1.fq && rm pipeline/reads/parent_1_7_4_0.golden.R2.fq
+Submitted job 1199 with external jobid 'Submitted batch job 19228430'.
+
+[Sun Oct  6 21:48:11 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.1.fa
+    output: pipeline/reads/child_5_5_1.golden.R1.fq, pipeline/reads/child_5_5_1.golden.R2.fq, pipeline/reads/child_5_5_1.golden.bam
+    jobid: 1709
+    reason: Missing output files: pipeline/reads/child_5_5_1.golden.bam
+    wildcards: indiv=child, run=5, iter=5, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_5_5_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_5_5_1.golden.R1.fq -or pipeline/reads/child_5_5_1.golden.R2.fq -oa pipeline/reads/child_5_5_1.golden.bam && rm pipeline/reads/child_5_5_1.golden.R1.fq && rm pipeline/reads/child_5_5_1.golden.R2.fq
+Submitted job 1709 with external jobid 'Submitted batch job 19228431'.
+
+[Sun Oct  6 21:48:11 2024]
+rule SimulateReads:
+    input: pipeline/ref/6_child_renamed.0.fa
+    output: pipeline/reads/child_3_6_0.golden.R1.fq, pipeline/reads/child_3_6_0.golden.R2.fq, pipeline/reads/child_3_6_0.golden.bam
+    jobid: 2070
+    reason: Forced execution
+    wildcards: indiv=child, run=3, iter=6, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_3_6_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/6_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_3_6_0.golden.R1.fq -or pipeline/reads/child_3_6_0.golden.R2.fq -oa pipeline/reads/child_3_6_0.golden.bam && rm pipeline/reads/child_3_6_0.golden.R1.fq && rm pipeline/reads/child_3_6_0.golden.R2.fq
+Submitted job 2070 with external jobid 'Submitted batch job 19228432'.
+
+[Sun Oct  6 21:48:14 2024]
+rule SimulateReads:
+    input: pipeline/ref/1_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_2_1_0.golden.R1.fq, pipeline/reads/parent_1_2_1_0.golden.R2.fq, pipeline/reads/parent_1_2_1_0.golden.bam
+    jobid: 91
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=2, iter=1, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_2_1_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/1_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_2_1_0.golden.R1.fq -or pipeline/reads/parent_1_2_1_0.golden.R2.fq -oa pipeline/reads/parent_1_2_1_0.golden.bam && rm pipeline/reads/parent_1_2_1_0.golden.R1.fq && rm pipeline/reads/parent_1_2_1_0.golden.R2.fq
+Submitted job 91 with external jobid 'Submitted batch job 19228433'.
+
+[Sun Oct  6 21:48:15 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.0.fa
+    output: pipeline/reads/child_6_10_0.golden.R1.fq, pipeline/reads/child_6_10_0.golden.R2.fq, pipeline/reads/child_6_10_0.golden.bam
+    jobid: 3540
+    reason: Missing output files: pipeline/reads/child_6_10_0.golden.bam
+    wildcards: indiv=child, run=6, iter=10, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_6_10_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_6_10_0.golden.R1.fq -or pipeline/reads/child_6_10_0.golden.R2.fq -oa pipeline/reads/child_6_10_0.golden.bam && rm pipeline/reads/child_6_10_0.golden.R1.fq && rm pipeline/reads/child_6_10_0.golden.R2.fq
+Submitted job 3540 with external jobid 'Submitted batch job 19228434'.
+
+[Sun Oct  6 21:48:15 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_7_4_1.golden.R1.fq, pipeline/reads/parent_1_7_4_1.golden.R2.fq, pipeline/reads/parent_1_7_4_1.golden.bam
+    jobid: 1200
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=7, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_7_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_7_4_1.golden.R1.fq -or pipeline/reads/parent_1_7_4_1.golden.R2.fq -oa pipeline/reads/parent_1_7_4_1.golden.bam && rm pipeline/reads/parent_1_7_4_1.golden.R1.fq && rm pipeline/reads/parent_1_7_4_1.golden.R2.fq
+Submitted job 1200 with external jobid 'Submitted batch job 19228435'.
+
+[Sun Oct  6 21:48:16 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.0.fa
+    output: pipeline/reads/child_6_5_0.golden.R1.fq, pipeline/reads/child_6_5_0.golden.R2.fq, pipeline/reads/child_6_5_0.golden.bam
+    jobid: 1710
+    reason: Missing output files: pipeline/reads/child_6_5_0.golden.bam
+    wildcards: indiv=child, run=6, iter=5, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_6_5_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_6_5_0.golden.R1.fq -or pipeline/reads/child_6_5_0.golden.R2.fq -oa pipeline/reads/child_6_5_0.golden.bam && rm pipeline/reads/child_6_5_0.golden.R1.fq && rm pipeline/reads/child_6_5_0.golden.R2.fq
+Submitted job 1710 with external jobid 'Submitted batch job 19228436'.
+
+[Sun Oct  6 21:48:16 2024]
+rule SimulateReads:
+    input: pipeline/ref/6_child_renamed.1.fa
+    output: pipeline/reads/child_3_6_1.golden.R1.fq, pipeline/reads/child_3_6_1.golden.R2.fq, pipeline/reads/child_3_6_1.golden.bam
+    jobid: 2071
+    reason: Forced execution
+    wildcards: indiv=child, run=3, iter=6, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_3_6_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/6_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_3_6_1.golden.R1.fq -or pipeline/reads/child_3_6_1.golden.R2.fq -oa pipeline/reads/child_3_6_1.golden.bam && rm pipeline/reads/child_3_6_1.golden.R1.fq && rm pipeline/reads/child_3_6_1.golden.R2.fq
+Submitted job 2071 with external jobid 'Submitted batch job 19228437'.
+
+[Sun Oct  6 21:48:16 2024]
+rule SimulateReads:
+    input: pipeline/ref/1_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_2_1_1.golden.R1.fq, pipeline/reads/parent_1_2_1_1.golden.R2.fq, pipeline/reads/parent_1_2_1_1.golden.bam
+    jobid: 92
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=2, iter=1, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_2_1_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/1_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_2_1_1.golden.R1.fq -or pipeline/reads/parent_1_2_1_1.golden.R2.fq -oa pipeline/reads/parent_1_2_1_1.golden.bam && rm pipeline/reads/parent_1_2_1_1.golden.R1.fq && rm pipeline/reads/parent_1_2_1_1.golden.R2.fq
+Submitted job 92 with external jobid 'Submitted batch job 19228438'.
+
+[Sun Oct  6 21:48:16 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.1.fa
+    output: pipeline/reads/child_6_10_1.golden.R1.fq, pipeline/reads/child_6_10_1.golden.R2.fq, pipeline/reads/child_6_10_1.golden.bam
+    jobid: 3541
+    reason: Missing output files: pipeline/reads/child_6_10_1.golden.bam
+    wildcards: indiv=child, run=6, iter=10, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_6_10_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_6_10_1.golden.R1.fq -or pipeline/reads/child_6_10_1.golden.R2.fq -oa pipeline/reads/child_6_10_1.golden.bam && rm pipeline/reads/child_6_10_1.golden.R1.fq && rm pipeline/reads/child_6_10_1.golden.R2.fq
+Submitted job 3541 with external jobid 'Submitted batch job 19228439'.
+
+[Sun Oct  6 21:48:16 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_8_4_0.golden.R1.fq, pipeline/reads/parent_1_8_4_0.golden.R2.fq, pipeline/reads/parent_1_8_4_0.golden.bam
+    jobid: 1201
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=8, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_8_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_8_4_0.golden.R1.fq -or pipeline/reads/parent_1_8_4_0.golden.R2.fq -oa pipeline/reads/parent_1_8_4_0.golden.bam && rm pipeline/reads/parent_1_8_4_0.golden.R1.fq && rm pipeline/reads/parent_1_8_4_0.golden.R2.fq
+Submitted job 1201 with external jobid 'Submitted batch job 19228440'.
+
+[Sun Oct  6 21:48:16 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.1.fa
+    output: pipeline/reads/child_6_5_1.golden.R1.fq, pipeline/reads/child_6_5_1.golden.R2.fq, pipeline/reads/child_6_5_1.golden.bam
+    jobid: 1711
+    reason: Missing output files: pipeline/reads/child_6_5_1.golden.bam
+    wildcards: indiv=child, run=6, iter=5, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_6_5_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_6_5_1.golden.R1.fq -or pipeline/reads/child_6_5_1.golden.R2.fq -oa pipeline/reads/child_6_5_1.golden.bam && rm pipeline/reads/child_6_5_1.golden.R1.fq && rm pipeline/reads/child_6_5_1.golden.R2.fq
+Submitted job 1711 with external jobid 'Submitted batch job 19228441'.
+
+[Sun Oct  6 21:48:17 2024]
+rule SimulateReads:
+    input: pipeline/ref/6_child_renamed.0.fa
+    output: pipeline/reads/child_4_6_0.golden.R1.fq, pipeline/reads/child_4_6_0.golden.R2.fq, pipeline/reads/child_4_6_0.golden.bam
+    jobid: 2072
+    reason: Forced execution
+    wildcards: indiv=child, run=4, iter=6, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_4_6_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/6_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_4_6_0.golden.R1.fq -or pipeline/reads/child_4_6_0.golden.R2.fq -oa pipeline/reads/child_4_6_0.golden.bam && rm pipeline/reads/child_4_6_0.golden.R1.fq && rm pipeline/reads/child_4_6_0.golden.R2.fq
+Submitted job 2072 with external jobid 'Submitted batch job 19228442'.
+
+[Sun Oct  6 21:48:17 2024]
+rule SimulateReads:
+    input: pipeline/ref/1_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_3_1_0.golden.R1.fq, pipeline/reads/parent_1_3_1_0.golden.R2.fq, pipeline/reads/parent_1_3_1_0.golden.bam
+    jobid: 93
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=3, iter=1, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_3_1_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/1_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_3_1_0.golden.R1.fq -or pipeline/reads/parent_1_3_1_0.golden.R2.fq -oa pipeline/reads/parent_1_3_1_0.golden.bam && rm pipeline/reads/parent_1_3_1_0.golden.R1.fq && rm pipeline/reads/parent_1_3_1_0.golden.R2.fq
+Submitted job 93 with external jobid 'Submitted batch job 19228443'.
+
+[Sun Oct  6 21:48:17 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.0.fa
+    output: pipeline/reads/child_7_10_0.golden.R1.fq, pipeline/reads/child_7_10_0.golden.R2.fq, pipeline/reads/child_7_10_0.golden.bam
+    jobid: 3542
+    reason: Missing output files: pipeline/reads/child_7_10_0.golden.bam
+    wildcards: indiv=child, run=7, iter=10, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_7_10_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_7_10_0.golden.R1.fq -or pipeline/reads/child_7_10_0.golden.R2.fq -oa pipeline/reads/child_7_10_0.golden.bam && rm pipeline/reads/child_7_10_0.golden.R1.fq && rm pipeline/reads/child_7_10_0.golden.R2.fq
+Submitted job 3542 with external jobid 'Submitted batch job 19228444'.
+
+[Sun Oct  6 21:48:17 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_8_4_1.golden.R1.fq, pipeline/reads/parent_1_8_4_1.golden.R2.fq, pipeline/reads/parent_1_8_4_1.golden.bam
+    jobid: 1202
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=8, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_8_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_8_4_1.golden.R1.fq -or pipeline/reads/parent_1_8_4_1.golden.R2.fq -oa pipeline/reads/parent_1_8_4_1.golden.bam && rm pipeline/reads/parent_1_8_4_1.golden.R1.fq && rm pipeline/reads/parent_1_8_4_1.golden.R2.fq
+Submitted job 1202 with external jobid 'Submitted batch job 19228445'.
+
+[Sun Oct  6 21:48:18 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.0.fa
+    output: pipeline/reads/child_1_10_0.golden.R1.fq, pipeline/reads/child_1_10_0.golden.R2.fq, pipeline/reads/child_1_10_0.golden.bam
+    jobid: 3482
+    reason: Forced execution
+    wildcards: indiv=child, run=1, iter=10, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_1_10_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_1_10_0.golden.R1.fq -or pipeline/reads/child_1_10_0.golden.R2.fq -oa pipeline/reads/child_1_10_0.golden.bam && rm pipeline/reads/child_1_10_0.golden.R1.fq && rm pipeline/reads/child_1_10_0.golden.R2.fq
+Submitted job 3482 with external jobid 'Submitted batch job 19228446'.
+
+[Sun Oct  6 21:48:18 2024]
+rule SimulateReads:
+    input: pipeline/ref/5_child_renamed.0.fa
+    output: pipeline/reads/child_7_5_0.golden.R1.fq, pipeline/reads/child_7_5_0.golden.R2.fq, pipeline/reads/child_7_5_0.golden.bam
+    jobid: 1712
+    reason: Missing output files: pipeline/reads/child_7_5_0.golden.bam
+    wildcards: indiv=child, run=7, iter=5, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_7_5_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/5_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_7_5_0.golden.R1.fq -or pipeline/reads/child_7_5_0.golden.R2.fq -oa pipeline/reads/child_7_5_0.golden.bam && rm pipeline/reads/child_7_5_0.golden.R1.fq && rm pipeline/reads/child_7_5_0.golden.R2.fq
+Submitted job 1712 with external jobid 'Submitted batch job 19228447'.
+
+[Sun Oct  6 21:48:18 2024]
+rule SimulateReads:
+    input: pipeline/ref/6_child_renamed.1.fa
+    output: pipeline/reads/child_4_6_1.golden.R1.fq, pipeline/reads/child_4_6_1.golden.R2.fq, pipeline/reads/child_4_6_1.golden.bam
+    jobid: 2073
+    reason: Forced execution
+    wildcards: indiv=child, run=4, iter=6, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_4_6_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/6_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_4_6_1.golden.R1.fq -or pipeline/reads/child_4_6_1.golden.R2.fq -oa pipeline/reads/child_4_6_1.golden.bam && rm pipeline/reads/child_4_6_1.golden.R1.fq && rm pipeline/reads/child_4_6_1.golden.R2.fq
+Submitted job 2073 with external jobid 'Submitted batch job 19228448'.
+
+[Sun Oct  6 21:48:18 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.1.fa
+    output: pipeline/reads/child_7_10_1.golden.R1.fq, pipeline/reads/child_7_10_1.golden.R2.fq, pipeline/reads/child_7_10_1.golden.bam
+    jobid: 3543
+    reason: Missing output files: pipeline/reads/child_7_10_1.golden.bam
+    wildcards: indiv=child, run=7, iter=10, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_7_10_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_7_10_1.golden.R1.fq -or pipeline/reads/child_7_10_1.golden.R2.fq -oa pipeline/reads/child_7_10_1.golden.bam && rm pipeline/reads/child_7_10_1.golden.R1.fq && rm pipeline/reads/child_7_10_1.golden.R2.fq
+Submitted job 3543 with external jobid 'Submitted batch job 19228449'.
+
+[Sun Oct  6 21:48:18 2024]
+rule SimulateReads:
+    input: pipeline/ref/6_child_renamed.1.fa
+    output: pipeline/reads/child_1_6_1.golden.R1.fq, pipeline/reads/child_1_6_1.golden.R2.fq, pipeline/reads/child_1_6_1.golden.bam
+    jobid: 2043
+    reason: Forced execution
+    wildcards: indiv=child, run=1, iter=6, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_1_6_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/6_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_1_6_1.golden.R1.fq -or pipeline/reads/child_1_6_1.golden.R2.fq -oa pipeline/reads/child_1_6_1.golden.bam && rm pipeline/reads/child_1_6_1.golden.R1.fq && rm pipeline/reads/child_1_6_1.golden.R2.fq
+Submitted job 2043 with external jobid 'Submitted batch job 19228450'.
+
+[Sun Oct  6 21:48:18 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.0.fa
+    output: pipeline/reads/child_8_10_0.golden.R1.fq, pipeline/reads/child_8_10_0.golden.R2.fq, pipeline/reads/child_8_10_0.golden.bam
+    jobid: 3544
+    reason: Missing output files: pipeline/reads/child_8_10_0.golden.bam
+    wildcards: indiv=child, run=8, iter=10, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_8_10_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_8_10_0.golden.R1.fq -or pipeline/reads/child_8_10_0.golden.R2.fq -oa pipeline/reads/child_8_10_0.golden.bam && rm pipeline/reads/child_8_10_0.golden.R1.fq && rm pipeline/reads/child_8_10_0.golden.R2.fq
+Submitted job 3544 with external jobid 'Submitted batch job 19228451'.
+
+[Sun Oct  6 21:48:18 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_child_renamed.1.fa
+    output: pipeline/reads/child_8_10_1.golden.R1.fq, pipeline/reads/child_8_10_1.golden.R2.fq, pipeline/reads/child_8_10_1.golden.bam
+    jobid: 3545
+    reason: Missing output files: pipeline/reads/child_8_10_1.golden.bam
+    wildcards: indiv=child, run=8, iter=10, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_8_10_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_8_10_1.golden.R1.fq -or pipeline/reads/child_8_10_1.golden.R2.fq -oa pipeline/reads/child_8_10_1.golden.bam && rm pipeline/reads/child_8_10_1.golden.R1.fq && rm pipeline/reads/child_8_10_1.golden.R2.fq
+Submitted job 3545 with external jobid 'Submitted batch job 19228452'.
+
+[Sun Oct  6 21:48:19 2024]
+rule SimulateReads:
+    input: pipeline/ref/1_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_1_1_1.golden.R1.fq, pipeline/reads/parent_1_1_1_1.golden.R2.fq, pipeline/reads/parent_1_1_1_1.golden.bam
+    jobid: 66
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=1, iter=1, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_1_1_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/1_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_1_1_1.golden.R1.fq -or pipeline/reads/parent_1_1_1_1.golden.R2.fq -oa pipeline/reads/parent_1_1_1_1.golden.bam && rm pipeline/reads/parent_1_1_1_1.golden.R1.fq && rm pipeline/reads/parent_1_1_1_1.golden.R2.fq
+Submitted job 66 with external jobid 'Submitted batch job 19228453'.
+
+[Sun Oct  6 21:48:19 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_parent_2_renamed.0.fa
+    output: pipeline/reads/parent_2_1_4_0.golden.R1.fq, pipeline/reads/parent_2_1_4_0.golden.R2.fq, pipeline/reads/parent_2_1_4_0.golden.bam
+    jobid: 1212
+    reason: Forced execution
+    wildcards: indiv=parent_2, run=1, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_2_1_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_parent_2_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_2_1_4_0.golden.R1.fq -or pipeline/reads/parent_2_1_4_0.golden.R2.fq -oa pipeline/reads/parent_2_1_4_0.golden.bam && rm pipeline/reads/parent_2_1_4_0.golden.R1.fq && rm pipeline/reads/parent_2_1_4_0.golden.R2.fq
+Submitted job 1212 with external jobid 'Submitted batch job 19228454'.
+
+[Sun Oct  6 21:48:19 2024]
+rule SimulateReads:
+    input: pipeline/ref/10_parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_1_10_1.golden.R1.fq, pipeline/reads/parent_2_1_10_1.golden.R2.fq, pipeline/reads/parent_2_1_10_1.golden.bam
+    jobid: 3433
+    reason: Forced execution
+    wildcards: indiv=parent_2, run=1, iter=10, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_2_1_10_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/10_parent_2_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_2_1_10_1.golden.R1.fq -or pipeline/reads/parent_2_1_10_1.golden.R2.fq -oa pipeline/reads/parent_2_1_10_1.golden.bam && rm pipeline/reads/parent_2_1_10_1.golden.R1.fq && rm pipeline/reads/parent_2_1_10_1.golden.R2.fq
+Submitted job 3433 with external jobid 'Submitted batch job 19228455'.
+
+[Sun Oct  6 21:48:19 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_2_8_0.golden.R1.fq, pipeline/reads/parent_1_2_8_0.golden.R2.fq, pipeline/reads/parent_1_2_8_0.golden.bam
+    jobid: 2653
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=2, iter=8, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_2_8_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_2_8_0.golden.R1.fq -or pipeline/reads/parent_1_2_8_0.golden.R2.fq -oa pipeline/reads/parent_1_2_8_0.golden.bam && rm pipeline/reads/parent_1_2_8_0.golden.R1.fq && rm pipeline/reads/parent_1_2_8_0.golden.R2.fq
+Submitted job 2653 with external jobid 'Submitted batch job 19228456'.
+
+[Sun Oct  6 21:48:19 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_2_8_1.golden.R1.fq, pipeline/reads/parent_1_2_8_1.golden.R2.fq, pipeline/reads/parent_1_2_8_1.golden.bam
+    jobid: 2654
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=2, iter=8, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_2_8_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_2_8_1.golden.R1.fq -or pipeline/reads/parent_1_2_8_1.golden.R2.fq -oa pipeline/reads/parent_1_2_8_1.golden.bam && rm pipeline/reads/parent_1_2_8_1.golden.R1.fq && rm pipeline/reads/parent_1_2_8_1.golden.R2.fq
+Submitted job 2654 with external jobid 'Submitted batch job 19228457'.
+
+[Sun Oct  6 21:48:19 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_child_renamed.1.fa
+    output: pipeline/reads/child_1_8_1.golden.R1.fq, pipeline/reads/child_1_8_1.golden.R2.fq, pipeline/reads/child_1_8_1.golden.bam
+    jobid: 2775
+    reason: Forced execution
+    wildcards: indiv=child, run=1, iter=8, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_1_8_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_1_8_1.golden.R1.fq -or pipeline/reads/child_1_8_1.golden.R2.fq -oa pipeline/reads/child_1_8_1.golden.bam && rm pipeline/reads/child_1_8_1.golden.R1.fq && rm pipeline/reads/child_1_8_1.golden.R2.fq
+Submitted job 2775 with external jobid 'Submitted batch job 19228458'.
+
+[Sun Oct  6 21:48:20 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_3_8_0.golden.R1.fq, pipeline/reads/parent_1_3_8_0.golden.R2.fq, pipeline/reads/parent_1_3_8_0.golden.bam
+    jobid: 2655
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=3, iter=8, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_3_8_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_3_8_0.golden.R1.fq -or pipeline/reads/parent_1_3_8_0.golden.R2.fq -oa pipeline/reads/parent_1_3_8_0.golden.bam && rm pipeline/reads/parent_1_3_8_0.golden.R1.fq && rm pipeline/reads/parent_1_3_8_0.golden.R2.fq
+Submitted job 2655 with external jobid 'Submitted batch job 19228459'.
+
+[Sun Oct  6 21:48:20 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.0.fa
+    output: pipeline/reads/child_2_4_0.golden.R1.fq, pipeline/reads/child_2_4_0.golden.R2.fq, pipeline/reads/child_2_4_0.golden.bam
+    jobid: 1336
+    reason: Forced execution
+    wildcards: indiv=child, run=2, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_2_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_2_4_0.golden.R1.fq -or pipeline/reads/child_2_4_0.golden.R2.fq -oa pipeline/reads/child_2_4_0.golden.bam && rm pipeline/reads/child_2_4_0.golden.R1.fq && rm pipeline/reads/child_2_4_0.golden.R2.fq
+Submitted job 1336 with external jobid 'Submitted batch job 19228460'.
+
+[Sun Oct  6 21:48:20 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_3_8_1.golden.R1.fq, pipeline/reads/parent_1_3_8_1.golden.R2.fq, pipeline/reads/parent_1_3_8_1.golden.bam
+    jobid: 2656
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=3, iter=8, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_3_8_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_3_8_1.golden.R1.fq -or pipeline/reads/parent_1_3_8_1.golden.R2.fq -oa pipeline/reads/parent_1_3_8_1.golden.bam && rm pipeline/reads/parent_1_3_8_1.golden.R1.fq && rm pipeline/reads/parent_1_3_8_1.golden.R2.fq
+Submitted job 2656 with external jobid 'Submitted batch job 19228461'.
+
+[Sun Oct  6 21:48:20 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.1.fa
+    output: pipeline/reads/child_2_4_1.golden.R1.fq, pipeline/reads/child_2_4_1.golden.R2.fq, pipeline/reads/child_2_4_1.golden.bam
+    jobid: 1337
+    reason: Forced execution
+    wildcards: indiv=child, run=2, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_2_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_2_4_1.golden.R1.fq -or pipeline/reads/child_2_4_1.golden.R2.fq -oa pipeline/reads/child_2_4_1.golden.bam && rm pipeline/reads/child_2_4_1.golden.R1.fq && rm pipeline/reads/child_2_4_1.golden.R2.fq
+Submitted job 1337 with external jobid 'Submitted batch job 19228462'.
+
+[Sun Oct  6 21:48:20 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_4_8_0.golden.R1.fq, pipeline/reads/parent_1_4_8_0.golden.R2.fq, pipeline/reads/parent_1_4_8_0.golden.bam
+    jobid: 2657
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=4, iter=8, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_4_8_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_4_8_0.golden.R1.fq -or pipeline/reads/parent_1_4_8_0.golden.R2.fq -oa pipeline/reads/parent_1_4_8_0.golden.bam && rm pipeline/reads/parent_1_4_8_0.golden.R1.fq && rm pipeline/reads/parent_1_4_8_0.golden.R2.fq
+Submitted job 2657 with external jobid 'Submitted batch job 19228463'.
+
+[Sun Oct  6 21:48:20 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.0.fa
+    output: pipeline/reads/child_3_4_0.golden.R1.fq, pipeline/reads/child_3_4_0.golden.R2.fq, pipeline/reads/child_3_4_0.golden.bam
+    jobid: 1338
+    reason: Forced execution
+    wildcards: indiv=child, run=3, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_3_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_3_4_0.golden.R1.fq -or pipeline/reads/child_3_4_0.golden.R2.fq -oa pipeline/reads/child_3_4_0.golden.bam && rm pipeline/reads/child_3_4_0.golden.R1.fq && rm pipeline/reads/child_3_4_0.golden.R2.fq
+Submitted job 1338 with external jobid 'Submitted batch job 19228464'.
+
+[Sun Oct  6 21:48:20 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_4_8_1.golden.R1.fq, pipeline/reads/parent_1_4_8_1.golden.R2.fq, pipeline/reads/parent_1_4_8_1.golden.bam
+    jobid: 2658
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=4, iter=8, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_4_8_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_4_8_1.golden.R1.fq -or pipeline/reads/parent_1_4_8_1.golden.R2.fq -oa pipeline/reads/parent_1_4_8_1.golden.bam && rm pipeline/reads/parent_1_4_8_1.golden.R1.fq && rm pipeline/reads/parent_1_4_8_1.golden.R2.fq
+Submitted job 2658 with external jobid 'Submitted batch job 19228465'.
+
+[Sun Oct  6 21:48:20 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.1.fa
+    output: pipeline/reads/child_3_4_1.golden.R1.fq, pipeline/reads/child_3_4_1.golden.R2.fq, pipeline/reads/child_3_4_1.golden.bam
+    jobid: 1339
+    reason: Forced execution
+    wildcards: indiv=child, run=3, iter=4, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_3_4_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_3_4_1.golden.R1.fq -or pipeline/reads/child_3_4_1.golden.R2.fq -oa pipeline/reads/child_3_4_1.golden.bam && rm pipeline/reads/child_3_4_1.golden.R1.fq && rm pipeline/reads/child_3_4_1.golden.R2.fq
+Submitted job 1339 with external jobid 'Submitted batch job 19228466'.
+
+[Sun Oct  6 21:48:21 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_5_8_0.golden.R1.fq, pipeline/reads/parent_1_5_8_0.golden.R2.fq, pipeline/reads/parent_1_5_8_0.golden.bam
+    jobid: 2659
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=5, iter=8, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_5_8_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_5_8_0.golden.R1.fq -or pipeline/reads/parent_1_5_8_0.golden.R2.fq -oa pipeline/reads/parent_1_5_8_0.golden.bam && rm pipeline/reads/parent_1_5_8_0.golden.R1.fq && rm pipeline/reads/parent_1_5_8_0.golden.R2.fq
+Submitted job 2659 with external jobid 'Submitted batch job 19228467'.
+
+[Sun Oct  6 21:48:21 2024]
+rule SimulateReads:
+    input: pipeline/ref/4_child_renamed.0.fa
+    output: pipeline/reads/child_4_4_0.golden.R1.fq, pipeline/reads/child_4_4_0.golden.R2.fq, pipeline/reads/child_4_4_0.golden.bam
+    jobid: 1340
+    reason: Forced execution
+    wildcards: indiv=child, run=4, iter=4, genome=0
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_child_4_4_0" --seed $RANDOM --num-threads 12 -ir pipeline/ref/4_child_renamed.0.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/child_4_4_0.golden.R1.fq -or pipeline/reads/child_4_4_0.golden.R2.fq -oa pipeline/reads/child_4_4_0.golden.bam && rm pipeline/reads/child_4_4_0.golden.R1.fq && rm pipeline/reads/child_4_4_0.golden.R2.fq
+Submitted job 1340 with external jobid 'Submitted batch job 19228468'.
+
+[Sun Oct  6 21:48:21 2024]
+rule SimulateReads:
+    input: pipeline/ref/8_parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_5_8_1.golden.R1.fq, pipeline/reads/parent_1_5_8_1.golden.R2.fq, pipeline/reads/parent_1_5_8_1.golden.bam
+    jobid: 2660
+    reason: Forced execution
+    wildcards: indiv=parent_1, run=5, iter=8, genome=1
+    threads: 12
+    resources: mem_mb=64000, mem_mib=61036, disk_mb=5127, disk_mib=4890, tmpdir=<TBD>, runtime=720
+
+~/mason/bin/mason_simulator --read-name-prefix "simulated_parent_1_5_8_1" --seed $RANDOM --num-threads 12 -ir pipeline/ref/8_parent_1_renamed.1.fa --fragment-mean-size 300 --illumina-read-length 100 -n 9955082 -o pipeline/reads/parent_1_5_8_1.golden.R1.fq -or pipeline/reads/parent_1_5_8_1.golden.R2.fq -oa pipeline/reads/parent_1_5_8_1.golden.bam && rm pipeline/reads/parent_1_5_8_1.golden.R1.fq && rm pipeline/reads/parent_1_5_8_1.golden.R2.fq
+Submitted job 2660 with external jobid 'Submitted batch job 19228469'.

@@ -23,6 +23,7 @@ output = []
 wd = args.working_directory
 output_file.write("Filter\tThreshold\tTotal_Sites\tMutations\tVariants\tSequencing_Errors\n")
 complete_file.write("Filter\tThreshold\tTotal_Sites\tMutations\tVariants\tSequencing_Errors\n")
+
 if vars_used:
     orig_var_sites = int(os.popen("grep -v '#' "+wd+"/pipeline/mutations/polymorphisms."+num+".vcf | wc -l").read())
     mv_var_sites = int(os.popen("grep -v '#' "+wd+"/pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV."+num+".polymorphisms.vcf | wc -l").read())
