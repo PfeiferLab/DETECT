@@ -112,14 +112,12 @@ def return_AB(run,bound):
 
     if bound == 'max':
         best_ab = max(mut_list)
-        filtername = 'ABMAX'
         mut_counts = len([x for x in mut_list if x <= best_ab])
         var_counts = len([x for x in var_list if x <= best_ab])
         err_counts = len([x for x in err_list if x <= best_ab])
     
     elif bound == 'min':
         best_ab = min(mut_list)
-        filtername = 'ABMIN'
         mut_counts = len([x for x in mut_list if x <= best_ab])
         var_counts = len([x for x in var_list if x <= best_ab])
         err_counts = len([x for x in err_list if x <= best_ab])
@@ -128,20 +126,7 @@ def return_AB(run,bound):
         print("ERROR")
         sys.exit()
     total_counts = mut_counts + var_counts + err_counts
-    return [run,filtername,bound,best_ab,total_counts,mut_counts,var_counts,err_counts]
-
-filter_names=['parent_1.DPMIN','parent_1.DPMAX',
-        'parent_2.DPMIN','parent_2.DPMAX',
-        'child.DPMIN','child.DPMAX',
-        'parent_1.GQ','parent_2.GQ','child.GQ',
-        'QUAL',
-        'parent_1.AD','parent_2.AD',
-        'child.ABMIN','child.ABMAX',
-        'QD',
-        'MQRS.MIN','MQRS.MAX',
-        'RPRS.MIN','RPRS.MAX',
-        'FS',
-        'SOR']
+    return [run,'child.AB',bound,best_ab,total_counts,mut_counts,var_counts,err_counts]
 
 total_output = []
 
