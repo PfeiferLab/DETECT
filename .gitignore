@@ -1,6 +1,6 @@
 .snakemake/*
 .snakemake_backup/*
-demo/demo_workdir/.snakemake/*
+demo/demo_workdir/*.
 *.swp
 *.err
 *.out

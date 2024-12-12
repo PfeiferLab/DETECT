@@ -26,7 +26,7 @@ output_file = open(args.out_file,'w')
 if not os.path.exists('pipeline/run_outputs'):
     os.makedirs('pipeline/run_outputs')
 
-runs = int(args.num_iter)
+run = int(args.num_iter)
 rec_filter_output_dict = {}
 
 def return_counts(run,filtername,bound):
@@ -118,9 +118,9 @@ def return_AB(run,bound):
     
     elif bound == 'min':
         best_ab = min(mut_list)
-        mut_counts = len([x for x in mut_list if x <= best_ab])
-        var_counts = len([x for x in var_list if x <= best_ab])
-        err_counts = len([x for x in err_list if x <= best_ab])
+        mut_counts = len([x for x in mut_list if x >= best_ab])
+        var_counts = len([x for x in var_list if x >= best_ab])
+        err_counts = len([x for x in err_list if x >= best_ab])
 
     else:
         print("ERROR")
@@ -131,7 +131,7 @@ def return_AB(run,bound):
 total_output = []
 
 run_output = [] 
-num_muts = os.popen('grep -v "#" pipeline/mutations/all_mutations.'+str(run)+'.phased.vcf | wc -l').read()
+num_muts = os.popen('grep -v "#" pipeline/mutations/input_mutations.'+str(run)+'.phased.vcf | wc -l').read()
 mut_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.mutations.table')
 #var_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.polymorphisms.table')
 #err_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.errors.table')

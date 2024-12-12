@@ -97,19 +97,19 @@ rule Mutate:
 #	multihit='pipeline/mutations/multihit_count.{iter}.txt'
     params:                                                                     
     	mu  = config['dnm_file'] if config['dnm_file'] != "False" else config['mu'],
-	script = 'mutator.py' if config['dnm_file'] != 'False'	else 'mutator_no_dnm_list.py',
+	
         chroms = ",".join(list(config["chroms"].keys())),                       
         snakedir = SNAKEDIR,
     resources:
         mem_mb = 8000,
 	runtime='15m'
     shell:                                                                      
-        'python {params.snakedir}/scripts/{params.script} -i {input.fa} -u {params.mu} -p \"parent_1,parent_2,child\" -c \"{params.chroms}\" -n {wildcards.iter} -o {output.muts}; '
+        'python {params.snakedir}/scripts/mutator.py -i {input.fa} -u {params.mu} -p \"parent_1,parent_2,child\" -c \"{params.chroms}\" -n {wildcards.iter} -o {output.muts}; '
 	'gatk IndexFeatureFile -I {output.muts}'
 
 rule ReformatMutations:
 	input:
-		'pipeline/mutations/input_mutations.{iter}.phased.vcf'
+		muts = config['dnm_file'] if config['dnm_file'] != 'False' else 'pipeline/mutations/input_mutations.{iter}.phased.vcf'
 	output:
 		'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
 	params:
@@ -117,7 +117,7 @@ rule ReformatMutations:
 	resources:
 		runtime='15m'
 	shell:
-		'python {params.snakedir}/scripts/reformat_vcf.py {input} > {output} && gatk IndexFeatureFile -I {input}'
+		'python {params.snakedir}/scripts/reformat_vcf.py {input.muts} > {output} && gatk IndexFeatureFile -I {output}'
 
 rule splitVCF:
 	input:
@@ -138,8 +138,6 @@ rule VCFtoFasta:
 		'pipeline/ref/{indiv}_{chromosome}:{genome}.fasta' 
 	params:
 		ref = config['reference_genome'],
-		
-	#conda: 'DETECT_053124_env.yml'
 	resources:
 		runtime='15m'
 	shell:
@@ -189,8 +187,10 @@ rule MutateGoldenBam:
 		vcf='pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
 	output:
 		'pipeline/reads/child_{iter}.golden.mutated.bam'
+	params:
+		jvarkit = config['apps']['jvarkit']
 	shell:
-		'java -jar ~/jvarkit/dist/biostar404363.jar -p {input.vcf} -o {output} {input.bam}'
+		'java -jar {params.jvarkit} -p {input.vcf} -o {output} {input.bam}'
 
 rule SamToFastq:
 	input:
@@ -221,10 +221,10 @@ rule DownsampleBam:
 		'pipeline/sorted_bams/{indiv}.{iter}.bam'
 	output:
 		'pipeline/sorted_bams/{indiv}.downsampled.{iter}.bam'
-		int(config['num_cores'])
 	resources:
 		mem_mb = 2000 * int(config['num_cores']),
 		runtime='4h'
+	threads: int(config['num_cores'])
 	
 	shell:
 		'samtools view -@ {threads} -b -s 0.83333333 {input} > {output}'
@@ -235,8 +235,7 @@ rule SortBam:
     output:
         'pipeline/sorted_bams/{indiv}.downsampled.sorted.{iter}.bam'
     resources:
-        mem_mb=get_mem_mb
-    threads: 12
+        mem_mb=lambda wc, input: max(input.size_mb*2,1024)
     shell:
         'gatk SortSam --java-options "-Xmx{resources.mem_mb}m" -I {input} --TMP_DIR pipeline/sorted_bams/ -O {output} -SO coordinate '
 	
@@ -250,7 +249,7 @@ rule MarkDuplicates:
     retries: 20
     resources:
     	runtime='1d',
-        mem_mb=get_mem_mb,
+	mem_mb=lambda wc, input: input.size_mb*2,
     shell:
         'gatk --java-options "-Xmx{resources.mem_mb}m" MarkDuplicates -I {input} -O {output.output_bam} -M {output.output_metrics}  --TMP_DIR pipeline/mark_dups/ --CREATE_INDEX true'
 
@@ -289,7 +288,7 @@ rule CallVariants:
     resources:
     	tmpdir='pipeline/call_variants/',
 	runtime='1d',
-	mem_mb=get_mem_mb
+	mem_mb=lambda wc, input: input.size_mb*2
     shell:
         'gatk --java-options "-Xmx{resources.mem_mb}m" HaplotypeCaller -R {input.reference}  -I {input.input_bam}  -ERC GVCF --minimum-mapping-quality 40 --max-reads-per-alignment-start 0 --pcr-indel-model NONE -O {output.output_vcf} -L {wildcards.chromosome} --tmp-dir {resources.tmpdir} -bamout {output.reassembled_bam}'
 
@@ -302,13 +301,14 @@ rule GenotypeVariants:
         'pipeline/genotype_variants/{chromosome}_trio.downsampled.sorted.mark_dups.{iter}.vcf'
     params:
         reference = config['reference_genome'],
+	gatk3 = config['apps']['gatk3']
     resources:
     	tmpdir='pipeline/genotype_variants/',
 	runtime='1d'
     shell:
-        'gatk3 \
+        'apptainer exec --bind \"/scratch/mmilhave/\" {params.gatk3} gatk \
 -T GenotypeGVCFs \
--R /scratch/mmilhave/refs/panTro6.fa \
+-R {params.reference} \
 --variant {input.p1_vcf} \
 --variant {input.p2_vcf} \
 --variant {input.ch_vcf} \
@@ -386,7 +386,8 @@ rule get_vars_table:
 rule get_MV_errors:
 	input:
 		vcf = 'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.vcf',
-		muts = 'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
+		muts = 'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf',
+		xvars = config['input_variants']
 	output:
 		'pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.errors.vcf'
 	resources:
@@ -410,7 +411,7 @@ rule get_recommended_stats:
 		vars_table = expand('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.polymorphisms.table',iter=np.arange(1,int(config['num_iterations'])+1)),
 		err_table = expand('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.{iter}.errors.table',iter=np.arange(1,int(config['num_iterations'])+1))
 	output:
-		'pipeline/run_outputs/run.{iter}.statistics.txt'
+		'pipeline/run_outputs/run{iter}.statistics.txt'
 		
 	params:
 		work_dir = config['working_directory'],

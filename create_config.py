@@ -158,26 +158,22 @@ output["coverages"]["parent_1"] = coverages[0]
 output["coverages"]["parent_2"] = coverages[1]                                 
 output["coverages"]["child"] = coverages[2]
 
-#Adding -F
-output["filters"] = {}
-for line in filter_file:
-    if "#" not in line:
-        name,min_filter,max_filter,step=line.strip().split()
-
-        output["filters"][name] = {}
-        output["filters"][name]["min"] = str(float(min_filter))
-        output["filters"][name]["max"] = str(float(max_filter))
-        output["filters"][name]["step"] = str(float(step))
-
 #Adding apps 
 output["apps"] = {}
 deps = ["bwa","mason_simulator","python","samtools","gatk"]
+
+hasJvarkit = False
+hasGatk3 = False
+
 try:
     path_list = os.path.abspath(args.path_list)
     for line in open(path_list):
         fields = line.strip().split()
         output["apps"][fields[0]] = fields[1]
-
+        if fields[0] == 'jvarkit':
+            hasJvarkit = True
+        if fields[0] == 'gatk3':
+            hasGatk3 = True
     for dep in deps:
         if dep not in output["apps"].keys():
             output["apps"][dep] = dep
