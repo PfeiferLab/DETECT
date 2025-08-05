@@ -30,9 +30,9 @@ run = int(args.num_iter)
 rec_filter_output_dict = {}
 
 def return_counts(run,filtername,bound):
-    mut_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.mutations.table')
-    var_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.polymorphisms.table')
-    err_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.errors.table')
+    mut_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.mutations.table')
+    var_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.polymorphisms.table')
+    err_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.errors.table')
     if bound == 'max':
         val = max(mut_table[filtername]) 
         mut_counts = len(mut_table[mut_table[filtername] <= val])
@@ -50,9 +50,9 @@ def return_counts(run,filtername,bound):
     return [run,filtername,bound,val,total_counts,mut_counts,var_counts,err_counts]
 
 def return_AD(run,filtername,bound):
-    mut_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.mutations.table')
-    var_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.polymorphisms.table')
-    err_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.errors.table')
+    mut_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.mutations.table')
+    var_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.polymorphisms.table')
+    err_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.errors.table')
 
     mut_list = []
     var_list = []
@@ -81,9 +81,9 @@ def return_AD(run,filtername,bound):
     return [run,filtername,bound,best_ad,total_counts,mut_counts,var_counts,err_counts]
 
 def return_AB(run,bound):
-    mut_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.mutations.table')
-    var_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.polymorphisms.table')
-    err_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.errors.table')
+    mut_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.mutations.table')
+    var_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.polymorphisms.table')
+    err_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.errors.table')
     
     mut_list = []
     var_list = []
@@ -93,7 +93,7 @@ def return_AB(run,bound):
         ref,alt = site.split(',')
         ref = int(ref)
         alt = int(alt)
-        ab = alt/(ref+alt)
+        ab = round(alt/(ref+alt),2)
         mut_list.append(ab)
     
     for site in var_table['child.AD']:
@@ -132,10 +132,10 @@ total_output = []
 
 run_output = [] 
 num_muts = os.popen('grep -v "#" pipeline/mutations/input_mutations.'+str(run)+'.phased.vcf | wc -l').read()
-mut_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.mutations.table')
-#var_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.polymorphisms.table')
-#err_table = pd.read_table('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.errors.table')
-print('pipeline/MV/all_chr_trio.downsampled.sorted.mark_dups.MV.'+str(run)+'.mutations.table')
+mut_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.mutations.table')
+#var_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.polymorphisms.table')
+#err_table = pd.read_table('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.errors.table')
+print('pipeline/MV/all_chr_trio.sorted.mark_dups.MV.'+str(run)+'.mutations.table')
 print(mut_table.columns)
 #DPMAX
 max_dp_p1 = return_counts(run,'parent_1.DP','max') #max(mut_table['parent_1.DP'])
@@ -229,7 +229,9 @@ run_output.append(best_fs)
 best_sor = return_counts(run,'SOR','max')
 run_output.append(best_sor)
 #[run,filtername,bound,total_counts,mut_counts,var_counts,err_counts]
-df = pd.DataFrame(run_output,columns = ['Run','FilterName','FilterValue','min/max','TotalSites','MutCounts','VarCounts','ErrCounts'])
-df.to_csv('pipeline/run_outputs/run'+str(run)+'.statistics.txt',sep='\t',index=False)
+df = pd.DataFrame(run_output,columns = ['Run','FilterName','min/max','FilterValue','TotalSites','MutCounts','VarCounts','ErrCounts'])
+print(df)
+outfile = open('pipeline/run_outputs/run'+str(run)+'.statistics.txt','w')
+df.to_csv(outfile,sep='\t',index=False)
 #Conglomerate Runs
-
+outfile.close()

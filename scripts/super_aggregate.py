@@ -41,4 +41,4 @@ for filtername in iter_dict.keys():
             variance=statistics.variance(iter_dict[filtername][bound])
         else:
             variance=0
-        output_file.write(filtername+'\t'+bound+'\t'+str(mean)+'\t'+str(variance)+'\t'+'\t'.join([str(x) for x in iter_dict[filtername][bound]])+'\n')
+        output_file.write(filtername+'\t'+bound+'\t'+str(round(mean,2))+'\t'+str(round(variance,2))+'\t'+'\t'.join([str(x) for x in iter_dict[filtername][bound]])+'\n')

@@ -9,8 +9,8 @@ required_args = parser.add_argument_group('Required arguments')
 required_args.add_argument("-C","--coverages",dest="coverages",help="Comma delimited string with coverages of Dam,Sire,Offspring in empirical data",required = True)
 required_args.add_argument("-O","--output-file",dest="output_file",help="Output .txt file.", required = True)
 required_args.add_argument("-R","--reference-genome",dest="ref",help="Reference Genome of organism in question", required = True)
-required_args.add_argument("-V","--input-variants",dest="input_variants",help="Variant catalog to act as false positives. Optional, but recommended.",default="NONE",required = False)
-
+required_args.add_argument("-V","--input-variants",dest="input_variants",help="Variant catalog to act as false positives.",default="NONE",required = True)
+required_args.add_argument("-KV","--known-variants",dest="known_variants",help="Variant catalog to be used during BQSR. If not specified, -V will be used.",default="NONE",required=True)
 optional_args = parser.add_argument_group('Optional arguments')
 optional_args.add_argument("-U","--mutation-rate",dest="mutation_rate",help="Estimated mutation rate of organism. Mutation rate has to be nonzero OR there has to be a specified DNM file. Default: 0", default=0, required = False)
 optional_args.add_argument("-D","--dnm-list",dest="dnm_file",help="VCF file containing DNMs to populate the offspring. Either the DNM file has to be specified, or the mutation rate has to be nonzero. Default: Random DNMs will be populated on the offspring.",default="False",required=False)
@@ -32,8 +32,9 @@ args = parser.parse_args()
 cwd = os.path.abspath(os.path.dirname(__file__))
 ref = os.path.abspath(args.ref) 
 dnm_file = args.dnm_file
-mutation_rate = float(args.mutation_rate)
+mutation_rate =  float(args.mutation_rate)
 input_variants = os.path.abspath(args.input_variants)
+known_variants = os.path.abspath(args.known_variants)
 read_length = args.read_length
 read_fragment = args.frag_len
 frag_stdv = args.frag_stdv
@@ -120,7 +121,11 @@ except:
     print("No dictionary detected. Please rerun this command after creating the dictionary.")                        
     sys.exit()
 
-vcf_idx = input_variants.replace(".vcf",".vcf.idx")
+if input_variants.endswith('.gz'):
+    vcf_idx = input_variants.replace(".vcf.gz",".vcf.gz.tbi")
+else:
+    vcf_idx = input_variants.replace(".vcf",".vcf.idx")
+
 
 try:
     open_vcf_idx = open(vcf_idx,'r')
@@ -183,6 +188,13 @@ except:
 #Adding -V                                                                      
 if args.input_variants != "NONE":                                                    
     output["input_variants"] = input_variants                                   
+else:
+    print("You NEED False positive variants. I recommend running a pipeline to produce some variants (our own version is coming), and use that final VCF as input here.")
+
+if args.known_variants != "NONE":
+    output["known_variants"] = known_variants
+else:
+    output["known_variants"] = input_variants
 
 #Setting Trio or Population Level VCF
 if args.trio:
@@ -203,7 +215,7 @@ if not args.trio and not args.population and args.input_variants != "NONE":
     print("You must specify whether the VCF is a trio or a population!")
     sys.exit()
 
-output["num_cores"] = args.cpu_count
+output["num_cores"] = int(args.cpu_count)
 
 output["snakemake_dir"] = cwd
 
