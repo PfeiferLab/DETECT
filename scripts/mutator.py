@@ -11,23 +11,16 @@ import sys
 seq = ['A','G','C','T']
 num_list = [0,1,2,3]
 
-###############################################################
-####Mean and SD are from Tatsumoto nonMV, filtered variants####
-####mean=0.4945519#############################################
-####sd=0.05927348##############################################
-###############################################################
-
-
 parser = argparse.ArgumentParser(description="Creates a VCF file with a mutation rate equivalent to the mu input in positions bounded by the input FASTA.")
 parser.add_argument("-i","--input-fasta",dest="input_file",help="The input FASTA file.")
-parser.add_argument("-u","--mutation-rate",dest="mutation_count",help="The mutation rate/count.")
+parser.add_argument("-u","--mutation-input",dest="mutation_input",help="The mutation rate/count/file.")
 parser.add_argument("-o","--output-VCF",dest="output_file",help="Output VCF file.")
 parser.add_argument("-p","--pedigree",dest="pedigree",help="comma delimited string for dam,sire,offspring")
 parser.add_argument("-n","--num",dest="num",help="the number to add to the end.")
 args = parser.parse_args()
 
 input_file = SeqIO.parse(open(args.input_file),'fasta')
-num_mutations = float(args.mutation_count)
+mutation_input = args.mutation_input
 mutation_file = open(args.output_file,'w')
 pedigree_list = args.pedigree.strip().split(",")
 num=args.num
@@ -38,29 +31,71 @@ total_len = 0
 contig_lines=[]
 
 config = json.load(open('config/config.json'))
-chrom_lengths = [int(x) for x in config['chroms'].values()]
-total_length = sum(chrom_lengths)
-weights = [x/total_length for x in chrom_lengths]
-print(weights)
-chroms = list(config['chroms'].keys())
-print(chroms)
-mut_chrom_list = np.random.choice(chroms,size=int(num_mutations),replace=True, p=weights)
-
-mutation_lines=[]
 
 mutation_file.write("##fileformat=VCFv4.2\n")
-mutation_file.write("##INFO=<ID=ST,Number=A,Type=Float,Description=\"input mu:"+str()+"\tmu_calculation:"+str(float(num_mutations)/total_length)+"\">\n")
+#mutation_file.write("##INFO=<ID=ST,Number=A,Type=Float,Description=\"input mu:"+str()+"\tmu_calculation:"+str(float(num_mutations)/total_length)+"\">\n")
 mutation_file.write("##INFO=<ID=MT,Number=A,Type=Integer,Description=\"Whether the site is a mutation or not; 1: Yes, 0: No\">\n")
 mutation_file.write("##FORMAT=<ID=GT,Number=A,Type=Float,Description=\"Genotype\""+">\n")
 
-mut_dict = {}
-for chrom in mut_chrom_list:
-    chrom_length = int(config['chroms'][chrom])
-    pos = np.random.randint(1,chrom_length+1)
-    if chrom not in mut_dict.keys():
-        mut_dict[chrom] = []
-    mut_dict[chrom].append(pos)
+mutation_input_type = ""
 
+chroms = list(config['chroms'].keys())
+
+try:
+   mutation_input = float(mutation_input)
+   if mutation_input >= 1:
+       print("Mutation Count Detected.")
+       mutation_input_type="count"
+   else:
+       print("Mutation Rate Detected.")
+       mutation_input_type="rate"
+except:
+    print("Mutation File Detected.")
+    mutation_input_type="file"
+
+mut_dict={}
+
+if mutation_input_type!="file":
+    verb="created"
+    chrom_lengths = [int(x) for x in config['chroms'].values()]
+    total_length = sum(chrom_lengths)
+    weights = [x/total_length for x in chrom_lengths]
+    
+    if mutation_input_type == "count":
+        num_mutations = int(mutation_input)
+    
+    if mutation_input_type == "rate":
+        expected_number = float(mutation_input) * total_length * 2
+        num_mutations = np.random.poisson(expected_number)
+    
+    mut_chrom_list = np.random.choice(chroms,size=int(num_mutations),replace=True, p=weights)
+    for chrom in mut_chrom_list:
+        all_pos = []
+        chrom_length = int(config['chroms'][chrom])
+        if chrom not in mut_dict.keys():
+            mut_dict[chrom] = []
+        pos=-1 #initiate pos before while loop, but make it a position that can't normally exist
+        while pos in mut_dict[chrom] or pos < 0:
+            pos = np.random.randint(1,chrom_length+1)
+        mut_dict[chrom].append(pos)
+
+else:
+    verb="imported"
+    num_mutations=0
+    mutation_input_file = open(mutation_input)
+    for line in mutation_input_file:
+        if "#" in line:
+            continue
+        fields = line.strip().split()
+        chrom=fields[0]
+        pos=int(fields[1])
+        if chrom not in mut_dict.keys():
+            mut_dict[chrom] = []
+        mut_dict[chrom].append(pos)
+        num_mutations+=1
+
+mutation_lines=[]
+print(str(num_mutations)+" mutations "+verb+".")
 for item in input_file:
     genome_seq = item.seq
     header = item.id

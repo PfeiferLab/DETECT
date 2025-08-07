@@ -100,7 +100,7 @@ rule Mutate:
 	output:
 		muts='pipeline/mutations/input_mutations.{iter}.phased.vcf'
 	params:
-		mu  = config['dnm_file'] if config['dnm_file'] != "False" else config['mu'],
+		mu  = config['mutation_input'],
 		snakedir = SNAKEDIR
 	resources:
 		mem_mb = 8000,
@@ -111,7 +111,7 @@ rule Mutate:
 
 rule ReformatMutations:
 	input:
-		muts = config['dnm_file'] if config['dnm_file'] != 'False' else 'pipeline/mutations/input_mutations.{iter}.phased.vcf'
+		muts = 'pipeline/mutations/input_mutations.{iter}.phased.vcf'
 	output:
 		'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
 	params:
@@ -167,8 +167,10 @@ rule SimulateReads:
 		golden_bam = temp('pipeline/reads/{indiv}_{sim}_{iter}_{genome}.golden.bam')
 	params:
 		read_length = config['read_length'],
-		read_fragmean = config['read_fragment'],
+		frag_mean = config['read_fragment'],
+		frag_sd = config['frag_stdv'],
 		read_count = get_reads_per_sim,
+		
 	retries: 20
 	resources:
 		mem_mb=get_mem_mb,
@@ -176,7 +178,17 @@ rule SimulateReads:
 	threads:
 		int(config['num_cores'])
 	shell:
-		'mason_simulator --read-name-prefix "simulated_{wildcards.indiv}_{wildcards.sim}_{wildcards.iter}_{wildcards.genome}" --seed $RANDOM --num-threads 12 -ir {input.fa} --fragment-mean-size {params.read_fragmean} --illumina-read-length {params.read_length} -n {params.read_count} -o {output.r1} -or {output.r2} -oa {output.golden_bam}' 
+		'mason_simulator \
+		--read-name-prefix "simulated_{wildcards.indiv}_{wildcards.sim}_{wildcards.iter}_{wildcards.genome}" \
+		--seed $RANDOM --num-threads {threads} \
+		-ir {input.fa} \
+		--fragment-mean-size {params.frag_mean} \
+		--fragment-size-std-dev {params.frag_sd} \
+		--illumina-read-length {params.read_length} \
+		-n {params.read_count} \
+		-o {output.r1} \
+		-or {output.r2} \
+		-oa {output.golden_bam}' 
 
 rule MergeGoldenBam:
 	input:
@@ -190,7 +202,10 @@ rule MergeGoldenBam:
 	threads:
 		int(config['num_cores'])
 	shell:
-		'samtools merge -@ {threads} {output} {params.input_list}'
+		'samtools merge \
+		-@ {threads} \
+		{output} \
+		{params.input_list}'
 
 rule MutateGoldenBam:
 	input:
@@ -201,7 +216,10 @@ rule MutateGoldenBam:
 	resources:
 		runtime='4d'
 	shell:
-		'jvarkit biostar404363 -p {input.vcf} -o {output} {input.bam}'
+		'jvarkit biostar404363 \
+		-p {input.vcf} \
+		-o {output} \
+		{input.bam}'
 
 rule SamToFastq:
 	input:
@@ -210,7 +228,10 @@ rule SamToFastq:
 		fq1=temp('pipeline/reads/{indiv}_{iter}.R1.fq'),
 		fq2=temp('pipeline/reads/{indiv}_{iter}.R2.fq')
 	shell:
-		'gatk SamToFastq -I {input} -F {output.fq1} -F2 {output.fq2}'
+		'gatk SamToFastq \
+		-I {input} \
+		-F {output.fq1} \
+		-F2 {output.fq2}'
 
 rule MapReads: 
 	input:
@@ -224,7 +245,12 @@ rule MapReads:
 		mem_mb = 2000 * int(config['num_cores']),
 		runtime='2d'
 	shell:
-		'bwa mem -t {threads} -R \"@RG\\tID:{wildcards.indiv}_{wildcards.iter}\\tSM:{wildcards.indiv}\\tPL:ILLUMINA\" {input.reference}  {input.fq1} {input.fq2} | samtools view -b - > {output} '
+		'bwa mem \
+		-t {threads}\
+		-R \"@RG\\tID:{wildcards.indiv}_{wildcards.iter}\\tSM:{wildcards.indiv}\\tPL:ILLUMINA\" \
+		{input.reference} \
+		{input.fq1} {input.fq2} \
+		| samtools view -b - > {output} '
 
 rule DownsampleBam:
 	input:
@@ -237,7 +263,9 @@ rule DownsampleBam:
 	threads: int(config['num_cores'])
 	
 	shell:
-		'samtools view -@ {threads} -b -s 0.83333333 {input} > {output}'
+		'samtools view \
+		-@ {threads} -b -s 0.83333333 \
+		{input} > {output}'
 
 rule SortBam:
 	input:
@@ -247,8 +275,9 @@ rule SortBam:
 	resources:
 		mem_mb=lambda wc, input: max(input.size_mb*2,1024),
 		runtime='12h'
+	threads: int(config['num_cores'])
 	shell:
-		'gatk SortSam --java-options "-Xmx{resources.mem_mb}m" -I {input} --TMP_DIR pipeline/sorted_bams/ -O {output} -SO coordinate '
+		'samtools sort -@ {threads} {input} > {output}'
 	
 
 rule MarkDuplicates:
@@ -260,9 +289,15 @@ rule MarkDuplicates:
 		output_metrics = temp('pipeline/mark_dups/{indiv}.sorted.mark_dups.metrics.{iter}.txt')
 	resources:
 		runtime='2d',
-		mem_mb=122880 #lambda wc, input: input.size_mb*2,
+		mem_mb=122880, #lambda wc, input: input.size_mb*2,
+		tmpdir='pipeline/mark_dups/'
 	shell:
-		'gatk --java-options "-Xmx{resources.mem_mb}m" MarkDuplicates -I {input} -O {output.output_bam} -M {output.output_metrics}  --TMP_DIR pipeline/mark_dups/ --CREATE_INDEX true'
+		'gatk --java-options "-Xmx{resources.mem_mb}m" MarkDuplicates \
+		-I {input} \
+		-O {output.output_bam} \
+		-M {output.output_metrics} \
+		--TMP_DIR {resources.tmpdir} \
+		--CREATE_INDEX true'
 
 rule BQSR:
 	input:
@@ -275,7 +310,12 @@ rule BQSR:
 		tmpdir='pipeline/BQSR/',
 		runtime='8h'
 	shell:
-		'gatk BaseRecalibrator -R {input.reference} -I {input.bam} --known-sites {input.known_variants} --tmp-dir {resources.tmpdir} -O {output}'
+		'gatk BaseRecalibrator \
+		-R {input.reference} \
+		-I {input.bam} \
+		--known-sites {input.known_variants} \
+		--tmp-dir {resources.tmpdir} \
+		-O {output}'
 rule ApplyBQSR:
 	input:
 		bam = 'pipeline/mark_dups/{indiv}.sorted.mark_dups.{iter}.bam',
@@ -288,7 +328,13 @@ rule ApplyBQSR:
 		tmpdir='pipeline/BQSR/',
 		runtime='12h'
 	shell:
-		'gatk ApplyBQSR -I {input.bam} -R {input.reference} --bqsr-recal-file {input.recal} --tmp-dir {resources.tmpdir} -O {output.output_bam} --create-output-bam-index true'
+		'gatk ApplyBQSR \
+		-I {input.bam} \
+		-R {input.reference} \
+		--bqsr-recal-file {input.recal} \
+		--tmp-dir {resources.tmpdir} \
+		-O {output.output_bam} \
+		--create-output-bam-index true'
 
 
 
@@ -305,7 +351,17 @@ rule CallVariants:
 		runtime='8h',
 		mem_mb=40960
 	shell:
-		'gatk --java-options "-Xmx{resources.mem_mb}m" HaplotypeCaller -R {input.reference}  -I {input.input_bam}  -ERC GVCF --minimum-mapping-quality 40 --max-reads-per-alignment-start 0 --pcr-indel-model NONE -O {output.output_vcf} -L {wildcards.chromosome} --tmp-dir {resources.tmpdir} -bamout {output.reassembled_bam}'
+		'gatk --java-options "-Xmx{resources.mem_mb}m" HaplotypeCaller \
+		-R {input.reference} \
+		-I {input.input_bam} \
+		-ERC GVCF \
+		--minimum-mapping-quality 40 \
+		--max-reads-per-alignment-start 0 \
+		--pcr-indel-model NONE \
+		-O {output.output_vcf} \
+		-L {wildcards.chromosome} \
+		--tmp-dir {resources.tmpdir} \
+		-bamout {output.reassembled_bam}'
 
 rule CombineVariants:
 	input:
@@ -320,13 +376,13 @@ rule CombineVariants:
 		mem_mb=40960
 	shell:
 		'gatk --java-options "-Xmx{resources.mem_mb}m" \
-			GenomicsDBImport \
-			-R {input.reference} \
-			-V {input.p1_vcf} \
-			-V {input.p2_vcf} \
-			-V {input.ch_vcf} \
-			--genomicsdb-workspace-path {output.output_dir} \
-			-L {wildcards.chromosome}'
+		GenomicsDBImport \
+		-R {input.reference} \
+		-V {input.p1_vcf} \
+		-V {input.p2_vcf} \
+		-V {input.ch_vcf} \
+		--genomicsdb-workspace-path {output.output_dir} \
+		-L {wildcards.chromosome}'
 
 rule GenotypeVariants:
 	input:
@@ -340,36 +396,46 @@ rule GenotypeVariants:
 		mem_mb=40960
 	shell:
 		'gatk --java-options \"-Xmx{resources.mem_mb}m\" GenotypeGVCFs \
--R {input.reference} \
--V gendb://{input.input_dir} \
--A StrandOddsRatio \
--A MappingQualityRankSumTest \
--A ReadPosRankSumTest \
--A QualByDepth \
--A FisherStrand \
--O {output}'
+		-R {input.reference} \
+		-V gendb://{input.input_dir} \
+		-A StrandOddsRatio \
+		-A MappingQualityRankSumTest \
+		-A ReadPosRankSumTest \
+		-A QualByDepth \
+		-A FisherStrand \
+		-O {output}'
 
 rule IsolateMVs:
-    input:
-        'pipeline/genotype_variants/trio.{chromosome}.{iter}.vcf'
-    output:
-        'pipeline/MV/trio.MV.{chromosome}.{iter}.vcf'
-    resources:
-        runtime='15m' 
-    shell:
-        'gatk SelectVariants -V {input} --restrict-alleles-to BIALLELIC --select-type-to-include SNP --exclude-filtered true --exclude-non-variants true -select \'AN==6\' --select \'vc.getGenotype("parent_1").isHomRef()\' --select \'vc.getGenotype("parent_2").isHomRef()\' --select \'vc.getGenotype("child").isHet()\' -O {output}'
+	input:
+		'pipeline/genotype_variants/trio.{chromosome}.{iter}.vcf'
+	output:
+		'pipeline/MV/trio.MV.{chromosome}.{iter}.vcf'
+	resources:
+		runtime='15m' 
+	shell:
+		'gatk SelectVariants \
+		-V {input} \
+		--restrict-alleles-to BIALLELIC \
+		--select-type-to-include SNP \
+		--exclude-filtered true \
+		--exclude-non-variants true \
+		-select \'AN==6\' \
+		--select \'vc.getGenotype("parent_1").isHomRef()\' \
+		--select \'vc.getGenotype("parent_2").isHomRef()\' \
+		--select \'vc.getGenotype("child").isHet()\' \
+		-O {output}'
 
 rule MergeMVVCFs:
-    input:
-        expand('pipeline/MV/trio.MV.{chromosome}.{{iter}}.vcf', chromosome=config['chroms'].keys())
-    output:
-        'pipeline/MV/trio.MV.all_chr.{iter}.vcf'
-    params:
-        formatted = format_input,
-    resources:
-        runtime='15m'
-    run:
-        shell('gatk MergeVcfs {params.formatted} -O {output}')
+	input:
+		expand('pipeline/MV/trio.MV.{chromosome}.{{iter}}.vcf', chromosome=config['chroms'].keys())
+	output:
+		'pipeline/MV/trio.MV.all_chr.{iter}.vcf'
+	params:
+		formatted = format_input,
+	resources:
+		runtime='15m'
+	run:
+		shell('gatk MergeVcfs {params.formatted} -O {output}')
 
 rule get_MV_muts:
 	input:
@@ -396,10 +462,10 @@ rule get_assembly_depths:
     echo "CHROM POS p1_reassembled p2_reassembled child_reassembled"
         grep -v "#" {input.input_vcf} | awk '{{print $1"\t"$2}}' | while read chrom pos
     do
-        p1_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/${{chrom}}_parent_1.sorted.mark_dups.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
-        p2_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/${{chrom}}_parent_2.sorted.mark_dups.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+        p1_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/parent_1.sorted.mark_dups.BQSR.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+        p2_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/parent_2.sorted.mark_dups.BQSR.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
         ch_bqsr=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} {input.ch_bqsr_bam} | awk '{{print $3}}')
-        ch_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/${{chrom}}_child.sorted.mark_dups.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+        ch_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/child.sorted.mark_dups.BQSR.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
 
         if [ "$ch_bqsr" -gt "$ch_reassembled" ]; then
             ch_diff=$((ch_bqsr - ch_reassembled))
@@ -420,7 +486,13 @@ rule get_muts_table:
 	resources:
 		runtime='15m'
 	shell:
-		'gatk VariantsToTable -V {input} -F CHROM -F POS -F QUAL -F BaseQRankSum -F MQRankSum -F ReadPosRankSum -F SOR -F FS -F QD -GF AD -GF DP -GF GQ -GF PL -O {output}'
+		'gatk VariantsToTable \
+		-V {input} \
+		-F CHROM -F POS \
+		-F QUAL -F BaseQRankSum -F MQRankSum \
+		-F ReadPosRankSum -F SOR -F FS -F QD \
+		-GF AD -GF DP -GF GQ \
+		-O {output}'
 
 rule get_MV_vars:
 	input:
@@ -441,7 +513,12 @@ rule get_vars_table:
 	resources:
 		runtime='15m'
 	shell:
-		'gatk VariantsToTable -V {input} -F CHROM -F POS -F QUAL -F BaseQRankSum -F MQRankSum -F ReadPosRankSum -F SOR -F FS -F QD -GF AD -GF DP -GF GQ -GF PL -O {output}'
+		'gatk VariantsToTable \
+		-V {input} -F CHROM -F POS \
+		-F QUAL -F BaseQRankSum -F MQRankSum \
+		-F ReadPosRankSum -F SOR -F FS -F QD \
+		-GF AD -GF DP -GF GQ \
+		-O {output}'
 
 rule get_MV_errors:
 	input:
