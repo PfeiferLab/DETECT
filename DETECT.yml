@@ -29,7 +29,6 @@ dependencies:
   - certifi=2025.8.3=pyhd8ed1ab_0
   - cffi=1.17.1=py312h06ac9bb_0
   - charset-normalizer=3.4.2=pyhd8ed1ab_0
-  - click=8.2.2=pyh707e725_0
   - coin-or-cbc=2.10.12=h4d16d09_4
   - coin-or-cgl=0.60.9=hc46dffc_6
   - coin-or-clp=1.17.10=hc03379b_3
@@ -261,4 +260,3 @@ dependencies:
   - zlib=1.3.1=hb9d3cd8_2
   - zstandard=0.23.0=py312h66e93f0_2
   - zstd=1.5.7=hb8e6e7a_2
-prefix: /home/mmilhave/.conda/envs/snakemake_test_env

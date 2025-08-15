@@ -8,11 +8,11 @@ import datetime
 parser = argparse.ArgumentParser(description="Creates a config file, which is then passed to the DETECT workflow")
 required_args = parser.add_argument_group('Required arguments')
 required_args.add_argument("-C","--coverages",dest="coverages",help="Comma delimited string with coverages of Dam,Sire,Offspring in empirical data",required = True)
-required_args.add_argument("-O","--output-file",dest="output_file",help="Output .txt file.", required = True)
+required_args.add_argument("-O","--output-directory",dest="output_directory",help="Output directory where all iteration outputs will be put. They will have the structure DETECT_output.${iteration}.txt.", required = True)
 required_args.add_argument("-R","--reference-genome",dest="ref",help="Reference Genome of organism in question", required = True)
 required_args.add_argument("-V","--input-variants",dest="input_variants",help="Variant catalog to act as false positives.",default="NONE",required = True)
-required_args.add_argument("-KV","--known-variants",dest="known_variants",help="Variant catalog to be used during BQSR. If not specified, -V will be used.",default="NONE",required=True)
 optional_args = parser.add_argument_group('Optional arguments')
+optional_args.add_argument("-KV","--known-variants",dest="known_variants",help="Variant catalog to be used during BQSR. If not specified, -V will be used.",default="NONE",required=False)
 optional_args.add_argument("-U","--mutation-input",dest="mutation_input",help="Can either be a mutation rate if <1, can be a number of mutations to population if >=1, or can be a VCF containing specific mutations you wish to populate. Default: 0", default=0, required = False)
 optional_args.add_argument("-CL","--contig-list",dest="chrom_list",help="List of contigs you want DNMs to be detected on, one per line. Default: All contigs.",default="ALL",required=False)
 optional_args.add_argument("-FL","--fragment-length",dest="frag_len",help="Fragment lengths of empirical dataset. Default: 300",default=300,required=False)
@@ -37,7 +37,7 @@ known_variants = os.path.abspath(args.known_variants)
 read_length = args.read_length
 read_fragment = args.frag_len
 frag_stdv = args.frag_stdv
-output_file = os.path.abspath(args.output_file)
+output_directory = os.path.abspath(args.output_directory)
 coverages = args.coverages 
 pedigree = args.pedigree
 chrom_list = os.path.abspath(args.chrom_list)
@@ -76,7 +76,7 @@ output["read_fragment"] = read_fragment
 output["frag_stdv"] = frag_stdv
 
 #Adding -O 
-output["output_file"] = output_file
+output["outdir"] = output_directory
 
 #Check if input_variants exist, otherwise through error
 if not os.path.exists(input_variants) and  args.input_variants != "NONE":
@@ -149,8 +149,6 @@ else:
 
 if args.known_variants != "NONE":
     output["known_variants"] = known_variants
-else:
-    output["known_variants"] = input_variants
 
 #Setting Trio or Population Level VCF
 output["trio"] = 1

@@ -1,0 +1,59 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job                          count    min threads    max threads
+-------------------------  -------  -------------  -------------
+ApplyBQSR                        6              1              1
+BQSR                             6              1              1
+CallVariants                    30              1              1
+CombineVariants                 10              1              1
+DownsampleBam                    2              1              1
+GenotypeVariants                10              1              1
+IsolateMVs                      10              1              1
+MapReads                         5              1              1
+MarkDuplicates                   6              1              1
+MergeGoldenBam                   5              1              1
+MergeMVVCFs                      2              1              1
+MutateGoldenBam                  2              1              1
+SamToFastq                       5              1              1
+SimulateReads                   32              1              1
+SortBam                          5              1              1
+all                              1              1              1
+get_MV_errors                    2              1              1
+get_MV_muts                      2              1              1
+get_MV_poly                      2              1              1
+get_error_assembly_depths        2              1              1
+get_errors_table                 2              1              1
+get_mut_assembly_depths          2              1              1
+get_muts_table                   2              1              1
+get_poly_assembly_depths         2              1              1
+get_poly_table                   2              1              1
+make_output                      2              1              1
+total                          157              1              1
+
+Select jobs to execute...
+
+[Thu Aug 14 17:50:23 2025]
+rule MarkDuplicates:
+    input: pipeline/sorted_bams/parent_1.sorted.1.bam
+    output: pipeline/mark_dups/parent_1.sorted.mark_dups.1.bam, pipeline/mark_dups/parent_1.sorted.mark_dups.1.bai, pipeline/mark_dups/parent_1.sorted.mark_dups.metrics.1.txt
+    jobid: 8
+    reason: Forced execution
+    wildcards: indiv=parent_1, iter=1
+    resources: tmpdir=pipeline/mark_dups/, runtime=2880, mem_mb=122880, mem_mib=117188
+
+gatk --java-options "-Xmx122880m" MarkDuplicates 		-I pipeline/sorted_bams/parent_1.sorted.1.bam 		-O pipeline/mark_dups/parent_1.sorted.mark_dups.1.bam 		-M pipeline/mark_dups/parent_1.sorted.mark_dups.metrics.1.txt 		--TMP_DIR pipeline/mark_dups/ 		--CREATE_INDEX true
+[Thu Aug 14 17:50:46 2025]
+Error in rule MarkDuplicates:
+    jobid: 8
+    input: pipeline/sorted_bams/parent_1.sorted.1.bam
+    output: pipeline/mark_dups/parent_1.sorted.mark_dups.1.bam, pipeline/mark_dups/parent_1.sorted.mark_dups.1.bai, pipeline/mark_dups/parent_1.sorted.mark_dups.metrics.1.txt
+    shell:
+        gatk --java-options "-Xmx122880m" MarkDuplicates 		-I pipeline/sorted_bams/parent_1.sorted.1.bam 		-O pipeline/mark_dups/parent_1.sorted.mark_dups.1.bam 		-M pipeline/mark_dups/parent_1.sorted.mark_dups.metrics.1.txt 		--TMP_DIR pipeline/mark_dups/ 		--CREATE_INDEX true
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: ../.snakemake/log/2025-08-14T175017.880080.snakemake.log

@@ -1,0 +1,1547 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job                          count    min threads    max threads
+-------------------------  -------  -------------  -------------
+ApplyBQSR                        6              1              1
+BQSR                             6              1              1
+CallVariants                    30              1              1
+CombineVariants                 10              1              1
+DownsampleBam                    2              1              1
+GenotypeVariants                10              1              1
+IsolateMVs                      10              1              1
+MapReads                         6              1              1
+MarkDuplicates                   6              1              1
+MergeFastas                      6              1              1
+MergeGoldenBam                   6              1              1
+MergeMVVCFs                      2              1              1
+Mutate                           2              1              1
+MutateGoldenBam                  2              1              1
+ReformatMutations                2              1              1
+RenameInputTrioVCF               1              1              1
+SamToFastq                       6              1              1
+SimulateReads                   96              1              1
+SortBam                          6              1              1
+VCFtoFasta                       5              1              1
+all                              1              1              1
+get_MV_errors                    2              1              1
+get_MV_muts                      2              1              1
+get_MV_poly                      2              1              1
+get_error_assembly_depths        2              1              1
+get_errors_table                 2              1              1
+get_mut_assembly_depths          2              1              1
+get_muts_table                   2              1              1
+get_poly_assembly_depths         2              1              1
+get_poly_table                   2              1              1
+make_output                      2              1              1
+splitVCF                         5              1              1
+total                          246              1              1
+
+Select jobs to execute...
+
+[Thu Aug 14 17:40:07 2025]
+rule Mutate:
+    input: /home/mmilhave/DETECT/demo/reference.fa
+    output: pipeline/mutations/input_mutations.1.phased.vcf
+    jobid: 97
+    reason: Missing output files: pipeline/mutations/input_mutations.1.phased.vcf
+    wildcards: iter=1
+    resources: tmpdir=/tmp, mem_mb=8000, mem_mib=7630, runtime=15
+
+python /home/mmilhave/DETECT/scripts/mutator.py -i /home/mmilhave/DETECT/demo/reference.fa -u 100 -p "parent_1,parent_2,child" -n 1 -o pipeline/mutations/input_mutations.1.phased.vcf; 
+[Thu Aug 14 17:40:11 2025]
+Finished job 97.
+1 of 246 steps (0.4%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:11 2025]
+rule ReformatMutations:
+    input: pipeline/mutations/input_mutations.1.phased.vcf
+    output: pipeline/mutations/input_mutations.1.phased.reformatted.vcf
+    jobid: 96
+    reason: Missing output files: pipeline/mutations/input_mutations.1.phased.reformatted.vcf; Input files updated by another job: pipeline/mutations/input_mutations.1.phased.vcf
+    wildcards: iter=1
+    resources: tmpdir=/tmp, runtime=15
+
+python /home/mmilhave/DETECT/scripts/reformat_vcf.py pipeline/mutations/input_mutations.1.phased.vcf > pipeline/mutations/input_mutations.1.phased.reformatted.vcf && gatk IndexFeatureFile -I pipeline/mutations/input_mutations.1.phased.reformatted.vcf
+[Thu Aug 14 17:40:15 2025]
+Finished job 96.
+2 of 246 steps (1%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:15 2025]
+rule RenameInputTrioVCF:
+    input: /home/mmilhave/DETECT/demo/demo_variants.vcf
+    output: pipeline/input_variants/input_trio.renamed.vcf
+    jobid: 17
+    reason: Missing output files: pipeline/input_variants/input_trio.renamed.vcf
+    resources: tmpdir=/tmp
+
+python /home/mmilhave/DETECT/scripts/rename_samples.py /home/mmilhave/DETECT/demo/demo_variants.vcf  "mom,dad,junior" > pipeline/input_variants/input_trio.renamed.vcf && gatk IndexFeatureFile -I pipeline/input_variants/input_trio.renamed.vcf
+[Thu Aug 14 17:40:19 2025]
+Finished job 17.
+3 of 246 steps (1%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:19 2025]
+rule splitVCF:
+    input: pipeline/input_variants/input_trio.renamed.vcf
+    output: pipeline/mutations/polymorphisms.test_5.phased.vcf
+    jobid: 25
+    reason: Missing output files: pipeline/mutations/polymorphisms.test_5.phased.vcf; Input files updated by another job: pipeline/input_variants/input_trio.renamed.vcf
+    wildcards: chromosome=test_5
+    resources: tmpdir=/tmp, runtime=15
+
+gatk SelectVariants -V pipeline/input_variants/input_trio.renamed.vcf -L test_5 -O pipeline/mutations/polymorphisms.test_5.phased.vcf && gatk IndexFeatureFile -I pipeline/mutations/polymorphisms.test_5.phased.vcf
+[Thu Aug 14 17:40:26 2025]
+Finished job 25.
+4 of 246 steps (2%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:26 2025]
+rule VCFtoFasta:
+    input: /home/mmilhave/DETECT/demo/reference.fa, pipeline/mutations/polymorphisms.test_5.phased.vcf
+    output: pipeline/ref/parent_1_test_5:0.fa, pipeline/ref/parent_1_test_5:1.fa, pipeline/ref/parent_2_test_5:0.fa, pipeline/ref/parent_2_test_5:1.fa, pipeline/ref/child_test_5:0.fa, pipeline/ref/child_test_5:1.fa
+    jobid: 24
+    reason: Missing output files: pipeline/ref/child_test_5:0.fa, pipeline/ref/parent_2_test_5:1.fa, pipeline/ref/parent_1_test_5:1.fa, pipeline/ref/parent_1_test_5:0.fa, pipeline/ref/parent_2_test_5:0.fa, pipeline/ref/child_test_5:1.fa; Input files updated by another job: pipeline/mutations/polymorphisms.test_5.phased.vcf
+    wildcards: chromosome=test_5
+    resources: tmpdir=/tmp, runtime=5760
+
+mkdir -p pipeline/ref && cd pipeline/ref && vcf2fasta -f /home/mmilhave/DETECT/demo/reference.fa ../mutations/polymorphisms.test_5.phased.vcf
+[Thu Aug 14 17:40:26 2025]
+Finished job 24.
+5 of 246 steps (2%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:26 2025]
+rule splitVCF:
+    input: pipeline/input_variants/input_trio.renamed.vcf
+    output: pipeline/mutations/polymorphisms.test_2.phased.vcf
+    jobid: 19
+    reason: Missing output files: pipeline/mutations/polymorphisms.test_2.phased.vcf; Input files updated by another job: pipeline/input_variants/input_trio.renamed.vcf
+    wildcards: chromosome=test_2
+    resources: tmpdir=/tmp, runtime=15
+
+gatk SelectVariants -V pipeline/input_variants/input_trio.renamed.vcf -L test_2 -O pipeline/mutations/polymorphisms.test_2.phased.vcf && gatk IndexFeatureFile -I pipeline/mutations/polymorphisms.test_2.phased.vcf
+[Thu Aug 14 17:40:33 2025]
+Finished job 19.
+6 of 246 steps (2%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:33 2025]
+rule VCFtoFasta:
+    input: /home/mmilhave/DETECT/demo/reference.fa, pipeline/mutations/polymorphisms.test_2.phased.vcf
+    output: pipeline/ref/parent_1_test_2:0.fa, pipeline/ref/parent_1_test_2:1.fa, pipeline/ref/parent_2_test_2:0.fa, pipeline/ref/parent_2_test_2:1.fa, pipeline/ref/child_test_2:0.fa, pipeline/ref/child_test_2:1.fa
+    jobid: 18
+    reason: Missing output files: pipeline/ref/child_test_2:0.fa, pipeline/ref/parent_1_test_2:1.fa, pipeline/ref/parent_1_test_2:0.fa, pipeline/ref/parent_2_test_2:0.fa, pipeline/ref/child_test_2:1.fa, pipeline/ref/parent_2_test_2:1.fa; Input files updated by another job: pipeline/mutations/polymorphisms.test_2.phased.vcf
+    wildcards: chromosome=test_2
+    resources: tmpdir=/tmp, runtime=5760
+
+mkdir -p pipeline/ref && cd pipeline/ref && vcf2fasta -f /home/mmilhave/DETECT/demo/reference.fa ../mutations/polymorphisms.test_2.phased.vcf
+[Thu Aug 14 17:40:33 2025]
+Finished job 18.
+7 of 246 steps (3%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:33 2025]
+rule splitVCF:
+    input: pipeline/input_variants/input_trio.renamed.vcf
+    output: pipeline/mutations/polymorphisms.test_3.phased.vcf
+    jobid: 21
+    reason: Missing output files: pipeline/mutations/polymorphisms.test_3.phased.vcf; Input files updated by another job: pipeline/input_variants/input_trio.renamed.vcf
+    wildcards: chromosome=test_3
+    resources: tmpdir=/tmp, runtime=15
+
+gatk SelectVariants -V pipeline/input_variants/input_trio.renamed.vcf -L test_3 -O pipeline/mutations/polymorphisms.test_3.phased.vcf && gatk IndexFeatureFile -I pipeline/mutations/polymorphisms.test_3.phased.vcf
+[Thu Aug 14 17:40:40 2025]
+Finished job 21.
+8 of 246 steps (3%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:40 2025]
+rule VCFtoFasta:
+    input: /home/mmilhave/DETECT/demo/reference.fa, pipeline/mutations/polymorphisms.test_3.phased.vcf
+    output: pipeline/ref/parent_1_test_3:0.fa, pipeline/ref/parent_1_test_3:1.fa, pipeline/ref/parent_2_test_3:0.fa, pipeline/ref/parent_2_test_3:1.fa, pipeline/ref/child_test_3:0.fa, pipeline/ref/child_test_3:1.fa
+    jobid: 20
+    reason: Missing output files: pipeline/ref/child_test_3:0.fa, pipeline/ref/parent_1_test_3:0.fa, pipeline/ref/parent_2_test_3:0.fa, pipeline/ref/child_test_3:1.fa, pipeline/ref/parent_1_test_3:1.fa, pipeline/ref/parent_2_test_3:1.fa; Input files updated by another job: pipeline/mutations/polymorphisms.test_3.phased.vcf
+    wildcards: chromosome=test_3
+    resources: tmpdir=/tmp, runtime=5760
+
+mkdir -p pipeline/ref && cd pipeline/ref && vcf2fasta -f /home/mmilhave/DETECT/demo/reference.fa ../mutations/polymorphisms.test_3.phased.vcf
+[Thu Aug 14 17:40:41 2025]
+Finished job 20.
+9 of 246 steps (4%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:41 2025]
+rule Mutate:
+    input: /home/mmilhave/DETECT/demo/reference.fa
+    output: pipeline/mutations/input_mutations.2.phased.vcf
+    jobid: 211
+    reason: Missing output files: pipeline/mutations/input_mutations.2.phased.vcf
+    wildcards: iter=2
+    resources: tmpdir=/tmp, mem_mb=8000, mem_mib=7630, runtime=15
+
+python /home/mmilhave/DETECT/scripts/mutator.py -i /home/mmilhave/DETECT/demo/reference.fa -u 100 -p "parent_1,parent_2,child" -n 2 -o pipeline/mutations/input_mutations.2.phased.vcf; 
+[Thu Aug 14 17:40:42 2025]
+Finished job 211.
+10 of 246 steps (4%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:42 2025]
+rule ReformatMutations:
+    input: pipeline/mutations/input_mutations.2.phased.vcf
+    output: pipeline/mutations/input_mutations.2.phased.reformatted.vcf
+    jobid: 210
+    reason: Missing output files: pipeline/mutations/input_mutations.2.phased.reformatted.vcf; Input files updated by another job: pipeline/mutations/input_mutations.2.phased.vcf
+    wildcards: iter=2
+    resources: tmpdir=/tmp, runtime=15
+
+python /home/mmilhave/DETECT/scripts/reformat_vcf.py pipeline/mutations/input_mutations.2.phased.vcf > pipeline/mutations/input_mutations.2.phased.reformatted.vcf && gatk IndexFeatureFile -I pipeline/mutations/input_mutations.2.phased.reformatted.vcf
+[Thu Aug 14 17:40:45 2025]
+Finished job 210.
+11 of 246 steps (4%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:45 2025]
+rule splitVCF:
+    input: pipeline/input_variants/input_trio.renamed.vcf
+    output: pipeline/mutations/polymorphisms.test_4.phased.vcf
+    jobid: 23
+    reason: Missing output files: pipeline/mutations/polymorphisms.test_4.phased.vcf; Input files updated by another job: pipeline/input_variants/input_trio.renamed.vcf
+    wildcards: chromosome=test_4
+    resources: tmpdir=/tmp, runtime=15
+
+gatk SelectVariants -V pipeline/input_variants/input_trio.renamed.vcf -L test_4 -O pipeline/mutations/polymorphisms.test_4.phased.vcf && gatk IndexFeatureFile -I pipeline/mutations/polymorphisms.test_4.phased.vcf
+[Thu Aug 14 17:40:52 2025]
+Finished job 23.
+12 of 246 steps (5%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:52 2025]
+rule splitVCF:
+    input: pipeline/input_variants/input_trio.renamed.vcf
+    output: pipeline/mutations/polymorphisms.test_1.phased.vcf
+    jobid: 16
+    reason: Missing output files: pipeline/mutations/polymorphisms.test_1.phased.vcf; Input files updated by another job: pipeline/input_variants/input_trio.renamed.vcf
+    wildcards: chromosome=test_1
+    resources: tmpdir=/tmp, runtime=15
+
+gatk SelectVariants -V pipeline/input_variants/input_trio.renamed.vcf -L test_1 -O pipeline/mutations/polymorphisms.test_1.phased.vcf && gatk IndexFeatureFile -I pipeline/mutations/polymorphisms.test_1.phased.vcf
+[Thu Aug 14 17:40:59 2025]
+Finished job 16.
+13 of 246 steps (5%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:59 2025]
+rule VCFtoFasta:
+    input: /home/mmilhave/DETECT/demo/reference.fa, pipeline/mutations/polymorphisms.test_1.phased.vcf
+    output: pipeline/ref/parent_1_test_1:0.fa, pipeline/ref/parent_1_test_1:1.fa, pipeline/ref/parent_2_test_1:0.fa, pipeline/ref/parent_2_test_1:1.fa, pipeline/ref/child_test_1:0.fa, pipeline/ref/child_test_1:1.fa
+    jobid: 15
+    reason: Missing output files: pipeline/ref/child_test_1:1.fa, pipeline/ref/parent_2_test_1:0.fa, pipeline/ref/parent_2_test_1:1.fa, pipeline/ref/child_test_1:0.fa, pipeline/ref/parent_1_test_1:0.fa, pipeline/ref/parent_1_test_1:1.fa; Input files updated by another job: pipeline/mutations/polymorphisms.test_1.phased.vcf
+    wildcards: chromosome=test_1
+    resources: tmpdir=/tmp, runtime=5760
+
+mkdir -p pipeline/ref && cd pipeline/ref && vcf2fasta -f /home/mmilhave/DETECT/demo/reference.fa ../mutations/polymorphisms.test_1.phased.vcf
+[Thu Aug 14 17:40:59 2025]
+Finished job 15.
+14 of 246 steps (6%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:59 2025]
+rule VCFtoFasta:
+    input: /home/mmilhave/DETECT/demo/reference.fa, pipeline/mutations/polymorphisms.test_4.phased.vcf
+    output: pipeline/ref/parent_1_test_4:0.fa, pipeline/ref/parent_1_test_4:1.fa, pipeline/ref/parent_2_test_4:0.fa, pipeline/ref/parent_2_test_4:1.fa, pipeline/ref/child_test_4:0.fa, pipeline/ref/child_test_4:1.fa
+    jobid: 22
+    reason: Missing output files: pipeline/ref/parent_2_test_4:0.fa, pipeline/ref/child_test_4:0.fa, pipeline/ref/parent_1_test_4:0.fa, pipeline/ref/parent_1_test_4:1.fa, pipeline/ref/parent_2_test_4:1.fa, pipeline/ref/child_test_4:1.fa; Input files updated by another job: pipeline/mutations/polymorphisms.test_4.phased.vcf
+    wildcards: chromosome=test_4
+    resources: tmpdir=/tmp, runtime=5760
+
+mkdir -p pipeline/ref && cd pipeline/ref && vcf2fasta -f /home/mmilhave/DETECT/demo/reference.fa ../mutations/polymorphisms.test_4.phased.vcf
+[Thu Aug 14 17:40:59 2025]
+Finished job 22.
+15 of 246 steps (6%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:40:59 2025]
+rule MergeFastas:
+    input: pipeline/ref/parent_2_test_1:1.fa, pipeline/ref/parent_2_test_2:1.fa, pipeline/ref/parent_2_test_3:1.fa, pipeline/ref/parent_2_test_4:1.fa, pipeline/ref/parent_2_test_5:1.fa
+    output: pipeline/ref/parent_2_renamed.1.fa
+    jobid: 53
+    reason: Missing output files: pipeline/ref/parent_2_renamed.1.fa; Input files updated by another job: pipeline/ref/parent_2_test_5:1.fa, pipeline/ref/parent_2_test_2:1.fa, pipeline/ref/parent_2_test_4:1.fa, pipeline/ref/parent_2_test_1:1.fa, pipeline/ref/parent_2_test_3:1.fa
+    wildcards: indiv=parent_2, genome=1
+    resources: tmpdir=/tmp
+
+cat pipeline/ref/parent_2_test_1:1.fa pipeline/ref/parent_2_test_2:1.fa pipeline/ref/parent_2_test_3:1.fa pipeline/ref/parent_2_test_4:1.fa pipeline/ref/parent_2_test_5:1.fa | sed "s/:1//g; s/parent_2_//g" > pipeline/ref/parent_2_renamed.1.fa
+[Thu Aug 14 17:40:59 2025]
+Finished job 53.
+16 of 246 steps (7%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:41:00 2025]
+rule MergeFastas:
+    input: pipeline/ref/child_test_1:1.fa, pipeline/ref/child_test_2:1.fa, pipeline/ref/child_test_3:1.fa, pipeline/ref/child_test_4:1.fa, pipeline/ref/child_test_5:1.fa
+    output: pipeline/ref/child_renamed.1.fa
+    jobid: 81
+    reason: Missing output files: pipeline/ref/child_renamed.1.fa; Input files updated by another job: pipeline/ref/child_test_3:1.fa, pipeline/ref/child_test_1:1.fa, pipeline/ref/child_test_5:1.fa, pipeline/ref/child_test_2:1.fa, pipeline/ref/child_test_4:1.fa
+    wildcards: indiv=child, genome=1
+    resources: tmpdir=/tmp
+
+cat pipeline/ref/child_test_1:1.fa pipeline/ref/child_test_2:1.fa pipeline/ref/child_test_3:1.fa pipeline/ref/child_test_4:1.fa pipeline/ref/child_test_5:1.fa | sed "s/:1//g; s/child_//g" > pipeline/ref/child_renamed.1.fa
+[Thu Aug 14 17:41:00 2025]
+Finished job 81.
+17 of 246 steps (7%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:41:00 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_7_1_1.golden.R1.fq, pipeline/reads/child_7_1_1.golden.R2.fq, pipeline/reads/child_7_1_1.golden.bam
+    jobid: 93
+    reason: Missing output files: pipeline/reads/child_7_1_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=7, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_7_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_7_1_1.golden.R1.fq 		-or pipeline/reads/child_7_1_1.golden.R2.fq 		-oa pipeline/reads/child_7_1_1.golden.bam
+[Thu Aug 14 17:41:01 2025]
+Finished job 93.
+18 of 246 steps (7%) done
+Removing temporary output pipeline/reads/child_7_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_7_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:01 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_8_2_1.golden.R1.fq, pipeline/reads/child_8_2_1.golden.R2.fq, pipeline/reads/child_8_2_1.golden.bam
+    jobid: 209
+    reason: Missing output files: pipeline/reads/child_8_2_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=8, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_8_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_8_2_1.golden.R1.fq 		-or pipeline/reads/child_8_2_1.golden.R2.fq 		-oa pipeline/reads/child_8_2_1.golden.bam
+[Thu Aug 14 17:41:03 2025]
+Finished job 209.
+19 of 246 steps (8%) done
+Removing temporary output pipeline/reads/child_8_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_8_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:03 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_2_1_1.golden.R1.fq, pipeline/reads/child_2_1_1.golden.R2.fq, pipeline/reads/child_2_1_1.golden.bam
+    jobid: 83
+    reason: Missing output files: pipeline/reads/child_2_1_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=2, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_2_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_2_1_1.golden.R1.fq 		-or pipeline/reads/child_2_1_1.golden.R2.fq 		-oa pipeline/reads/child_2_1_1.golden.bam
+[Thu Aug 14 17:41:04 2025]
+Finished job 83.
+20 of 246 steps (8%) done
+Removing temporary output pipeline/reads/child_2_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_2_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:04 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_3_1_1.golden.R1.fq, pipeline/reads/parent_2_3_1_1.golden.R2.fq, pipeline/reads/parent_2_3_1_1.golden.bam
+    jobid: 57
+    reason: Missing output files: pipeline/reads/parent_2_3_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=3, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_3_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_3_1_1.golden.R1.fq 		-or pipeline/reads/parent_2_3_1_1.golden.R2.fq 		-oa pipeline/reads/parent_2_3_1_1.golden.bam
+[Thu Aug 14 17:41:05 2025]
+Finished job 57.
+21 of 246 steps (9%) done
+Removing temporary output pipeline/reads/parent_2_3_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_3_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:05 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_8_1_1.golden.R1.fq, pipeline/reads/child_8_1_1.golden.R2.fq, pipeline/reads/child_8_1_1.golden.bam
+    jobid: 95
+    reason: Missing output files: pipeline/reads/child_8_1_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=8, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_8_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_8_1_1.golden.R1.fq 		-or pipeline/reads/child_8_1_1.golden.R2.fq 		-oa pipeline/reads/child_8_1_1.golden.bam
+[Thu Aug 14 17:41:07 2025]
+Finished job 95.
+22 of 246 steps (9%) done
+Removing temporary output pipeline/reads/child_8_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_8_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:07 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_3_1_1.golden.R1.fq, pipeline/reads/child_3_1_1.golden.R2.fq, pipeline/reads/child_3_1_1.golden.bam
+    jobid: 85
+    reason: Missing output files: pipeline/reads/child_3_1_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=3, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_3_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_3_1_1.golden.R1.fq 		-or pipeline/reads/child_3_1_1.golden.R2.fq 		-oa pipeline/reads/child_3_1_1.golden.bam
+[Thu Aug 14 17:41:08 2025]
+Finished job 85.
+23 of 246 steps (9%) done
+Removing temporary output pipeline/reads/child_3_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_3_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:08 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_4_2_1.golden.R1.fq, pipeline/reads/child_4_2_1.golden.R2.fq, pipeline/reads/child_4_2_1.golden.bam
+    jobid: 201
+    reason: Missing output files: pipeline/reads/child_4_2_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=4, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_4_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_4_2_1.golden.R1.fq 		-or pipeline/reads/child_4_2_1.golden.R2.fq 		-oa pipeline/reads/child_4_2_1.golden.bam
+[Thu Aug 14 17:41:10 2025]
+Finished job 201.
+24 of 246 steps (10%) done
+Removing temporary output pipeline/reads/child_4_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_4_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:10 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_4_1_1.golden.R1.fq, pipeline/reads/parent_2_4_1_1.golden.R2.fq, pipeline/reads/parent_2_4_1_1.golden.bam
+    jobid: 59
+    reason: Missing output files: pipeline/reads/parent_2_4_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=4, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_4_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_4_1_1.golden.R1.fq 		-or pipeline/reads/parent_2_4_1_1.golden.R2.fq 		-oa pipeline/reads/parent_2_4_1_1.golden.bam
+[Thu Aug 14 17:41:11 2025]
+Finished job 59.
+25 of 246 steps (10%) done
+Removing temporary output pipeline/reads/parent_2_4_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_4_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:11 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_5_2_1.golden.R1.fq, pipeline/reads/parent_2_5_2_1.golden.R2.fq, pipeline/reads/parent_2_5_2_1.golden.bam
+    jobid: 177
+    reason: Missing output files: pipeline/reads/parent_2_5_2_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=5, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_5_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_5_2_1.golden.R1.fq 		-or pipeline/reads/parent_2_5_2_1.golden.R2.fq 		-oa pipeline/reads/parent_2_5_2_1.golden.bam
+[Thu Aug 14 17:41:12 2025]
+Finished job 177.
+26 of 246 steps (11%) done
+Removing temporary output pipeline/reads/parent_2_5_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_5_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:12 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_6_1_1.golden.R1.fq, pipeline/reads/parent_2_6_1_1.golden.R2.fq, pipeline/reads/parent_2_6_1_1.golden.bam
+    jobid: 63
+    reason: Missing output files: pipeline/reads/parent_2_6_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=6, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_6_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_6_1_1.golden.R1.fq 		-or pipeline/reads/parent_2_6_1_1.golden.R2.fq 		-oa pipeline/reads/parent_2_6_1_1.golden.bam
+[Thu Aug 14 17:41:13 2025]
+Finished job 63.
+27 of 246 steps (11%) done
+Removing temporary output pipeline/reads/parent_2_6_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_6_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:13 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_6_1_1.golden.R1.fq, pipeline/reads/child_6_1_1.golden.R2.fq, pipeline/reads/child_6_1_1.golden.bam
+    jobid: 91
+    reason: Missing output files: pipeline/reads/child_6_1_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=6, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_6_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_6_1_1.golden.R1.fq 		-or pipeline/reads/child_6_1_1.golden.R2.fq 		-oa pipeline/reads/child_6_1_1.golden.bam
+[Thu Aug 14 17:41:14 2025]
+Finished job 91.
+28 of 246 steps (11%) done
+Removing temporary output pipeline/reads/child_6_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_6_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:14 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_7_1_1.golden.R1.fq, pipeline/reads/parent_2_7_1_1.golden.R2.fq, pipeline/reads/parent_2_7_1_1.golden.bam
+    jobid: 65
+    reason: Missing output files: pipeline/reads/parent_2_7_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=7, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_7_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_7_1_1.golden.R1.fq 		-or pipeline/reads/parent_2_7_1_1.golden.R2.fq 		-oa pipeline/reads/parent_2_7_1_1.golden.bam
+[Thu Aug 14 17:41:16 2025]
+Finished job 65.
+29 of 246 steps (12%) done
+Removing temporary output pipeline/reads/parent_2_7_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_7_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:16 2025]
+rule MergeFastas:
+    input: pipeline/ref/parent_1_test_1:1.fa, pipeline/ref/parent_1_test_2:1.fa, pipeline/ref/parent_1_test_3:1.fa, pipeline/ref/parent_1_test_4:1.fa, pipeline/ref/parent_1_test_5:1.fa
+    output: pipeline/ref/parent_1_renamed.1.fa
+    jobid: 27
+    reason: Missing output files: pipeline/ref/parent_1_renamed.1.fa; Input files updated by another job: pipeline/ref/parent_1_test_1:1.fa, pipeline/ref/parent_1_test_3:1.fa, pipeline/ref/parent_1_test_5:1.fa, pipeline/ref/parent_1_test_4:1.fa, pipeline/ref/parent_1_test_2:1.fa
+    wildcards: indiv=parent_1, genome=1
+    resources: tmpdir=/tmp
+
+cat pipeline/ref/parent_1_test_1:1.fa pipeline/ref/parent_1_test_2:1.fa pipeline/ref/parent_1_test_3:1.fa pipeline/ref/parent_1_test_4:1.fa pipeline/ref/parent_1_test_5:1.fa | sed "s/:1//g; s/parent_1_//g" > pipeline/ref/parent_1_renamed.1.fa
+[Thu Aug 14 17:41:16 2025]
+Finished job 27.
+30 of 246 steps (12%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:41:16 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_6_1_1.golden.R1.fq, pipeline/reads/parent_1_6_1_1.golden.R2.fq, pipeline/reads/parent_1_6_1_1.golden.bam
+    jobid: 37
+    reason: Missing output files: pipeline/reads/parent_1_6_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=6, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_6_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_6_1_1.golden.R1.fq 		-or pipeline/reads/parent_1_6_1_1.golden.R2.fq 		-oa pipeline/reads/parent_1_6_1_1.golden.bam
+[Thu Aug 14 17:41:17 2025]
+Finished job 37.
+31 of 246 steps (13%) done
+Removing temporary output pipeline/reads/parent_1_6_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_6_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:17 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_2_2_1.golden.R1.fq, pipeline/reads/parent_1_2_2_1.golden.R2.fq, pipeline/reads/parent_1_2_2_1.golden.bam
+    jobid: 147
+    reason: Missing output files: pipeline/reads/parent_1_2_2_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=2, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_2_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_2_2_1.golden.R1.fq 		-or pipeline/reads/parent_1_2_2_1.golden.R2.fq 		-oa pipeline/reads/parent_1_2_2_1.golden.bam
+[Thu Aug 14 17:41:18 2025]
+Finished job 147.
+32 of 246 steps (13%) done
+Removing temporary output pipeline/reads/parent_1_2_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_2_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:18 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_4_2_1.golden.R1.fq, pipeline/reads/parent_2_4_2_1.golden.R2.fq, pipeline/reads/parent_2_4_2_1.golden.bam
+    jobid: 175
+    reason: Missing output files: pipeline/reads/parent_2_4_2_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=4, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_4_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_4_2_1.golden.R1.fq 		-or pipeline/reads/parent_2_4_2_1.golden.R2.fq 		-oa pipeline/reads/parent_2_4_2_1.golden.bam
+[Thu Aug 14 17:41:19 2025]
+Finished job 175.
+33 of 246 steps (13%) done
+Removing temporary output pipeline/reads/parent_2_4_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_4_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:19 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_5_2_1.golden.R1.fq, pipeline/reads/child_5_2_1.golden.R2.fq, pipeline/reads/child_5_2_1.golden.bam
+    jobid: 203
+    reason: Missing output files: pipeline/reads/child_5_2_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=5, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_5_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_5_2_1.golden.R1.fq 		-or pipeline/reads/child_5_2_1.golden.R2.fq 		-oa pipeline/reads/child_5_2_1.golden.bam
+[Thu Aug 14 17:41:21 2025]
+Finished job 203.
+34 of 246 steps (14%) done
+Removing temporary output pipeline/reads/child_5_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_5_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:21 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_3_2_1.golden.R1.fq, pipeline/reads/child_3_2_1.golden.R2.fq, pipeline/reads/child_3_2_1.golden.bam
+    jobid: 199
+    reason: Missing output files: pipeline/reads/child_3_2_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=3, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_3_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_3_2_1.golden.R1.fq 		-or pipeline/reads/child_3_2_1.golden.R2.fq 		-oa pipeline/reads/child_3_2_1.golden.bam
+[Thu Aug 14 17:41:22 2025]
+Finished job 199.
+35 of 246 steps (14%) done
+Removing temporary output pipeline/reads/child_3_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_3_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:22 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_6_2_1.golden.R1.fq, pipeline/reads/parent_2_6_2_1.golden.R2.fq, pipeline/reads/parent_2_6_2_1.golden.bam
+    jobid: 179
+    reason: Missing output files: pipeline/reads/parent_2_6_2_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=6, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_6_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_6_2_1.golden.R1.fq 		-or pipeline/reads/parent_2_6_2_1.golden.R2.fq 		-oa pipeline/reads/parent_2_6_2_1.golden.bam
+[Thu Aug 14 17:41:23 2025]
+Finished job 179.
+36 of 246 steps (15%) done
+Removing temporary output pipeline/reads/parent_2_6_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_6_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:23 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_8_1_1.golden.R1.fq, pipeline/reads/parent_2_8_1_1.golden.R2.fq, pipeline/reads/parent_2_8_1_1.golden.bam
+    jobid: 67
+    reason: Missing output files: pipeline/reads/parent_2_8_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=8, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_8_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_8_1_1.golden.R1.fq 		-or pipeline/reads/parent_2_8_1_1.golden.R2.fq 		-oa pipeline/reads/parent_2_8_1_1.golden.bam
+[Thu Aug 14 17:41:24 2025]
+Finished job 67.
+37 of 246 steps (15%) done
+Removing temporary output pipeline/reads/parent_2_8_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_8_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:24 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_7_1_1.golden.R1.fq, pipeline/reads/parent_1_7_1_1.golden.R2.fq, pipeline/reads/parent_1_7_1_1.golden.bam
+    jobid: 39
+    reason: Missing output files: pipeline/reads/parent_1_7_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=7, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_7_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_7_1_1.golden.R1.fq 		-or pipeline/reads/parent_1_7_1_1.golden.R2.fq 		-oa pipeline/reads/parent_1_7_1_1.golden.bam
+[Thu Aug 14 17:41:26 2025]
+Finished job 39.
+38 of 246 steps (15%) done
+Removing temporary output pipeline/reads/parent_1_7_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_7_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:26 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_2_1_1.golden.R1.fq, pipeline/reads/parent_1_2_1_1.golden.R2.fq, pipeline/reads/parent_1_2_1_1.golden.bam
+    jobid: 29
+    reason: Missing output files: pipeline/reads/parent_1_2_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=2, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_2_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_2_1_1.golden.R1.fq 		-or pipeline/reads/parent_1_2_1_1.golden.R2.fq 		-oa pipeline/reads/parent_1_2_1_1.golden.bam
+[Thu Aug 14 17:41:27 2025]
+Finished job 29.
+39 of 246 steps (16%) done
+Removing temporary output pipeline/reads/parent_1_2_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_2_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:27 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_1_1_1.golden.R1.fq, pipeline/reads/parent_1_1_1_1.golden.R2.fq, pipeline/reads/parent_1_1_1_1.golden.bam
+    jobid: 26
+    reason: Missing output files: pipeline/reads/parent_1_1_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=1, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_1_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_1_1_1.golden.R1.fq 		-or pipeline/reads/parent_1_1_1_1.golden.R2.fq 		-oa pipeline/reads/parent_1_1_1_1.golden.bam
+[Thu Aug 14 17:41:28 2025]
+Finished job 26.
+40 of 246 steps (16%) done
+Removing temporary output pipeline/reads/parent_1_1_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_1_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:28 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_6_2_1.golden.R1.fq, pipeline/reads/parent_1_6_2_1.golden.R2.fq, pipeline/reads/parent_1_6_2_1.golden.bam
+    jobid: 155
+    reason: Missing output files: pipeline/reads/parent_1_6_2_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=6, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_6_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_6_2_1.golden.R1.fq 		-or pipeline/reads/parent_1_6_2_1.golden.R2.fq 		-oa pipeline/reads/parent_1_6_2_1.golden.bam
+[Thu Aug 14 17:41:29 2025]
+Finished job 155.
+41 of 246 steps (17%) done
+Removing temporary output pipeline/reads/parent_1_6_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_6_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:29 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_1_2_1.golden.R1.fq, pipeline/reads/parent_1_1_2_1.golden.R2.fq, pipeline/reads/parent_1_1_2_1.golden.bam
+    jobid: 145
+    reason: Missing output files: pipeline/reads/parent_1_1_2_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=1, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_1_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_1_2_1.golden.R1.fq 		-or pipeline/reads/parent_1_1_2_1.golden.R2.fq 		-oa pipeline/reads/parent_1_1_2_1.golden.bam
+[Thu Aug 14 17:41:30 2025]
+Finished job 145.
+42 of 246 steps (17%) done
+Removing temporary output pipeline/reads/parent_1_1_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_1_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:30 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_5_1_1.golden.R1.fq, pipeline/reads/parent_1_5_1_1.golden.R2.fq, pipeline/reads/parent_1_5_1_1.golden.bam
+    jobid: 35
+    reason: Missing output files: pipeline/reads/parent_1_5_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=5, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_5_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_5_1_1.golden.R1.fq 		-or pipeline/reads/parent_1_5_1_1.golden.R2.fq 		-oa pipeline/reads/parent_1_5_1_1.golden.bam
+[Thu Aug 14 17:41:32 2025]
+Finished job 35.
+43 of 246 steps (17%) done
+Removing temporary output pipeline/reads/parent_1_5_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_5_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:32 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_4_2_1.golden.R1.fq, pipeline/reads/parent_1_4_2_1.golden.R2.fq, pipeline/reads/parent_1_4_2_1.golden.bam
+    jobid: 151
+    reason: Missing output files: pipeline/reads/parent_1_4_2_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=4, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_4_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_4_2_1.golden.R1.fq 		-or pipeline/reads/parent_1_4_2_1.golden.R2.fq 		-oa pipeline/reads/parent_1_4_2_1.golden.bam
+[Thu Aug 14 17:41:33 2025]
+Finished job 151.
+44 of 246 steps (18%) done
+Removing temporary output pipeline/reads/parent_1_4_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_4_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:33 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_8_2_1.golden.R1.fq, pipeline/reads/parent_2_8_2_1.golden.R2.fq, pipeline/reads/parent_2_8_2_1.golden.bam
+    jobid: 183
+    reason: Missing output files: pipeline/reads/parent_2_8_2_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=8, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_8_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_8_2_1.golden.R1.fq 		-or pipeline/reads/parent_2_8_2_1.golden.R2.fq 		-oa pipeline/reads/parent_2_8_2_1.golden.bam
+[Thu Aug 14 17:41:34 2025]
+Finished job 183.
+45 of 246 steps (18%) done
+Removing temporary output pipeline/reads/parent_2_8_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_8_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:34 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_7_2_1.golden.R1.fq, pipeline/reads/child_7_2_1.golden.R2.fq, pipeline/reads/child_7_2_1.golden.bam
+    jobid: 207
+    reason: Missing output files: pipeline/reads/child_7_2_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=7, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_7_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_7_2_1.golden.R1.fq 		-or pipeline/reads/child_7_2_1.golden.R2.fq 		-oa pipeline/reads/child_7_2_1.golden.bam
+[Thu Aug 14 17:41:35 2025]
+Finished job 207.
+46 of 246 steps (19%) done
+Removing temporary output pipeline/reads/child_7_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_7_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:35 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_3_2_1.golden.R1.fq, pipeline/reads/parent_2_3_2_1.golden.R2.fq, pipeline/reads/parent_2_3_2_1.golden.bam
+    jobid: 173
+    reason: Missing output files: pipeline/reads/parent_2_3_2_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=3, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_3_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_3_2_1.golden.R1.fq 		-or pipeline/reads/parent_2_3_2_1.golden.R2.fq 		-oa pipeline/reads/parent_2_3_2_1.golden.bam
+[Thu Aug 14 17:41:36 2025]
+Finished job 173.
+47 of 246 steps (19%) done
+Removing temporary output pipeline/reads/parent_2_3_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_3_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:36 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_2_1_1.golden.R1.fq, pipeline/reads/parent_2_2_1_1.golden.R2.fq, pipeline/reads/parent_2_2_1_1.golden.bam
+    jobid: 55
+    reason: Missing output files: pipeline/reads/parent_2_2_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=2, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_2_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_2_1_1.golden.R1.fq 		-or pipeline/reads/parent_2_2_1_1.golden.R2.fq 		-oa pipeline/reads/parent_2_2_1_1.golden.bam
+[Thu Aug 14 17:41:38 2025]
+Finished job 55.
+48 of 246 steps (20%) done
+Removing temporary output pipeline/reads/parent_2_2_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_2_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:38 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_7_2_1.golden.R1.fq, pipeline/reads/parent_2_7_2_1.golden.R2.fq, pipeline/reads/parent_2_7_2_1.golden.bam
+    jobid: 181
+    reason: Missing output files: pipeline/reads/parent_2_7_2_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=7, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_7_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_7_2_1.golden.R1.fq 		-or pipeline/reads/parent_2_7_2_1.golden.R2.fq 		-oa pipeline/reads/parent_2_7_2_1.golden.bam
+[Thu Aug 14 17:41:39 2025]
+Finished job 181.
+49 of 246 steps (20%) done
+Removing temporary output pipeline/reads/parent_2_7_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_7_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:39 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_2_2_1.golden.R1.fq, pipeline/reads/child_2_2_1.golden.R2.fq, pipeline/reads/child_2_2_1.golden.bam
+    jobid: 197
+    reason: Missing output files: pipeline/reads/child_2_2_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=2, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_2_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_2_2_1.golden.R1.fq 		-or pipeline/reads/child_2_2_1.golden.R2.fq 		-oa pipeline/reads/child_2_2_1.golden.bam
+[Thu Aug 14 17:41:40 2025]
+Finished job 197.
+50 of 246 steps (20%) done
+Removing temporary output pipeline/reads/child_2_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_2_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:40 2025]
+rule MergeFastas:
+    input: pipeline/ref/child_test_1:0.fa, pipeline/ref/child_test_2:0.fa, pipeline/ref/child_test_3:0.fa, pipeline/ref/child_test_4:0.fa, pipeline/ref/child_test_5:0.fa
+    output: pipeline/ref/child_renamed.0.fa
+    jobid: 79
+    reason: Missing output files: pipeline/ref/child_renamed.0.fa; Input files updated by another job: pipeline/ref/child_test_5:0.fa, pipeline/ref/child_test_3:0.fa, pipeline/ref/child_test_2:0.fa, pipeline/ref/child_test_4:0.fa, pipeline/ref/child_test_1:0.fa
+    wildcards: indiv=child, genome=0
+    resources: tmpdir=/tmp
+
+cat pipeline/ref/child_test_1:0.fa pipeline/ref/child_test_2:0.fa pipeline/ref/child_test_3:0.fa pipeline/ref/child_test_4:0.fa pipeline/ref/child_test_5:0.fa | sed "s/:0//g; s/child_//g" > pipeline/ref/child_renamed.0.fa
+[Thu Aug 14 17:41:40 2025]
+Finished job 79.
+51 of 246 steps (21%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:41:40 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_5_2_1.golden.R1.fq, pipeline/reads/parent_1_5_2_1.golden.R2.fq, pipeline/reads/parent_1_5_2_1.golden.bam
+    jobid: 153
+    reason: Missing output files: pipeline/reads/parent_1_5_2_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=5, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_5_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_5_2_1.golden.R1.fq 		-or pipeline/reads/parent_1_5_2_1.golden.R2.fq 		-oa pipeline/reads/parent_1_5_2_1.golden.bam
+[Thu Aug 14 17:41:41 2025]
+Finished job 153.
+52 of 246 steps (21%) done
+Removing temporary output pipeline/reads/parent_1_5_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_5_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:41 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_4_1_1.golden.R1.fq, pipeline/reads/parent_1_4_1_1.golden.R2.fq, pipeline/reads/parent_1_4_1_1.golden.bam
+    jobid: 33
+    reason: Missing output files: pipeline/reads/parent_1_4_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=4, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_4_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_4_1_1.golden.R1.fq 		-or pipeline/reads/parent_1_4_1_1.golden.R2.fq 		-oa pipeline/reads/parent_1_4_1_1.golden.bam
+[Thu Aug 14 17:41:43 2025]
+Finished job 33.
+53 of 246 steps (22%) done
+Removing temporary output pipeline/reads/parent_1_4_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_4_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:43 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.0.fa
+    output: pipeline/reads/child_6_1_0.golden.R1.fq, pipeline/reads/child_6_1_0.golden.R2.fq, pipeline/reads/child_6_1_0.golden.bam
+    jobid: 90
+    reason: Missing output files: pipeline/reads/child_6_1_0.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.0.fa
+    wildcards: indiv=child, sim=6, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_6_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_6_1_0.golden.R1.fq 		-or pipeline/reads/child_6_1_0.golden.R2.fq 		-oa pipeline/reads/child_6_1_0.golden.bam
+[Thu Aug 14 17:41:44 2025]
+Finished job 90.
+54 of 246 steps (22%) done
+Removing temporary output pipeline/reads/child_6_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/child_6_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:44 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.0.fa
+    output: pipeline/reads/child_7_2_0.golden.R1.fq, pipeline/reads/child_7_2_0.golden.R2.fq, pipeline/reads/child_7_2_0.golden.bam
+    jobid: 206
+    reason: Missing output files: pipeline/reads/child_7_2_0.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.0.fa
+    wildcards: indiv=child, sim=7, iter=2, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_7_2_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_7_2_0.golden.R1.fq 		-or pipeline/reads/child_7_2_0.golden.R2.fq 		-oa pipeline/reads/child_7_2_0.golden.bam
+[Thu Aug 14 17:41:45 2025]
+Finished job 206.
+55 of 246 steps (22%) done
+Removing temporary output pipeline/reads/child_7_2_0.golden.R1.fq.
+Removing temporary output pipeline/reads/child_7_2_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:45 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.0.fa
+    output: pipeline/reads/child_2_2_0.golden.R1.fq, pipeline/reads/child_2_2_0.golden.R2.fq, pipeline/reads/child_2_2_0.golden.bam
+    jobid: 196
+    reason: Missing output files: pipeline/reads/child_2_2_0.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.0.fa
+    wildcards: indiv=child, sim=2, iter=2, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_2_2_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_2_2_0.golden.R1.fq 		-or pipeline/reads/child_2_2_0.golden.R2.fq 		-oa pipeline/reads/child_2_2_0.golden.bam
+[Thu Aug 14 17:41:47 2025]
+Finished job 196.
+56 of 246 steps (23%) done
+Removing temporary output pipeline/reads/child_2_2_0.golden.R1.fq.
+Removing temporary output pipeline/reads/child_2_2_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:47 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.0.fa
+    output: pipeline/reads/child_1_1_0.golden.R1.fq, pipeline/reads/child_1_1_0.golden.R2.fq, pipeline/reads/child_1_1_0.golden.bam
+    jobid: 78
+    reason: Missing output files: pipeline/reads/child_1_1_0.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.0.fa
+    wildcards: indiv=child, sim=1, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_1_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_1_1_0.golden.R1.fq 		-or pipeline/reads/child_1_1_0.golden.R2.fq 		-oa pipeline/reads/child_1_1_0.golden.bam
+[Thu Aug 14 17:41:48 2025]
+Finished job 78.
+57 of 246 steps (23%) done
+Removing temporary output pipeline/reads/child_1_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/child_1_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:48 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.0.fa
+    output: pipeline/reads/child_4_1_0.golden.R1.fq, pipeline/reads/child_4_1_0.golden.R2.fq, pipeline/reads/child_4_1_0.golden.bam
+    jobid: 86
+    reason: Missing output files: pipeline/reads/child_4_1_0.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.0.fa
+    wildcards: indiv=child, sim=4, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_4_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_4_1_0.golden.R1.fq 		-or pipeline/reads/child_4_1_0.golden.R2.fq 		-oa pipeline/reads/child_4_1_0.golden.bam
+[Thu Aug 14 17:41:50 2025]
+Finished job 86.
+58 of 246 steps (24%) done
+Removing temporary output pipeline/reads/child_4_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/child_4_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:50 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.0.fa
+    output: pipeline/reads/child_5_2_0.golden.R1.fq, pipeline/reads/child_5_2_0.golden.R2.fq, pipeline/reads/child_5_2_0.golden.bam
+    jobid: 202
+    reason: Missing output files: pipeline/reads/child_5_2_0.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.0.fa
+    wildcards: indiv=child, sim=5, iter=2, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_5_2_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_5_2_0.golden.R1.fq 		-or pipeline/reads/child_5_2_0.golden.R2.fq 		-oa pipeline/reads/child_5_2_0.golden.bam
+[Thu Aug 14 17:41:51 2025]
+Finished job 202.
+59 of 246 steps (24%) done
+Removing temporary output pipeline/reads/child_5_2_0.golden.R1.fq.
+Removing temporary output pipeline/reads/child_5_2_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:51 2025]
+rule MergeFastas:
+    input: pipeline/ref/parent_1_test_1:0.fa, pipeline/ref/parent_1_test_2:0.fa, pipeline/ref/parent_1_test_3:0.fa, pipeline/ref/parent_1_test_4:0.fa, pipeline/ref/parent_1_test_5:0.fa
+    output: pipeline/ref/parent_1_renamed.0.fa
+    jobid: 14
+    reason: Missing output files: pipeline/ref/parent_1_renamed.0.fa; Input files updated by another job: pipeline/ref/parent_1_test_2:0.fa, pipeline/ref/parent_1_test_3:0.fa, pipeline/ref/parent_1_test_1:0.fa, pipeline/ref/parent_1_test_5:0.fa, pipeline/ref/parent_1_test_4:0.fa
+    wildcards: indiv=parent_1, genome=0
+    resources: tmpdir=/tmp
+
+cat pipeline/ref/parent_1_test_1:0.fa pipeline/ref/parent_1_test_2:0.fa pipeline/ref/parent_1_test_3:0.fa pipeline/ref/parent_1_test_4:0.fa pipeline/ref/parent_1_test_5:0.fa | sed "s/:0//g; s/parent_1_//g" > pipeline/ref/parent_1_renamed.0.fa
+[Thu Aug 14 17:41:51 2025]
+Finished job 14.
+60 of 246 steps (24%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:41:51 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.0.fa
+    output: pipeline/reads/child_1_2_0.golden.R1.fq, pipeline/reads/child_1_2_0.golden.R2.fq, pipeline/reads/child_1_2_0.golden.bam
+    jobid: 194
+    reason: Missing output files: pipeline/reads/child_1_2_0.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.0.fa
+    wildcards: indiv=child, sim=1, iter=2, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_1_2_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_1_2_0.golden.R1.fq 		-or pipeline/reads/child_1_2_0.golden.R2.fq 		-oa pipeline/reads/child_1_2_0.golden.bam
+[Thu Aug 14 17:41:52 2025]
+Finished job 194.
+61 of 246 steps (25%) done
+Removing temporary output pipeline/reads/child_1_2_0.golden.R1.fq.
+Removing temporary output pipeline/reads/child_1_2_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:53 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_8_2_0.golden.R1.fq, pipeline/reads/parent_1_8_2_0.golden.R2.fq, pipeline/reads/parent_1_8_2_0.golden.bam
+    jobid: 158
+    reason: Missing output files: pipeline/reads/parent_1_8_2_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=8, iter=2, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_8_2_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_8_2_0.golden.R1.fq 		-or pipeline/reads/parent_1_8_2_0.golden.R2.fq 		-oa pipeline/reads/parent_1_8_2_0.golden.bam
+[Thu Aug 14 17:41:54 2025]
+Finished job 158.
+62 of 246 steps (25%) done
+Removing temporary output pipeline/reads/parent_1_8_2_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_8_2_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:54 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_3_2_0.golden.R1.fq, pipeline/reads/parent_1_3_2_0.golden.R2.fq, pipeline/reads/parent_1_3_2_0.golden.bam
+    jobid: 148
+    reason: Missing output files: pipeline/reads/parent_1_3_2_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=3, iter=2, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_3_2_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_3_2_0.golden.R1.fq 		-or pipeline/reads/parent_1_3_2_0.golden.R2.fq 		-oa pipeline/reads/parent_1_3_2_0.golden.bam
+[Thu Aug 14 17:41:55 2025]
+Finished job 148.
+63 of 246 steps (26%) done
+Removing temporary output pipeline/reads/parent_1_3_2_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_3_2_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:55 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.0.fa
+    output: pipeline/reads/child_5_1_0.golden.R1.fq, pipeline/reads/child_5_1_0.golden.R2.fq, pipeline/reads/child_5_1_0.golden.bam
+    jobid: 88
+    reason: Missing output files: pipeline/reads/child_5_1_0.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.0.fa
+    wildcards: indiv=child, sim=5, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_5_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_5_1_0.golden.R1.fq 		-or pipeline/reads/child_5_1_0.golden.R2.fq 		-oa pipeline/reads/child_5_1_0.golden.bam
+[Thu Aug 14 17:41:56 2025]
+Finished job 88.
+64 of 246 steps (26%) done
+Removing temporary output pipeline/reads/child_5_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/child_5_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:56 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.0.fa
+    output: pipeline/reads/child_6_2_0.golden.R1.fq, pipeline/reads/child_6_2_0.golden.R2.fq, pipeline/reads/child_6_2_0.golden.bam
+    jobid: 204
+    reason: Missing output files: pipeline/reads/child_6_2_0.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.0.fa
+    wildcards: indiv=child, sim=6, iter=2, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_6_2_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_6_2_0.golden.R1.fq 		-or pipeline/reads/child_6_2_0.golden.R2.fq 		-oa pipeline/reads/child_6_2_0.golden.bam
+[Thu Aug 14 17:41:58 2025]
+Finished job 204.
+65 of 246 steps (26%) done
+Removing temporary output pipeline/reads/child_6_2_0.golden.R1.fq.
+Removing temporary output pipeline/reads/child_6_2_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:58 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_6_2_1.golden.R1.fq, pipeline/reads/child_6_2_1.golden.R2.fq, pipeline/reads/child_6_2_1.golden.bam
+    jobid: 205
+    reason: Missing output files: pipeline/reads/child_6_2_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=6, iter=2, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_6_2_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_6_2_1.golden.R1.fq 		-or pipeline/reads/child_6_2_1.golden.R2.fq 		-oa pipeline/reads/child_6_2_1.golden.bam
+[Thu Aug 14 17:41:59 2025]
+Finished job 205.
+66 of 246 steps (27%) done
+Removing temporary output pipeline/reads/child_6_2_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_6_2_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:41:59 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_7_1_0.golden.R1.fq, pipeline/reads/parent_1_7_1_0.golden.R2.fq, pipeline/reads/parent_1_7_1_0.golden.bam
+    jobid: 38
+    reason: Missing output files: pipeline/reads/parent_1_7_1_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=7, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_7_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_7_1_0.golden.R1.fq 		-or pipeline/reads/parent_1_7_1_0.golden.R2.fq 		-oa pipeline/reads/parent_1_7_1_0.golden.bam
+[Thu Aug 14 17:42:00 2025]
+Finished job 38.
+67 of 246 steps (27%) done
+Removing temporary output pipeline/reads/parent_1_7_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_7_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:00 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_4_1_0.golden.R1.fq, pipeline/reads/parent_1_4_1_0.golden.R2.fq, pipeline/reads/parent_1_4_1_0.golden.bam
+    jobid: 32
+    reason: Missing output files: pipeline/reads/parent_1_4_1_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=4, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_4_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_4_1_0.golden.R1.fq 		-or pipeline/reads/parent_1_4_1_0.golden.R2.fq 		-oa pipeline/reads/parent_1_4_1_0.golden.bam
+[Thu Aug 14 17:42:01 2025]
+Finished job 32.
+68 of 246 steps (28%) done
+Removing temporary output pipeline/reads/parent_1_4_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_4_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:01 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_1_1_1.golden.R1.fq, pipeline/reads/child_1_1_1.golden.R2.fq, pipeline/reads/child_1_1_1.golden.bam
+    jobid: 80
+    reason: Missing output files: pipeline/reads/child_1_1_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=1, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_1_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_1_1_1.golden.R1.fq 		-or pipeline/reads/child_1_1_1.golden.R2.fq 		-oa pipeline/reads/child_1_1_1.golden.bam
+[Thu Aug 14 17:42:03 2025]
+Finished job 80.
+69 of 246 steps (28%) done
+Removing temporary output pipeline/reads/child_1_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_1_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:03 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_5_1_0.golden.R1.fq, pipeline/reads/parent_1_5_1_0.golden.R2.fq, pipeline/reads/parent_1_5_1_0.golden.bam
+    jobid: 34
+    reason: Missing output files: pipeline/reads/parent_1_5_1_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=5, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_5_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_5_1_0.golden.R1.fq 		-or pipeline/reads/parent_1_5_1_0.golden.R2.fq 		-oa pipeline/reads/parent_1_5_1_0.golden.bam
+[Thu Aug 14 17:42:04 2025]
+Finished job 34.
+70 of 246 steps (28%) done
+Removing temporary output pipeline/reads/parent_1_5_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_5_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:04 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_1_2_0.golden.R1.fq, pipeline/reads/parent_1_1_2_0.golden.R2.fq, pipeline/reads/parent_1_1_2_0.golden.bam
+    jobid: 144
+    reason: Missing output files: pipeline/reads/parent_1_1_2_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=1, iter=2, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_1_2_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_1_2_0.golden.R1.fq 		-or pipeline/reads/parent_1_1_2_0.golden.R2.fq 		-oa pipeline/reads/parent_1_1_2_0.golden.bam
+[Thu Aug 14 17:42:05 2025]
+Finished job 144.
+71 of 246 steps (29%) done
+Removing temporary output pipeline/reads/parent_1_1_2_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_1_2_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:05 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_4_2_0.golden.R1.fq, pipeline/reads/parent_1_4_2_0.golden.R2.fq, pipeline/reads/parent_1_4_2_0.golden.bam
+    jobid: 150
+    reason: Missing output files: pipeline/reads/parent_1_4_2_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=4, iter=2, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_4_2_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_4_2_0.golden.R1.fq 		-or pipeline/reads/parent_1_4_2_0.golden.R2.fq 		-oa pipeline/reads/parent_1_4_2_0.golden.bam
+[Thu Aug 14 17:42:06 2025]
+Finished job 150.
+72 of 246 steps (29%) done
+Removing temporary output pipeline/reads/parent_1_4_2_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_4_2_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:06 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_8_1_0.golden.R1.fq, pipeline/reads/parent_1_8_1_0.golden.R2.fq, pipeline/reads/parent_1_8_1_0.golden.bam
+    jobid: 40
+    reason: Missing output files: pipeline/reads/parent_1_8_1_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=8, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_8_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_8_1_0.golden.R1.fq 		-or pipeline/reads/parent_1_8_1_0.golden.R2.fq 		-oa pipeline/reads/parent_1_8_1_0.golden.bam
+[Thu Aug 14 17:42:08 2025]
+Finished job 40.
+73 of 246 steps (30%) done
+Removing temporary output pipeline/reads/parent_1_8_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_8_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:08 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_1_1_0.golden.R1.fq, pipeline/reads/parent_1_1_1_0.golden.R2.fq, pipeline/reads/parent_1_1_1_0.golden.bam
+    jobid: 13
+    reason: Missing output files: pipeline/reads/parent_1_1_1_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=1, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_1_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_1_1_0.golden.R1.fq 		-or pipeline/reads/parent_1_1_1_0.golden.R2.fq 		-oa pipeline/reads/parent_1_1_1_0.golden.bam
+[Thu Aug 14 17:42:09 2025]
+Finished job 13.
+74 of 246 steps (30%) done
+Removing temporary output pipeline/reads/parent_1_1_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_1_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:09 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_3_1_0.golden.R1.fq, pipeline/reads/parent_1_3_1_0.golden.R2.fq, pipeline/reads/parent_1_3_1_0.golden.bam
+    jobid: 30
+    reason: Missing output files: pipeline/reads/parent_1_3_1_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=3, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_3_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_3_1_0.golden.R1.fq 		-or pipeline/reads/parent_1_3_1_0.golden.R2.fq 		-oa pipeline/reads/parent_1_3_1_0.golden.bam
+[Thu Aug 14 17:42:10 2025]
+Finished job 30.
+75 of 246 steps (30%) done
+Removing temporary output pipeline/reads/parent_1_3_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_3_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:10 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_7_2_0.golden.R1.fq, pipeline/reads/parent_1_7_2_0.golden.R2.fq, pipeline/reads/parent_1_7_2_0.golden.bam
+    jobid: 156
+    reason: Missing output files: pipeline/reads/parent_1_7_2_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=7, iter=2, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_7_2_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_7_2_0.golden.R1.fq 		-or pipeline/reads/parent_1_7_2_0.golden.R2.fq 		-oa pipeline/reads/parent_1_7_2_0.golden.bam
+[Thu Aug 14 17:42:11 2025]
+Finished job 156.
+76 of 246 steps (31%) done
+Removing temporary output pipeline/reads/parent_1_7_2_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_7_2_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:11 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_2_2_0.golden.R1.fq, pipeline/reads/parent_1_2_2_0.golden.R2.fq, pipeline/reads/parent_1_2_2_0.golden.bam
+    jobid: 146
+    reason: Missing output files: pipeline/reads/parent_1_2_2_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=2, iter=2, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_2_2_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_2_2_0.golden.R1.fq 		-or pipeline/reads/parent_1_2_2_0.golden.R2.fq 		-oa pipeline/reads/parent_1_2_2_0.golden.bam
+[Thu Aug 14 17:42:12 2025]
+Finished job 146.
+77 of 246 steps (31%) done
+Removing temporary output pipeline/reads/parent_1_2_2_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_2_2_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:12 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_3_1_1.golden.R1.fq, pipeline/reads/parent_1_3_1_1.golden.R2.fq, pipeline/reads/parent_1_3_1_1.golden.bam
+    jobid: 31
+    reason: Missing output files: pipeline/reads/parent_1_3_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=3, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_3_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_3_1_1.golden.R1.fq 		-or pipeline/reads/parent_1_3_1_1.golden.R2.fq 		-oa pipeline/reads/parent_1_3_1_1.golden.bam
+[Thu Aug 14 17:42:14 2025]
+Finished job 31.
+78 of 246 steps (32%) done
+Removing temporary output pipeline/reads/parent_1_3_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_3_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:14 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_6_1_0.golden.R1.fq, pipeline/reads/parent_1_6_1_0.golden.R2.fq, pipeline/reads/parent_1_6_1_0.golden.bam
+    jobid: 36
+    reason: Missing output files: pipeline/reads/parent_1_6_1_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=6, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_6_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_6_1_0.golden.R1.fq 		-or pipeline/reads/parent_1_6_1_0.golden.R2.fq 		-oa pipeline/reads/parent_1_6_1_0.golden.bam
+[Thu Aug 14 17:42:15 2025]
+Finished job 36.
+79 of 246 steps (32%) done
+Removing temporary output pipeline/reads/parent_1_6_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_6_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:15 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.1.fa
+    output: pipeline/reads/parent_1_8_1_1.golden.R1.fq, pipeline/reads/parent_1_8_1_1.golden.R2.fq, pipeline/reads/parent_1_8_1_1.golden.bam
+    jobid: 41
+    reason: Missing output files: pipeline/reads/parent_1_8_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.1.fa
+    wildcards: indiv=parent_1, sim=8, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_8_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_8_1_1.golden.R1.fq 		-or pipeline/reads/parent_1_8_1_1.golden.R2.fq 		-oa pipeline/reads/parent_1_8_1_1.golden.bam
+[Thu Aug 14 17:42:16 2025]
+Finished job 41.
+80 of 246 steps (33%) done
+Removing temporary output pipeline/reads/parent_1_8_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_8_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:16 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_2_renamed.1.fa
+    output: pipeline/reads/parent_2_1_1_1.golden.R1.fq, pipeline/reads/parent_2_1_1_1.golden.R2.fq, pipeline/reads/parent_2_1_1_1.golden.bam
+    jobid: 52
+    reason: Missing output files: pipeline/reads/parent_2_1_1_1.golden.bam; Input files updated by another job: pipeline/ref/parent_2_renamed.1.fa
+    wildcards: indiv=parent_2, sim=1, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_2_1_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_2_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_2_1_1_1.golden.R1.fq 		-or pipeline/reads/parent_2_1_1_1.golden.R2.fq 		-oa pipeline/reads/parent_2_1_1_1.golden.bam
+[Thu Aug 14 17:42:17 2025]
+Finished job 52.
+81 of 246 steps (33%) done
+Removing temporary output pipeline/reads/parent_2_1_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_2_1_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:17 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.0.fa
+    output: pipeline/reads/child_2_1_0.golden.R1.fq, pipeline/reads/child_2_1_0.golden.R2.fq, pipeline/reads/child_2_1_0.golden.bam
+    jobid: 82
+    reason: Missing output files: pipeline/reads/child_2_1_0.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.0.fa
+    wildcards: indiv=child, sim=2, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_2_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_2_1_0.golden.R1.fq 		-or pipeline/reads/child_2_1_0.golden.R2.fq 		-oa pipeline/reads/child_2_1_0.golden.bam
+[Thu Aug 14 17:42:19 2025]
+Finished job 82.
+82 of 246 steps (33%) done
+Removing temporary output pipeline/reads/child_2_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/child_2_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:19 2025]
+rule SimulateReads:
+    input: pipeline/ref/child_renamed.1.fa
+    output: pipeline/reads/child_4_1_1.golden.R1.fq, pipeline/reads/child_4_1_1.golden.R2.fq, pipeline/reads/child_4_1_1.golden.bam
+    jobid: 87
+    reason: Missing output files: pipeline/reads/child_4_1_1.golden.bam; Input files updated by another job: pipeline/ref/child_renamed.1.fa
+    wildcards: indiv=child, sim=4, iter=1, genome=1
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_child_4_1_1" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/child_renamed.1.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 18750 		-o pipeline/reads/child_4_1_1.golden.R1.fq 		-or pipeline/reads/child_4_1_1.golden.R2.fq 		-oa pipeline/reads/child_4_1_1.golden.bam
+[Thu Aug 14 17:42:20 2025]
+Finished job 87.
+83 of 246 steps (34%) done
+Removing temporary output pipeline/reads/child_4_1_1.golden.R1.fq.
+Removing temporary output pipeline/reads/child_4_1_1.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:20 2025]
+rule MergeFastas:
+    input: pipeline/ref/parent_2_test_1:0.fa, pipeline/ref/parent_2_test_2:0.fa, pipeline/ref/parent_2_test_3:0.fa, pipeline/ref/parent_2_test_4:0.fa, pipeline/ref/parent_2_test_5:0.fa
+    output: pipeline/ref/parent_2_renamed.0.fa
+    jobid: 51
+    reason: Missing output files: pipeline/ref/parent_2_renamed.0.fa; Input files updated by another job: pipeline/ref/parent_2_test_4:0.fa, pipeline/ref/parent_2_test_2:0.fa, pipeline/ref/parent_2_test_1:0.fa, pipeline/ref/parent_2_test_3:0.fa, pipeline/ref/parent_2_test_5:0.fa
+    wildcards: indiv=parent_2, genome=0
+    resources: tmpdir=/tmp
+
+cat pipeline/ref/parent_2_test_1:0.fa pipeline/ref/parent_2_test_2:0.fa pipeline/ref/parent_2_test_3:0.fa pipeline/ref/parent_2_test_4:0.fa pipeline/ref/parent_2_test_5:0.fa | sed "s/:0//g; s/parent_2_//g" > pipeline/ref/parent_2_renamed.0.fa
+[Thu Aug 14 17:42:20 2025]
+Finished job 51.
+84 of 246 steps (34%) done
+Select jobs to execute...
+
+[Thu Aug 14 17:42:20 2025]
+rule SimulateReads:
+    input: pipeline/ref/parent_1_renamed.0.fa
+    output: pipeline/reads/parent_1_2_1_0.golden.R1.fq, pipeline/reads/parent_1_2_1_0.golden.R2.fq, pipeline/reads/parent_1_2_1_0.golden.bam
+    jobid: 28
+    reason: Missing output files: pipeline/reads/parent_1_2_1_0.golden.bam; Input files updated by another job: pipeline/ref/parent_1_renamed.0.fa
+    wildcards: indiv=parent_1, sim=2, iter=1, genome=0
+    resources: tmpdir=/tmp, mem_mb=64000, mem_mib=61036, runtime=2880
+
+mason_simulator 		--read-name-prefix "simulated_parent_1_2_1_0" 		--seed $RANDOM --num-threads 1 		-ir pipeline/ref/parent_1_renamed.0.fa 		--fragment-mean-size 400 		--fragment-size-std-dev 30 		--illumina-read-length 100 		-n 15625 		-o pipeline/reads/parent_1_2_1_0.golden.R1.fq 		-or pipeline/reads/parent_1_2_1_0.golden.R2.fq 		-oa pipeline/reads/parent_1_2_1_0.golden.bam
+[Thu Aug 14 17:42:21 2025]
+Finished job 28.
+85 of 246 steps (35%) done
+Removing temporary output pipeline/reads/parent_1_2_1_0.golden.R1.fq.
+Removing temporary output pipeline/reads/parent_1_2_1_0.golden.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:21 2025]
+rule MergeGoldenBam:
+    input: pipeline/reads/parent_1_1_1_0.golden.bam, pipeline/reads/parent_1_1_1_1.golden.bam, pipeline/reads/parent_1_2_1_0.golden.bam, pipeline/reads/parent_1_2_1_1.golden.bam, pipeline/reads/parent_1_3_1_0.golden.bam, pipeline/reads/parent_1_3_1_1.golden.bam, pipeline/reads/parent_1_4_1_0.golden.bam, pipeline/reads/parent_1_4_1_1.golden.bam, pipeline/reads/parent_1_5_1_0.golden.bam, pipeline/reads/parent_1_5_1_1.golden.bam, pipeline/reads/parent_1_6_1_0.golden.bam, pipeline/reads/parent_1_6_1_1.golden.bam, pipeline/reads/parent_1_7_1_0.golden.bam, pipeline/reads/parent_1_7_1_1.golden.bam, pipeline/reads/parent_1_8_1_0.golden.bam, pipeline/reads/parent_1_8_1_1.golden.bam
+    output: pipeline/reads/parent_1_1.golden.bam
+    jobid: 12
+    reason: Missing output files: pipeline/reads/parent_1_1.golden.bam; Input files updated by another job: pipeline/reads/parent_1_2_1_0.golden.bam, pipeline/reads/parent_1_7_1_1.golden.bam, pipeline/reads/parent_1_5_1_0.golden.bam, pipeline/reads/parent_1_8_1_1.golden.bam, pipeline/reads/parent_1_4_1_0.golden.bam, pipeline/reads/parent_1_2_1_1.golden.bam, pipeline/reads/parent_1_1_1_0.golden.bam, pipeline/reads/parent_1_1_1_1.golden.bam, pipeline/reads/parent_1_3_1_1.golden.bam, pipeline/reads/parent_1_6_1_1.golden.bam, pipeline/reads/parent_1_8_1_0.golden.bam, pipeline/reads/parent_1_4_1_1.golden.bam, pipeline/reads/parent_1_7_1_0.golden.bam, pipeline/reads/parent_1_5_1_1.golden.bam, pipeline/reads/parent_1_3_1_0.golden.bam, pipeline/reads/parent_1_6_1_0.golden.bam
+    wildcards: indiv=parent_1, iter=1
+    resources: tmpdir=/tmp, runtime=480
+
+samtools merge 		-@ 1 		pipeline/reads/parent_1_1.golden.bam 		 pipeline/reads/parent_1_1_1_0.golden.bam   pipeline/reads/parent_1_1_1_1.golden.bam   pipeline/reads/parent_1_2_1_0.golden.bam   pipeline/reads/parent_1_2_1_1.golden.bam   pipeline/reads/parent_1_3_1_0.golden.bam   pipeline/reads/parent_1_3_1_1.golden.bam   pipeline/reads/parent_1_4_1_0.golden.bam   pipeline/reads/parent_1_4_1_1.golden.bam   pipeline/reads/parent_1_5_1_0.golden.bam   pipeline/reads/parent_1_5_1_1.golden.bam   pipeline/reads/parent_1_6_1_0.golden.bam   pipeline/reads/parent_1_6_1_1.golden.bam   pipeline/reads/parent_1_7_1_0.golden.bam   pipeline/reads/parent_1_7_1_1.golden.bam   pipeline/reads/parent_1_8_1_0.golden.bam   pipeline/reads/parent_1_8_1_1.golden.bam 
+[Thu Aug 14 17:42:25 2025]
+Finished job 12.
+86 of 246 steps (35%) done
+Removing temporary output pipeline/reads/parent_1_1_1_0.golden.bam.
+Removing temporary output pipeline/reads/parent_1_1_1_1.golden.bam.
+Removing temporary output pipeline/reads/parent_1_2_1_0.golden.bam.
+Removing temporary output pipeline/reads/parent_1_2_1_1.golden.bam.
+Removing temporary output pipeline/reads/parent_1_3_1_0.golden.bam.
+Removing temporary output pipeline/reads/parent_1_3_1_1.golden.bam.
+Removing temporary output pipeline/reads/parent_1_4_1_0.golden.bam.
+Removing temporary output pipeline/reads/parent_1_4_1_1.golden.bam.
+Removing temporary output pipeline/reads/parent_1_5_1_0.golden.bam.
+Removing temporary output pipeline/reads/parent_1_5_1_1.golden.bam.
+Removing temporary output pipeline/reads/parent_1_6_1_0.golden.bam.
+Removing temporary output pipeline/reads/parent_1_6_1_1.golden.bam.
+Removing temporary output pipeline/reads/parent_1_7_1_0.golden.bam.
+Removing temporary output pipeline/reads/parent_1_7_1_1.golden.bam.
+Removing temporary output pipeline/reads/parent_1_8_1_0.golden.bam.
+Removing temporary output pipeline/reads/parent_1_8_1_1.golden.bam.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:25 2025]
+rule SamToFastq:
+    input: pipeline/reads/parent_1_1.golden.bam
+    output: pipeline/reads/parent_1_1.R1.fq, pipeline/reads/parent_1_1.R2.fq
+    jobid: 11
+    reason: Missing output files: pipeline/reads/parent_1_1.R1.fq, pipeline/reads/parent_1_1.R2.fq; Input files updated by another job: pipeline/reads/parent_1_1.golden.bam
+    wildcards: indiv=parent_1, iter=1
+    resources: tmpdir=/tmp
+
+gatk SamToFastq 		-I pipeline/reads/parent_1_1.golden.bam 		-F pipeline/reads/parent_1_1.R1.fq 		-F2 pipeline/reads/parent_1_1.R2.fq
+[Thu Aug 14 17:42:32 2025]
+Finished job 11.
+87 of 246 steps (35%) done
+Removing temporary output pipeline/reads/parent_1_1.golden.bam.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:32 2025]
+rule MapReads:
+    input: /home/mmilhave/DETECT/demo/reference.fa, pipeline/reads/parent_1_1.R1.fq, pipeline/reads/parent_1_1.R2.fq
+    output: pipeline/sorted_bams/parent_1.1.bam
+    jobid: 10
+    reason: Missing output files: pipeline/sorted_bams/parent_1.1.bam; Input files updated by another job: pipeline/reads/parent_1_1.R2.fq, pipeline/reads/parent_1_1.R1.fq
+    wildcards: indiv=parent_1, iter=1
+    resources: tmpdir=/tmp, mem_mb=24000, mem_mib=22889, runtime=2880
+
+bwa mem 		-t 1		-R "@RG\tID:parent_1_1\tSM:parent_1\tPL:ILLUMINA" 		/home/mmilhave/DETECT/demo/reference.fa 		pipeline/reads/parent_1_1.R1.fq pipeline/reads/parent_1_1.R2.fq 		| samtools view -b - > pipeline/sorted_bams/parent_1.1.bam 
+[Thu Aug 14 17:42:49 2025]
+Finished job 10.
+88 of 246 steps (36%) done
+Removing temporary output pipeline/reads/parent_1_1.R1.fq.
+Removing temporary output pipeline/reads/parent_1_1.R2.fq.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:49 2025]
+rule SortBam:
+    input: pipeline/sorted_bams/parent_1.1.bam
+    output: pipeline/sorted_bams/parent_1.sorted.1.bam
+    jobid: 9
+    reason: Missing output files: pipeline/sorted_bams/parent_1.sorted.1.bam; Input files updated by another job: pipeline/sorted_bams/parent_1.1.bam
+    wildcards: indiv=parent_1, iter=1
+    resources: tmpdir=/tmp, mem_mb=1024, mem_mib=977, runtime=720
+
+samtools sort -@ 1 pipeline/sorted_bams/parent_1.1.bam > pipeline/sorted_bams/parent_1.sorted.1.bam
+[Thu Aug 14 17:42:52 2025]
+Finished job 9.
+89 of 246 steps (36%) done
+Removing temporary output pipeline/sorted_bams/parent_1.1.bam.
+Select jobs to execute...
+
+[Thu Aug 14 17:42:52 2025]
+rule MarkDuplicates:
+    input: pipeline/sorted_bams/parent_1.sorted.1.bam
+    output: pipeline/mark_dups/parent_1.sorted.mark_dups.1.bam, pipeline/mark_dups/parent_1.sorted.mark_dups.1.bai, pipeline/mark_dups/parent_1.sorted.mark_dups.metrics.1.txt
+    jobid: 8
+    reason: Missing output files: pipeline/mark_dups/parent_1.sorted.mark_dups.1.bam; Input files updated by another job: pipeline/sorted_bams/parent_1.sorted.1.bam
+    wildcards: indiv=parent_1, iter=1
+    resources: tmpdir=pipeline/mark_dups/, runtime=2880, mem_mb=122880, mem_mib=117188
+
+gatk --java-options "-Xmx122880m" MarkDuplicates 		-I pipeline/sorted_bams/parent_1.sorted.1.bam 		-O pipeline/mark_dups/parent_1.sorted.mark_dups.1.bam 		-M pipeline/mark_dups/parent_1.sorted.mark_dups.metrics.1.txt 		--TMP_DIR pipeline/mark_dups/ 		--CREATE_INDEX true
+[Thu Aug 14 17:43:13 2025]
+Error in rule MarkDuplicates:
+    jobid: 8
+    input: pipeline/sorted_bams/parent_1.sorted.1.bam
+    output: pipeline/mark_dups/parent_1.sorted.mark_dups.1.bam, pipeline/mark_dups/parent_1.sorted.mark_dups.1.bai, pipeline/mark_dups/parent_1.sorted.mark_dups.metrics.1.txt
+    shell:
+        gatk --java-options "-Xmx122880m" MarkDuplicates 		-I pipeline/sorted_bams/parent_1.sorted.1.bam 		-O pipeline/mark_dups/parent_1.sorted.mark_dups.1.bam 		-M pipeline/mark_dups/parent_1.sorted.mark_dups.metrics.1.txt 		--TMP_DIR pipeline/mark_dups/ 		--CREATE_INDEX true
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: ../.snakemake/log/2025-08-14T174002.910794.snakemake.log

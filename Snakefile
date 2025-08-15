@@ -9,7 +9,6 @@ num_chroms = len(config["chroms"].keys())
 read_cutoff = 1e6
 #TODO Clean up shell commands
 
-
 import pprint
 import numpy
 from numpy import random
@@ -79,7 +78,7 @@ def get_simreads_runtime(wildcards):
 
 rule all:
     input:
-        config['output_file']
+        expand(config['outdir']+"/DETECT_output.{iter}.txt",iter=range(1,int(config['num_iterations'])+1))
 
 rule RenameInputTrioVCF:
 	input:
@@ -178,7 +177,7 @@ rule SimulateReads:
 	threads:
 		int(config['num_cores'])
 	shell:
-		'mason_simulator \
+		"""mason_simulator \
 		--read-name-prefix "simulated_{wildcards.indiv}_{wildcards.sim}_{wildcards.iter}_{wildcards.genome}" \
 		--seed $RANDOM --num-threads {threads} \
 		-ir {input.fa} \
@@ -188,7 +187,7 @@ rule SimulateReads:
 		-n {params.read_count} \
 		-o {output.r1} \
 		-or {output.r2} \
-		-oa {output.golden_bam}' 
+		-oa {output.golden_bam}"""
 
 rule MergeGoldenBam:
 	input:
@@ -204,7 +203,7 @@ rule MergeGoldenBam:
 	shell:
 		'samtools merge \
 		-@ {threads} \
-		{output} \
+		-o {output} \
 		{params.input_list}'
 
 rule MutateGoldenBam:
@@ -284,12 +283,12 @@ rule MarkDuplicates:
 	input:
     		'pipeline/sorted_bams/{indiv}.sorted.{iter}.bam'
 	output:
-		output_bam = temp('pipeline/mark_dups/{indiv}.sorted.mark_dups.{iter}.bam'),
-		output_bai = temp('pipeline/mark_dups/{indiv}.sorted.mark_dups.{iter}.bai'),
+		output_bam = 'pipeline/mark_dups/{indiv}.sorted.mark_dups.{iter}.bam',
+		output_bai = 'pipeline/mark_dups/{indiv}.sorted.mark_dups.{iter}.bai',
 		output_metrics = temp('pipeline/mark_dups/{indiv}.sorted.mark_dups.metrics.{iter}.txt')
 	resources:
 		runtime='2d',
-		mem_mb=122880, #lambda wc, input: input.size_mb*2,
+		mem_mb=lambda wc, input: input.size_mb*2,
 		tmpdir='pipeline/mark_dups/'
 	shell:
 		'gatk --java-options "-Xmx{resources.mem_mb}m" MarkDuplicates \
@@ -301,8 +300,8 @@ rule MarkDuplicates:
 
 rule BQSR:
 	input:
-		bam = lambda x: 'pipeline/mark_dups/{indiv}.sorted.mark_dups.{iter}.bam' if 'input_variants' in config.keys() else [],
-		known_variants = lambda x: config['input_variants'] if 'known_variants' == "NONE" else config['known_variants'],
+		bam = 'pipeline/mark_dups/{indiv}.sorted.mark_dups.{iter}.bam' if 'known_variants' in config.keys() else [],
+		known_variants = config['known_variants'] if 'known_variants' in config.keys() else [],
 		reference = config['reference_genome']
 	output:
 		'pipeline/BQSR/{indiv}.sorted.mark_dups.BQSR.{iter}.txt'
@@ -318,9 +317,9 @@ rule BQSR:
 		-O {output}'
 rule ApplyBQSR:
 	input:
-		bam = 'pipeline/mark_dups/{indiv}.sorted.mark_dups.{iter}.bam',
+		bam = 'pipeline/mark_dups/{indiv}.sorted.mark_dups.{iter}.bam' if 'known_variants' in config.keys() else [],
 		reference = config['reference_genome'],
-		recal = 'pipeline/BQSR/{indiv}.sorted.mark_dups.BQSR.{iter}.txt'
+		recal = 'pipeline/BQSR/{indiv}.sorted.mark_dups.BQSR.{iter}.txt' #if 'known_variants' in config.keys() else []
 	output:
 		output_bam = 'pipeline/BQSR/{indiv}.sorted.mark_dups.BQSR.{iter}.bam',
 		output_bai = 'pipeline/BQSR/{indiv}.sorted.mark_dups.BQSR.{iter}.bai'
@@ -341,11 +340,12 @@ rule ApplyBQSR:
 rule CallVariants:
 	input:
 		reference = config['reference_genome'],
-		input_bam = 'pipeline/BQSR/{indiv}.sorted.mark_dups.BQSR.{iter}.bam',
-		input_bai = 'pipeline/BQSR/{indiv}.sorted.mark_dups.BQSR.{iter}.bai'
+		input_bam = lambda x: 'pipeline/BQSR/{indiv}.sorted.mark_dups.BQSR.{iter}.bam' if 'known_variants' in config.keys() else 'pipeline/mark_dups/{indiv}.sorted.mark_dups.{iter}.bam',
+		input_bai = lambda x: 'pipeline/BQSR/{indiv}.sorted.mark_dups.BQSR.{iter}.bai' if 'known_variants' in config.keys() else 'pipeline/mark_dups/{indiv}.sorted.mark_dups.{iter}.bai'
 	output:
-		output_vcf = 'pipeline/call_variants/{indiv}.sorted.mark_dups.BQSR.{chromosome}.{iter}.g.vcf',
-		reassembled_bam = 'pipeline/call_variants/{indiv}.sorted.mark_dups.BQSR.{chromosome}.{iter}.reassembled.bam'
+		output_vcf = 'pipeline/call_variants/{indiv}.{chromosome}.{iter}.g.vcf',
+		reassembled_bam = 'pipeline/call_variants/{indiv}.{chromosome}.{iter}.reassembled.bam',
+		reassembled_bai = 'pipeline/call_variants/{indiv}.{chromosome}.{iter}.reassembled.bai'
 	resources:
 		tmpdir='pipeline/call_variants/',
 		runtime='8h',
@@ -366,9 +366,9 @@ rule CallVariants:
 rule CombineVariants:
 	input:
 		reference = config['reference_genome'],
-		p1_vcf='pipeline/call_variants/parent_1.sorted.mark_dups.BQSR.{chromosome}.{iter}.g.vcf',
-		p2_vcf='pipeline/call_variants/parent_2.sorted.mark_dups.BQSR.{chromosome}.{iter}.g.vcf',
-		ch_vcf='pipeline/call_variants/child.sorted.mark_dups.BQSR.{chromosome}.{iter}.g.vcf'
+		p1_vcf='pipeline/call_variants/parent_1.{chromosome}.{iter}.g.vcf',
+		p2_vcf='pipeline/call_variants/parent_2.{chromosome}.{iter}.g.vcf',
+		ch_vcf='pipeline/call_variants/child.{chromosome}.{iter}.g.vcf'
 	output:
 		output_dir = directory('pipeline/genotype_variants/trio.{chromosome}.{iter}')
 	resources:
@@ -405,26 +405,41 @@ rule GenotypeVariants:
 		-A FisherStrand \
 		-O {output}'
 
-rule IsolateMVs:
+
+rule IsolateSNPs:
 	input:
 		'pipeline/genotype_variants/trio.{chromosome}.{iter}.vcf'
+	output:
+		'pipeline/MV/trio.snp.{chromosome}.{iter}.vcf'
+	resources:
+		runtime='15m'
+	shell:
+		 """
+                gatk SelectVariants \
+                -V {input} \
+                --restrict-alleles-to BIALLELIC \
+                --select-type-to-include SNP \
+                --exclude-filtered true \
+                --exclude-non-variants true \
+                -select "AN==6" \
+                -O {output}
+		"""
+rule IsolateMVs:
+	input:
+		'pipeline/MV/trio.snp.{chromosome}.{iter}.vcf'
 	output:
 		'pipeline/MV/trio.MV.{chromosome}.{iter}.vcf'
 	resources:
 		runtime='15m' 
 	shell:
-		'gatk SelectVariants \
+		"""
+		gatk SelectVariants \
 		-V {input} \
-		--restrict-alleles-to BIALLELIC \
-		--select-type-to-include SNP \
-		--exclude-filtered true \
-		--exclude-non-variants true \
-		-select \'AN==6\' \
-		--select \'vc.getGenotype("parent_1").isHomRef()\' \
-		--select \'vc.getGenotype("parent_2").isHomRef()\' \
-		--select \'vc.getGenotype("child").isHet()\' \
-		-O {output}'
-
+		--select 'vc.getGenotype("parent_1").isHomRef()' \
+		--select 'vc.getGenotype("parent_2").isHomRef()' \
+		--select 'vc.getGenotype("child").isHet()' \
+		-O {output}
+		"""
 rule MergeMVVCFs:
 	input:
 		expand('pipeline/MV/trio.MV.{chromosome}.{{iter}}.vcf', chromosome=config['chroms'].keys())
@@ -442,47 +457,17 @@ rule get_MV_muts:
 		vcf = 'pipeline/MV/trio.MV.all_chr.{iter}.vcf',
 		muts = 'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
 	output:
-		'pipeline/MV/trio.MV.all_chr.{iter}.mutations.vcf'
+		'pipeline/MV/trio.MV.all_chr.mutations.{iter}.vcf'
 	resources:
 		runtime='15m'
 	shell:
 		'gatk SelectVariants -V {input.vcf} --concordance {input.muts} -O {output}'
 
-rule get_assembly_depths:
-	input:
-		input_vcf='pipeline/MV/trio.MV.all_chr.{iter}.mutations.vcf',
-		all_reassembled = expand('pipeline/call_variants/{indiv}.sorted.mark_dups.BQSR.{chromosome}.{{iter}}.reassembled.bam',chromosome=config['chroms'].keys(),indiv=config['names'].keys()),
-		ch_bqsr_bam = 'pipeline/BQSR/child.sorted.mark_dups.BQSR.{iter}.bam'
-	output:
-		'pipeline/MV/trio.MV.all_chr.{iter}.assembly_depths.txt'
-	resources:
-		runtime='4h'
-	shell:r"""
-{{
-    echo "CHROM POS p1_reassembled p2_reassembled child_reassembled"
-        grep -v "#" {input.input_vcf} | awk '{{print $1"\t"$2}}' | while read chrom pos
-    do
-        p1_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/parent_1.sorted.mark_dups.BQSR.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
-        p2_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/parent_2.sorted.mark_dups.BQSR.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
-        ch_bqsr=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} {input.ch_bqsr_bam} | awk '{{print $3}}')
-        ch_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/child.sorted.mark_dups.BQSR.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
-
-        if [ "$ch_bqsr" -gt "$ch_reassembled" ]; then
-            ch_diff=$((ch_bqsr - ch_reassembled))
-        else
-            ch_diff=$((ch_reassembled - ch_bqsr))
-        fi
-
-        echo "$chrom $pos $p1_reassembled $p2_reassembled $ch_diff"
-    done
-}} > {output}
-"""
-
 rule get_muts_table:
 	input:
-		'pipeline/MV/trio.MV.all_chr.{iter}.mutations.vcf'
+		'pipeline/MV/trio.MV.all_chr.mutations.{iter}.vcf'
 	output:
-		'pipeline/MV/trio.MV.all_chr.{iter}.mutations.table'
+		'pipeline/MV/trio.MV.all_chr.mutations.{iter}.table'
 	resources:
 		runtime='15m'
 	shell:
@@ -494,22 +479,22 @@ rule get_muts_table:
 		-GF AD -GF DP -GF GQ \
 		-O {output}'
 
-rule get_MV_vars:
+rule get_MV_poly:
 	input:
 		vcf = 'pipeline/MV/trio.MV.all_chr.{iter}.vcf',
 		poly_vcf = config['input_variants']
 	output:
-		'pipeline/MV/trio.MV.all_chr.{iter}.polymorphisms.vcf'
+		'pipeline/MV/trio.MV.all_chr.polymorphisms.{iter}.vcf'
 	resources:
 		runtime='15m'
 	shell:
 		'gatk SelectVariants -V {input.vcf} --concordance {input.poly_vcf} -O {output}'
 
-rule get_vars_table:
+rule get_poly_table:
 	input:
-		'pipeline/MV/trio.MV.all_chr.{iter}.polymorphisms.vcf'
+		'pipeline/MV/trio.MV.all_chr.polymorphisms.{iter}.vcf'
 	output:
-		'pipeline/MV/trio.MV.all_chr.{iter}.polymorphisms.table'
+		'pipeline/MV/trio.MV.all_chr.polymorphisms.{iter}.table'
 	resources:
 		runtime='15m'
 	shell:
@@ -526,32 +511,128 @@ rule get_MV_errors:
 		muts = 'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf',
 		xvars = config['input_variants']
 	output:
-		'pipeline/MV/trio.MV.all_chr.{iter}.errors.vcf'
+		'pipeline/MV/trio.MV.all_chr.errors.{iter}.vcf'
 	resources:
 		runtime='15m'
 	shell:
-		'gatk SelectVariants -V {input.vcf} --discordance {input.muts} -O pipeline/MV/trio.MV.all_chr.{wildcards.iter}.nomuts.vcf && gatk SelectVariants -V pipeline/MV/trio.MV.{wildcards.iter}.nomuts.vcf --discordance {input.xvars} -O {output}'
+		'gatk SelectVariants -V {input.vcf} --discordance {input.muts} -O pipeline/MV/trio.MV.all_chr.{wildcards.iter}.nomuts.vcf && gatk SelectVariants -V pipeline/MV/trio.MV.all_chr.{wildcards.iter}.nomuts.vcf --discordance {input.xvars} -O {output}'
 
 rule get_errors_table:
 	input:
-		input_vcf = 'pipeline/MV/trio.MV.all_chr.{iter}.errors.vcf',
+		input_vcf = 'pipeline/MV/trio.MV.all_chr.errors.{iter}.vcf',
 	output:
-		'pipeline/MV/trio.MV.all_chr.{iter}.errors.table'
+		'pipeline/MV/trio.MV.all_chr.errors.{iter}.table'
 	resources:
 		runtime='15m'
 	shell:
 		'gatk VariantsToTable -V {input.input_vcf} -F CHROM -F POS -F QUAL -F BaseQRankSum -F MQRankSum -F ReadPosRankSum -F SOR -F FS -F QD -GF AD -GF DP -GF GQ -GF PL -O {output}'
 
+rule get_mut_assembly_depths:
+        input:
+                input_vcf='pipeline/MV/trio.MV.all_chr.mutations.{iter}.vcf',
+                all_reassembled = expand('pipeline/call_variants/{indiv}.{chromosome}.{{iter}}.reassembled.bam',chromosome=config['chroms'].keys(),indiv=config['names'].keys()),
+                ch_bqsr_bam = 'pipeline/BQSR/child.sorted.mark_dups.BQSR.{iter}.bam' if 'known_variants' in config.keys() else 'pipeline/mark_dups/child.sorted.mark_dups.{iter}.bam'
+        output:
+                'pipeline/MV/trio.MV.all_chr.assembly_depths.mutations.{iter}.table'
+        resources:
+                runtime='4h'
+        shell:r"""
+{{
+    echo "CHROM POS p1_reassembled p2_reassembled child_reassembled"
+        grep -v "#" {input.input_vcf} | awk '{{print $1"\t"$2}}' | while read chrom pos
+    do
+        p1_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/parent_1.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+        p2_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/parent_2.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+        ch_bqsr=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} {input.ch_bqsr_bam} | awk '{{print $3}}')
+        ch_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/child.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+
+        if [ "$ch_bqsr" -gt "$ch_reassembled" ]; then
+            ch_diff=$((ch_bqsr - ch_reassembled))
+        else
+            ch_diff=$((ch_reassembled - ch_bqsr))
+        fi
+
+        echo "$chrom $pos $p1_reassembled $p2_reassembled $ch_diff"
+    done
+}} > {output}
+"""
+
+rule get_poly_assembly_depths:
+        input:
+                input_vcf='pipeline/MV/trio.MV.all_chr.polymorphisms.{iter}.vcf',
+                all_reassembled = expand('pipeline/call_variants/{indiv}.{chromosome}.{{iter}}.reassembled.bam',chromosome=config['chroms'].keys(),indiv=config['names'].keys()),
+                ch_bqsr_bam = 'pipeline/BQSR/child.sorted.mark_dups.BQSR.{iter}.bam' if 'known_variants' in config.keys() else 'pipeline/mark_dups/child.sorted.mark_dups.{iter}.bam'
+        output:
+                'pipeline/MV/trio.MV.all_chr.assembly_depths.polymorphisms.{iter}.table'
+        resources:
+                runtime='4h'
+        shell:r"""
+{{
+    echo "CHROM POS p1_reassembled p2_reassembled child_reassembled"
+        grep -v "#" {input.input_vcf} | awk '{{print $1"\t"$2}}' | while read chrom pos
+    do
+        p1_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/parent_1.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+        p2_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/parent_2.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+        ch_bqsr=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} {input.ch_bqsr_bam} | awk '{{print $3}}')
+        ch_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/child.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+
+        if [ "$ch_bqsr" -gt "$ch_reassembled" ]; then
+            ch_diff=$((ch_bqsr - ch_reassembled))
+        else
+            ch_diff=$((ch_reassembled - ch_bqsr))
+        fi
+
+        echo "$chrom $pos $p1_reassembled $p2_reassembled $ch_diff"
+    done
+}} > {output}
+"""
+
+rule get_error_assembly_depths:
+        input:
+                input_vcf='pipeline/MV/trio.MV.all_chr.errors.{iter}.vcf',
+                all_reassembled = expand('pipeline/call_variants/{indiv}.{chromosome}.{{iter}}.reassembled.bam',chromosome=config['chroms'].keys(),indiv=config['names'].keys()),
+                ch_bqsr_bam = 'pipeline/BQSR/child.sorted.mark_dups.BQSR.{iter}.bam' if 'known_variants' in config.keys() else 'pipeline/mark_dups/child.sorted.mark_dups.{iter}.bam'
+        output:
+                'pipeline/MV/trio.MV.all_chr.assembly_depths.errors.{iter}.table'
+        resources:
+                runtime='4h'
+        shell:r"""
+{{
+    echo "CHROM POS p1_reassembled p2_reassembled child_reassembled"
+        grep -v "#" {input.input_vcf} | awk '{{print $1"\t"$2}}' | while read chrom pos
+    do
+        p1_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/parent_1.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+        p2_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/parent_2.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+        ch_bqsr=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} {input.ch_bqsr_bam} | awk '{{print $3}}')
+        ch_reassembled=$(samtools depth -aa -r ${{chrom}}:${{pos}}-${{pos}} pipeline/call_variants/child.${{chrom}}.{wildcards.iter}.reassembled.bam | awk '{{print $3}}')
+
+        if [ "$ch_bqsr" -gt "$ch_reassembled" ]; then
+            ch_diff=$((ch_bqsr - ch_reassembled))
+        else
+            ch_diff=$((ch_reassembled - ch_bqsr))
+        fi
+
+        echo "$chrom $pos $p1_reassembled $p2_reassembled $ch_diff"
+    done
+}} > {output}
+"""
+
 rule make_output:
 	input:
-		mutation_list=expand('pipeline/MV/trio.MV.all_chr.{iter}.mutations.table',iter=np.arange(1,int(config['num_iterations'])+1)),
-		reassembly_file=expand('pipeline/MV/trio.MV.all_chr.{iter}.assembly_depths.txt',iter=np.arange(1,int(config['num_iterations'])+1))
+		mv_vcf='pipeline/MV/trio.MV.all_chr.{iter}.vcf',
+		mutation_vcf='pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf',
+		mutation_table='pipeline/MV/trio.MV.all_chr.mutations.{iter}.table',
+		polymorphism_table='pipeline/MV/trio.MV.all_chr.polymorphisms.{iter}.table',
+		error_table='pipeline/MV/trio.MV.all_chr.errors.{iter}.table',
+		reassembly_mut_table='pipeline/MV/trio.MV.all_chr.assembly_depths.mutations.{iter}.table',
+		reassembly_polymorphism_table='pipeline/MV/trio.MV.all_chr.assembly_depths.polymorphisms.{iter}.table',
+		reassembly_error_table='pipeline/MV/trio.MV.all_chr.assembly_depths.errors.{iter}.table'
 	output:
-		config['output_file']
+		config['outdir']+'/DETECT_output.{iter}.txt'
 	resources:
 		runtime='15m'
 	params:
 		snakedir=SNAKEDIR
 	shell:
-		'python {params.snakedir}/scripts/make_output_file.py -i {input.mutation_list} -r {input.reassembly_file} -o {output}'
+		'python {params.snakedir}/scripts/make_output_file.py -mv {input.mv_vcf} -v {input.mutation_vcf} -m {input.mutation_table} -p {input.polymorphism_table} -e {input.error_table} -rm {input.reassembly_mut_table} -rp {input.reassembly_polymorphism_table} -re {input.reassembly_error_table} -o {output}'
 

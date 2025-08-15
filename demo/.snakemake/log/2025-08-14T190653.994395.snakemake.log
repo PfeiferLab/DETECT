@@ -1,0 +1,58 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job                          count    min threads    max threads
+-------------------------  -------  -------------  -------------
+ApplyBQSR                        2              1              1
+BQSR                             1              1              1
+CallVariants                    10              1              1
+CombineVariants                  5              1              1
+GenotypeVariants                 6              1              1
+IsolateMVs                       6              1              1
+MapReads                         1              1              1
+MarkDuplicates                   1              1              1
+MergeGoldenBam                   1              1              1
+MergeMVVCFs                      2              1              1
+SamToFastq                       1              1              1
+SortBam                          1              1              1
+all                              1              1              1
+get_MV_errors                    2              1              1
+get_MV_muts                      2              1              1
+get_MV_poly                      2              1              1
+get_error_assembly_depths        2              1              1
+get_errors_table                 2              1              1
+get_mut_assembly_depths          2              1              1
+get_muts_table                   2              1              1
+get_poly_assembly_depths         2              1              1
+get_poly_table                   2              1              1
+make_output                      2              1              1
+total                           58              1              1
+
+Select jobs to execute...
+
+[Thu Aug 14 19:06:58 2025]
+rule MergeGoldenBam:
+    input: pipeline/reads/parent_2_1_2_0.golden.bam, pipeline/reads/parent_2_1_2_1.golden.bam, pipeline/reads/parent_2_2_2_0.golden.bam, pipeline/reads/parent_2_2_2_1.golden.bam, pipeline/reads/parent_2_3_2_0.golden.bam, pipeline/reads/parent_2_3_2_1.golden.bam, pipeline/reads/parent_2_4_2_0.golden.bam, pipeline/reads/parent_2_4_2_1.golden.bam, pipeline/reads/parent_2_5_2_0.golden.bam, pipeline/reads/parent_2_5_2_1.golden.bam, pipeline/reads/parent_2_6_2_0.golden.bam, pipeline/reads/parent_2_6_2_1.golden.bam, pipeline/reads/parent_2_7_2_0.golden.bam, pipeline/reads/parent_2_7_2_1.golden.bam, pipeline/reads/parent_2_8_2_0.golden.bam, pipeline/reads/parent_2_8_2_1.golden.bam
+    output: pipeline/reads/parent_2_2.golden.bam
+    jobid: 167
+    reason: Missing output files: pipeline/reads/parent_2_2.golden.bam
+    wildcards: indiv=parent_2, iter=2
+    resources: tmpdir=/tmp, runtime=480
+
+samtools merge 		-@ 1 		pipeline/reads/parent_2_2.golden.bam 		 pipeline/reads/parent_2_1_2_0.golden.bam   pipeline/reads/parent_2_1_2_1.golden.bam   pipeline/reads/parent_2_2_2_0.golden.bam   pipeline/reads/parent_2_2_2_1.golden.bam   pipeline/reads/parent_2_3_2_0.golden.bam   pipeline/reads/parent_2_3_2_1.golden.bam   pipeline/reads/parent_2_4_2_0.golden.bam   pipeline/reads/parent_2_4_2_1.golden.bam   pipeline/reads/parent_2_5_2_0.golden.bam   pipeline/reads/parent_2_5_2_1.golden.bam   pipeline/reads/parent_2_6_2_0.golden.bam   pipeline/reads/parent_2_6_2_1.golden.bam   pipeline/reads/parent_2_7_2_0.golden.bam   pipeline/reads/parent_2_7_2_1.golden.bam   pipeline/reads/parent_2_8_2_0.golden.bam   pipeline/reads/parent_2_8_2_1.golden.bam 
+[Thu Aug 14 19:07:01 2025]
+Error in rule MergeGoldenBam:
+    jobid: 167
+    input: pipeline/reads/parent_2_1_2_0.golden.bam, pipeline/reads/parent_2_1_2_1.golden.bam, pipeline/reads/parent_2_2_2_0.golden.bam, pipeline/reads/parent_2_2_2_1.golden.bam, pipeline/reads/parent_2_3_2_0.golden.bam, pipeline/reads/parent_2_3_2_1.golden.bam, pipeline/reads/parent_2_4_2_0.golden.bam, pipeline/reads/parent_2_4_2_1.golden.bam, pipeline/reads/parent_2_5_2_0.golden.bam, pipeline/reads/parent_2_5_2_1.golden.bam, pipeline/reads/parent_2_6_2_0.golden.bam, pipeline/reads/parent_2_6_2_1.golden.bam, pipeline/reads/parent_2_7_2_0.golden.bam, pipeline/reads/parent_2_7_2_1.golden.bam, pipeline/reads/parent_2_8_2_0.golden.bam, pipeline/reads/parent_2_8_2_1.golden.bam
+    output: pipeline/reads/parent_2_2.golden.bam
+    shell:
+        samtools merge 		-@ 1 		pipeline/reads/parent_2_2.golden.bam 		 pipeline/reads/parent_2_1_2_0.golden.bam   pipeline/reads/parent_2_1_2_1.golden.bam   pipeline/reads/parent_2_2_2_0.golden.bam   pipeline/reads/parent_2_2_2_1.golden.bam   pipeline/reads/parent_2_3_2_0.golden.bam   pipeline/reads/parent_2_3_2_1.golden.bam   pipeline/reads/parent_2_4_2_0.golden.bam   pipeline/reads/parent_2_4_2_1.golden.bam   pipeline/reads/parent_2_5_2_0.golden.bam   pipeline/reads/parent_2_5_2_1.golden.bam   pipeline/reads/parent_2_6_2_0.golden.bam   pipeline/reads/parent_2_6_2_1.golden.bam   pipeline/reads/parent_2_7_2_0.golden.bam   pipeline/reads/parent_2_7_2_1.golden.bam   pipeline/reads/parent_2_8_2_0.golden.bam   pipeline/reads/parent_2_8_2_1.golden.bam 
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Removing output files of failed job MergeGoldenBam since they might be corrupted:
+pipeline/reads/parent_2_2.golden.bam
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: ../.snakemake/log/2025-08-14T190653.994395.snakemake.log
