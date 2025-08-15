@@ -74,19 +74,33 @@ When DETECT finishes, it creates one, tab delimited output file per iteration. T
 **Filter**: Name of the filter.
 
 **min/max**: denoting whether this is an upper or lower bound filter.
-**Average:** Average value of summary statistic across de novo mutations(DNMs) that survived the pipeline.
+
+**average:** Average value of summary statistic across de novo mutations(DNMs) that survived the pipeline.
+
 **original_mutations:** the original number of DNMs populated into the simulation.
+
 **total_sites:** the total number of sites in the final Mendelian Violation(MV) VCF.
+
 **total_mutations:** the total number of DNMs that survived the pipeline.
+
 **total_mutation_mut_recall:** recall of DNMs relative to the number of DNMs that were originally populated into the simulation.
+
 **total_mutation_precision:** precision of DNMs relative to the total number of sites in the MV VCF.
+
 **total_polymorphisms:** total number of sites that are present in the MV VCF that are miscalled polymorphisms.
+
 **total_other_sites:** total number of sites that are present in the MV VCF that are neither DNMs nor miscalled polymorphisms.
+
 **recommendation**: recommended filter values based on percentile cutoffs.
+
 **filter_mutations:** number of DNMs retained after the recommended filter is applied to the MV VCF.
+
 **filter_mutation_recall:** recall of DNMs after the recommended filter is applied to the MV VCF.
+
 **filter_mutation_precision:** precision of DNMs after the recommended filter is applied to the MV VCF.
+
 **filter_polymorphisms:** number of sites that are polymorphisms after the recommended filter is aplied to the MV VCF.
+
 **filter_other_sites:** number of sites that are neither DNMs nor miscalled polymorphisms after the recommended filter is applied to the MV VCF.
 
 The filternames are explained here:
