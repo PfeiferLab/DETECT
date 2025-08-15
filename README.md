@@ -72,6 +72,7 @@ sbatch -n1 --job-name demo_detect_superjob \
 When DETECT finishes, it creates one, tab delimited output file per iteration. The columns are:
 
 **Filter**: Name of the filter.
+
 **min/max**: denoting whether this is an upper or lower bound filter.
 **Average:** Average value of summary statistic across de novo mutations(DNMs) that survived the pipeline.
 **original_mutations:** the original number of DNMs populated into the simulation.
