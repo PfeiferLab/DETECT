@@ -13,9 +13,9 @@ source activate DETECT
 ### Required Inputs
 **Reference Genome:** Reference genome to be used in your real data workflow, where the simulated read data will come from. Must have a dictionary file (GATK CreateSequenceDictionary) and be bwa indexed (bwa index) e. g. reference.fa 
 
-**Mutation Rate:** Number of mutations to population the VCF(if >1), mutation rate to use to populate mutations(if <1), or positions file where mutations will be placed (positions file/VCF).
+**Mutation Rate:** Number of mutations to populate the VCF(if >1), mutation rate to use to populate mutations(if <1), or positions file where mutations will be placed (positions file/VCF).
 
-**Input Variants:** VCF file of trio containing variants to be used as False Positives. Must be indexed (e.g. GATK IndexFeatureFile). 
+**Input Variants:** VCF file of trio containing variants to be used as False Positives. Must be without mendelian violations (MVs), and must be indexed (e.g. GATK IndexFeatureFile). 
 
 **Read Length:** Length of the reads used in the real dataset. e. g. 100  
 
@@ -26,6 +26,8 @@ source activate DETECT
 **Pedigree:** Comma delimited string of the names of sire, dam, and offspring in the VCF. Required if trio VCF provided. (ex. “dad,mom,junior”)
 
 ### Optional Inputs
+
+**Known Variants:** VCF file containing population-level variation to be used during BQSR. Default: None.
 
 **Fragment Length:** Mean length of the fragment size distribution of the real data. Default: 300. (Mason Default)  
 
@@ -67,11 +69,24 @@ sbatch -n1 --job-name demo_detect_superjob \
 
 ## Understanding the Output File
 
-When DETECT finishes, it creates one, tab delimited output file. The columns are:
+When DETECT finishes, it creates one, tab delimited output file per iteration. The columns are:
 
 **Filter**: Name of the filter.
 **min/max**: denoting whether this is an upper or lower bound filter.
-**Recommendations**: Recommended filter values based on percentile cutoffs.
+**Average:** Average value of summary statistic across de novo mutations(DNMs) that survived the pipeline.
+**original_mutations:** the original number of DNMs populated into the simulation.
+**total_sites:** the total number of sites in the final Mendelian Violation(MV) VCF.
+**total_mutations:** the total number of DNMs that survived the pipeline.
+**total_mutation_mut_recall:** recall of DNMs relative to the number of DNMs that were originally populated into the simulation.
+**total_mutation_precision:** precision of DNMs relative to the total number of sites in the MV VCF.
+**total_polymorphisms:** total number of sites that are present in the MV VCF that are miscalled polymorphisms.
+**total_other_sites:** total number of sites that are present in the MV VCF that are neither DNMs nor miscalled polymorphisms.
+**recommendation**: recommended filter values based on percentile cutoffs.
+**filter_mutations:** number of DNMs retained after the recommended filter is applied to the MV VCF.
+**filter_mutation_recall:** recall of DNMs after the recommended filter is applied to the MV VCF.
+**filter_mutation_precision:** precision of DNMs after the recommended filter is applied to the MV VCF.
+**filter_polymorphisms:** number of sites that are polymorphisms after the recommended filter is aplied to the MV VCF.
+**filter_other_sites:** number of sites that are neither DNMs nor miscalled polymorphisms after the recommended filter is applied to the MV VCF.
 
 The filternames are explained here:
 
