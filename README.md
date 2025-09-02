@@ -5,7 +5,7 @@ DETECT is a simulation-based workflow that recommends filter thresholds that can
 ### Environment Installation
 ```
 git clone https://github.com/PfeiferLab/DETECT.git
-conda env create -n DETECT -f DETECT/DETECT.yml  
+mamba env create -n DETECT -f DETECT/DETECT.yml  
 source activate DETECT
 ```
 
@@ -15,7 +15,7 @@ source activate DETECT
 
 **Mutation Rate:** Number of mutations to populate the VCF(if >1), mutation rate to use to populate mutations(if <1), or positions file where mutations will be placed (positions file/VCF).
 
-**Input Variants:** VCF file of trio containing variants to be used as False Positives. Must be without mendelian violations (MVs), and must be indexed (e.g. GATK IndexFeatureFile). 
+**Input Variants:** VCF file containing variants to be used as False Positives. Must be without mendelian violations (MVs), and must be indexed (e.g. GATK IndexFeatureFile). 
 
 **Read Length:** Length of the reads used in the real dataset. e. g. 100  
 
@@ -23,7 +23,7 @@ source activate DETECT
 
 **Output File:** Output file name of consolidated filter recommendations. 
 
-**Pedigree:** Comma delimited string of the names of sire, dam, and offspring in the VCF. Required if trio VCF provided. (ex. “dad,mom,junior”)
+**Pedigree:** Comma delimited string of the names of sire, dam, and offspring in the VCF. Required if trio VCF provided. If population VCF provided, you can either choose two parents where a child will be "made" with haplotypes from the parent, or two random individuals will be chosen as parents (ex. “dad,mom,junior”)
 
 ### Optional Inputs
 
@@ -45,13 +45,14 @@ First, you must create the config file from which the workflow will read the use
 python DETECT/create_config.py \
 -R DETECT/demo/reference.fa \
 -U 2e-6 \
--O DETECT/demo/demo_workdir/best_filters.txt \
+-O DETECT/demo/demo_workdir \
 -V DETECT/demo/demo_variants.vcf \
 -P "dad,mom,junior" \
 -C "10,20,30" \
 -RL 100 -FL 300 -SD 30 \
 -CL DETECT/demo/chrom_list.txt \
---cpus 12 -WD DETECT/demo/demo_workdir/
+--cpus 12 \
+-WD DETECT/demo/demo_workdir/
 ```
 
 Then, you can submit the snakemake job that will submit all subjobs. Note that this is more of a template, and the command may need to be altered to run on your cluster based on its SLURM configuration:   

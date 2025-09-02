@@ -17,44 +17,13 @@ pp = pprint.PrettyPrinter(indent=4)
 wildcard_constraints:
     indiv="|".join(list(config['names'].keys())).replace("_", "\\_"), 
     chromosome="|".join(list(config['chroms'].keys())).replace("_", "\\_"),
-    genome="0|1",
+    genome="1|2",
     iter='|'.join([str(x) for x in numpy.arange(1,9999)]),
     sim="|".join([str(x) for x in numpy.arange(1,9999)])
-
-def get_Mutate_input(wildcards):
-	if config["trio"]:
-		return f'pipeline/input_variants/input_trio.renamed.vcf'
-	elif config['population']:
-		return f'pipeline/simulated_vcf/simulated_trio_variants.vcf'
-
-def format_vcfmerge(wildcards,input):
-	if input.vcf != []:
-		return f'-v '+input.vcf
-	else:
-		return ''
 
 def get_mem_mb(wildcards,attempt,input):
 	return 64000 #min(max(attempt*(150 *1024),input.size_mb* 1024),307200)
 
-def format_input(wildcards, input):
-    return [f'-I {a}' for a in input]
-
-def format_merge_input(wildcards, input):
-	return[f'{a}' for a in input]
-
-def format_samtofastq_input(wildcards):
-	if wildcards.indiv == 'child':
-		return 'pipeline/reads/child_{iter}.golden.mutated.bam'
-	else:
-		return 'pipeline/reads/{indiv}_{iter}.golden.bam'
-
-def format_sortbam_input(wildcards):
-	if wildcards.indiv == 'child':
-		return 'pipeline/sorted_bams/child.downsampled.{iter}.bam'
-	else:
-		return 'pipeline/sorted_bams/{indiv}.{iter}.bam'
-def format_genotype(wildcards,input):
-    return [f'--variant {a}' for a in input]
 
 def get_read_count(wildcards): 
 	read_length = float(config["read_length"])
@@ -72,7 +41,7 @@ def get_reads_per_sim(wildcards):
     return num_reads
 
 def get_simreads_runtime(wildcards):
-	num_reads = get_reads_per_run(wildcards)
+	num_reads = get_reads_per_sim(wildcards)
 	runtime = str(26.9*(num_reads/1e6) + 237 + 60)+'m'
 	return runtime
 
@@ -80,9 +49,19 @@ rule all:
     input:
         expand(config['outdir']+"/DETECT_output.{iter}.txt",iter=range(1,int(config['num_iterations'])+1))
 
+#rule CreateChild:
+#	input:
+#		config['input_variants'] if 'population' in config.keys() else []
+#	output:
+#		'pipeline/simulated_vcf/simulated_trio_variants.vcf'
+#	params:
+#		snakedir=config["snakemake_dir"]
+#	shell:
+#		python {params.snakedir}/scripts/create_child.py -i {input} -o {output}
+
 rule RenameInputTrioVCF:
 	input:
-		input_file = lambda x: config['input_variants'] if 'input_variants' in config.keys() else 0
+		config['input_variants'] if 'trio' in config.keys() else 'pipeline/simulated_vcf/simulated_trio_variants.vcf'
 	output:
 		'pipeline/input_variants/input_trio.renamed.vcf'
 	params:
@@ -91,7 +70,7 @@ rule RenameInputTrioVCF:
 		ch = config["names"]["child"],
 		snakedir = SNAKEDIR
 	shell:
-		'python {params.snakedir}/scripts/rename_samples.py {input.input_file}  \"{params.p1},{params.p2},{params.ch}\" > {output} && gatk IndexFeatureFile -I {output}'
+		'python {params.snakedir}/scripts/rename_samples.py {input}  \"{params.p1},{params.p2},{params.ch}\" > {output} && gatk IndexFeatureFile -I {output}'
 
 rule Mutate:
 	input:
@@ -105,16 +84,23 @@ rule Mutate:
 		mem_mb = 8000,
 		runtime='15m'
 	shell:
-		'python {params.snakedir}/scripts/mutator.py -i {input.fa} -u {params.mu} -p \"parent_1,parent_2,child\" -n {wildcards.iter} -o {output.muts}; '
-	'gatk IndexFeatureFile -I {output.muts}'
+		'python {params.snakedir}/scripts/mutator.py -i {input.fa} -u {params.mu} -p \"parent_1,parent_2,child\" -n {wildcards.iter} -o {output.muts} && gatk IndexFeatureFile -I {output.muts}'
+
+rule SplitFasta:
+	input:
+		config['reference_genome']
+	output:
+		'pipeline/mutations/{chromosome}.fa'
+	shell:
+		'samtools faidx {input} {wildcards.chromosome} > {output}'
 
 rule ReformatMutations:
 	input:
-		muts = 'pipeline/mutations/input_mutations.{iter}.phased.vcf'
+		muts='pipeline/mutations/input_mutations.{iter}.phased.vcf' #config['mutation_input'] if config['mutation_input_type'] == 'file' else 'pipeline/mutations/input_mutations.{iter}.phased.vcf'
 	output:
 		'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
 	params:
-		snakedir=config["snakemake_dir"],
+		snakedir=config["snakemake_dir"]
 	resources:
 		runtime='15m'
 	shell:
@@ -133,33 +119,53 @@ rule splitVCF:
 
 rule VCFtoFasta:
 	input:
-		ref=config['reference_genome'],
-		vcf='pipeline/mutations/polymorphisms.{chromosome}.phased.vcf'
+		ref='pipeline/mutations/{chromosome}.fa',
+		vcf='pipeline/mutations/polymorphisms.{chromosome}.phased.vcf'	
 	output:
-		'pipeline/ref/parent_1_{chromosome}:0.fa',
-		'pipeline/ref/parent_1_{chromosome}:1.fa',
-		'pipeline/ref/parent_2_{chromosome}:0.fa',
-		'pipeline/ref/parent_2_{chromosome}:1.fa',
-		'pipeline/ref/child_{chromosome}:0.fa',
-		'pipeline/ref/child_{chromosome}:1.fa' 
+		'pipeline/ref/{indiv}.{chromosome}.1.fa',
+		'pipeline/ref/{indiv}.{chromosome}.2.fa'
 	params:
-		ref = config['reference_genome'],
-	resources:
-		runtime='4d'
+		snakedir=config["snakemake_dir"]
 	shell:
-		'mkdir -p pipeline/ref && cd pipeline/ref && vcf2fasta -f {input.ref} ../mutations/polymorphisms.{wildcards.chromosome}.phased.vcf'
+		'python {params.snakedir}/scripts/vcf2fasta.py -i {input.ref} -v {input.vcf} -s {wildcards.indiv} -o pipeline/ref/{wildcards.indiv}.{wildcards.chromosome}'
+
+#rule VCFtoFasta:
+#	input:
+#		ref=config['reference_genome'],
+#		vcf='pipeline/mutations/polymorphisms.{chromosome}.phased.vcf'
+#	output:
+#		'pipeline/ref/parent_1_{chromosome}:0.fa',
+#		'pipeline/ref/parent_1_{chromosome}:1.fa',
+#		'pipeline/ref/parent_2_{chromosome}:0.fa',
+#		'pipeline/ref/parent_2_{chromosome}:1.fa',
+#		'pipeline/ref/child_{chromosome}:0.fa',
+#		'pipeline/ref/child_{chromosome}:1.fa' 
+#	params:
+#		ref = config['reference_genome'],
+#	resources:
+#		runtime='4d'
+#	shell:
+#		'mkdir -p pipeline/ref && cd pipeline/ref && vcf2fasta -f {input.ref} ../mutations/polymorphisms.{wildcards.chromosome}.phased.vcf'
+
+#rule MergeFastas:
+#	input:
+#		expand('pipeline/ref/{{indiv}}_{chromosome}:{{genome}}.fa',chromosome=config['chroms'].keys())
+#	output:
+#		'pipeline/ref/{indiv}_renamed.{genome}.fa'
+#	shell:
+#		'cat {input} | sed "s/:{wildcards.genome}//g; s/{wildcards.indiv}_//g" > {output}'
 
 rule MergeFastas:
 	input:
-		expand('pipeline/ref/{{indiv}}_{chromosome}:{{genome}}.fa',chromosome=config['chroms'].keys())
+		expand('pipeline/ref/{{indiv}}.{chromosome}.{{genome}}.fa',chromosome=config['chroms'].keys())
 	output:
-		'pipeline/ref/{indiv}_renamed.{genome}.fa'
+		'pipeline/ref/{indiv}.{genome}.fa'
 	shell:
-		'cat {input} | sed "s/:{wildcards.genome}//g; s/{wildcards.indiv}_//g" > {output}'
+		'cat {input} > {output}'
 
 rule SimulateReads:
 	input:
-		fa = 'pipeline/ref/{indiv}_renamed.{genome}.fa',
+		fa = 'pipeline/ref/{indiv}.{genome}.fa'
 	output:
 		r1 = temp('pipeline/reads/{indiv}_{sim}_{iter}_{genome}.golden.R1.fq'),
 		r2 = temp('pipeline/reads/{indiv}_{sim}_{iter}_{genome}.golden.R2.fq'),
@@ -173,7 +179,7 @@ rule SimulateReads:
 	retries: 20
 	resources:
 		mem_mb=get_mem_mb,
-		runtime='2d'#get_simreads_runtime
+		runtime='4h'#get_simreads_runtime
 	threads:
 		int(config['num_cores'])
 	shell:
@@ -191,9 +197,7 @@ rule SimulateReads:
 
 rule MergeGoldenBam:
 	input:
-		expand('pipeline/reads/{{indiv}}_{sim}_{{iter}}_{genome}.golden.bam',sim=numpy.arange(1,9,1),genome=[0,1])
-	params:
-		input_list = format_merge_input,
+		expand('pipeline/reads/{{indiv}}_{sim}_{{iter}}_{genome}.golden.bam',sim=numpy.arange(1,9,1),genome=[1,2])
 	output:
 		temp('pipeline/reads/{indiv}_{iter}.golden.bam')
 	resources:
@@ -204,7 +208,7 @@ rule MergeGoldenBam:
 		'samtools merge \
 		-@ {threads} \
 		-o {output} \
-		{params.input_list}'
+		{input}' 
 
 rule MutateGoldenBam:
 	input:
@@ -222,7 +226,7 @@ rule MutateGoldenBam:
 
 rule SamToFastq:
 	input:
-		format_samtofastq_input
+		lambda wildcards: 'pipeline/reads/child_{iter}.golden.mutated.bam' if wildcards.indiv == 'child' else 'pipeline/reads/{indiv}_{iter}.golden.bam' #format_samtofastq_input
 	output:
 		fq1=temp('pipeline/reads/{indiv}_{iter}.R1.fq'),
 		fq2=temp('pipeline/reads/{indiv}_{iter}.R2.fq')
@@ -238,6 +242,8 @@ rule MapReads:
 		fq1 = 'pipeline/reads/{indiv}_{iter}.R1.fq', 
 		fq2 = 'pipeline/reads/{indiv}_{iter}.R2.fq',
 	threads: int(config['num_cores'])
+	params:
+		cores = int(config['num_cores'])/2
 	output:
 		temp('pipeline/sorted_bams/{indiv}.{iter}.bam')
 	resources:
@@ -245,11 +251,11 @@ rule MapReads:
 		runtime='2d'
 	shell:
 		'bwa mem \
-		-t {threads}\
+		-t {params.cores}\
 		-R \"@RG\\tID:{wildcards.indiv}_{wildcards.iter}\\tSM:{wildcards.indiv}\\tPL:ILLUMINA\" \
 		{input.reference} \
 		{input.fq1} {input.fq2} \
-		| samtools view -b - > {output} '
+		| samtools view -@ {params.cores} -b - > {output}'
 
 rule DownsampleBam:
 	input:
@@ -268,7 +274,7 @@ rule DownsampleBam:
 
 rule SortBam:
 	input:
-		format_sortbam_input
+		lambda wildcards: 'pipeline/sorted_bams/child.downsampled.{iter}.bam' if wildcards.indiv == 'child' else 'pipeline/sorted_bams/{indiv}.{iter}.bam'
 	output:
 		temp('pipeline/sorted_bams/{indiv}.sorted.{iter}.bam')
 	resources:
@@ -370,12 +376,13 @@ rule CombineVariants:
 		p2_vcf='pipeline/call_variants/parent_2.{chromosome}.{iter}.g.vcf',
 		ch_vcf='pipeline/call_variants/child.{chromosome}.{iter}.g.vcf'
 	output:
-		output_dir = directory('pipeline/genotype_variants/trio.{chromosome}.{iter}')
+		output_dir = directory('pipeline/genotype_variants/trio.{chromosome}.{iter}'),
+		callset = 'pipeline/genotype_variants/trio.{chromosome}.{iter}/callset.json'
 	resources:
 		runtime='8h',
 		mem_mb=40960
 	shell:
-		'gatk --java-options "-Xmx{resources.mem_mb}m" \
+		'rm -r {output.output_dir} && gatk --java-options "-Xmx{resources.mem_mb}m" \
 		GenomicsDBImport \
 		-R {input.reference} \
 		-V {input.p1_vcf} \
@@ -387,6 +394,7 @@ rule CombineVariants:
 rule GenotypeVariants:
 	input:
 		input_dir = 'pipeline/genotype_variants/trio.{chromosome}.{iter}',
+		callset = 'pipeline/genotype_variants/trio.{chromosome}.{iter}/callset.json',
 		reference = config['reference_genome']
 	output:
 		'pipeline/genotype_variants/trio.{chromosome}.{iter}.vcf'
@@ -410,11 +418,11 @@ rule IsolateSNPs:
 	input:
 		'pipeline/genotype_variants/trio.{chromosome}.{iter}.vcf'
 	output:
-		'pipeline/MV/trio.snp.{chromosome}.{iter}.vcf'
+		'pipeline/SNP/trio.{chromosome}.snp.{iter}.vcf'
 	resources:
 		runtime='15m'
 	shell:
-		 """
+		r"""
                 gatk SelectVariants \
                 -V {input} \
                 --restrict-alleles-to BIALLELIC \
@@ -426,48 +434,44 @@ rule IsolateSNPs:
 		"""
 rule IsolateMVs:
 	input:
-		'pipeline/MV/trio.snp.{chromosome}.{iter}.vcf'
+		'pipeline/SNP/trio.{chromosome}.snp.{iter}.vcf'
 	output:
-		'pipeline/MV/trio.MV.{chromosome}.{iter}.vcf'
+		'pipeline/MV/trio.{chromosome}.MV.{iter}.vcf'
 	resources:
 		runtime='15m' 
 	shell:
-		"""
-		gatk SelectVariants \
-		-V {input} \
-		--select 'vc.getGenotype("parent_1").isHomRef()' \
-		--select 'vc.getGenotype("parent_2").isHomRef()' \
-		--select 'vc.getGenotype("child").isHet()' \
-		-O {output}
-		"""
+		'gatk SelectVariants -V {input} --select \'vc.getGenotype("parent_1").isHomRef() && vc.getGenotype("parent_2").isHomRef() && vc.getGenotype("child").isHet()\' -O {output}'
 rule MergeMVVCFs:
 	input:
-		expand('pipeline/MV/trio.MV.{chromosome}.{{iter}}.vcf', chromosome=config['chroms'].keys())
+		expand('pipeline/MV/trio.{chromosome}.MV.{{iter}}.vcf', chromosome=config['chroms'].keys())
 	output:
-		'pipeline/MV/trio.MV.all_chr.{iter}.vcf'
+		'pipeline/MV/trio.all_chr.MV.{iter}.vcf'
 	params:
-		formatted = format_input,
-	resources:
-		runtime='15m'
-	run:
-		shell('gatk MergeVcfs {params.formatted} -O {output}')
-
-rule get_MV_muts:
-	input:
-		vcf = 'pipeline/MV/trio.MV.all_chr.{iter}.vcf',
-		muts = 'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
-	output:
-		'pipeline/MV/trio.MV.all_chr.mutations.{iter}.vcf'
+		formatted = lambda wildcards, input: " ".join(f"-I {vcf}" for vcf in input)
 	resources:
 		runtime='15m'
 	shell:
-		'gatk SelectVariants -V {input.vcf} --concordance {input.muts} -O {output}'
+		'gatk MergeVcfs {params.formatted} -O {output}'
+
+rule get_MV_muts:
+	input:
+		vcf = 'pipeline/MV/trio.all_chr.MV.{iter}.vcf',
+		muts = 'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf'
+	output:
+		'pipeline/MV/trio.all_chr.MV.mutations.{iter}.vcf'
+	resources:
+		runtime='15m'
+	shell:
+		'gatk SelectVariants \
+		-V {input.vcf} \
+		--concordance {input.muts} \
+		-O {output}'
 
 rule get_muts_table:
 	input:
-		'pipeline/MV/trio.MV.all_chr.mutations.{iter}.vcf'
+		'pipeline/MV/trio.all_chr.MV.mutations.{iter}.vcf'
 	output:
-		'pipeline/MV/trio.MV.all_chr.mutations.{iter}.table'
+		'pipeline/MV/trio.all_chr.MV.mutations.{iter}.table'
 	resources:
 		runtime='15m'
 	shell:
@@ -481,10 +485,10 @@ rule get_muts_table:
 
 rule get_MV_poly:
 	input:
-		vcf = 'pipeline/MV/trio.MV.all_chr.{iter}.vcf',
+		vcf = 'pipeline/MV/trio.all_chr.MV.{iter}.vcf',
 		poly_vcf = config['input_variants']
 	output:
-		'pipeline/MV/trio.MV.all_chr.polymorphisms.{iter}.vcf'
+		'pipeline/MV/trio.all_chr.MV.polymorphisms.{iter}.vcf'
 	resources:
 		runtime='15m'
 	shell:
@@ -492,9 +496,9 @@ rule get_MV_poly:
 
 rule get_poly_table:
 	input:
-		'pipeline/MV/trio.MV.all_chr.polymorphisms.{iter}.vcf'
+		'pipeline/MV/trio.all_chr.MV.polymorphisms.{iter}.vcf'
 	output:
-		'pipeline/MV/trio.MV.all_chr.polymorphisms.{iter}.table'
+		'pipeline/MV/trio.all_chr.MV.polymorphisms.{iter}.table'
 	resources:
 		runtime='15m'
 	shell:
@@ -507,11 +511,11 @@ rule get_poly_table:
 
 rule get_MV_errors:
 	input:
-		vcf = 'pipeline/MV/trio.MV.all_chr.{iter}.vcf',
+		vcf = 'pipeline/MV/trio.all_chr.MV.{iter}.vcf',
 		muts = 'pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf',
 		xvars = config['input_variants']
 	output:
-		'pipeline/MV/trio.MV.all_chr.errors.{iter}.vcf'
+		'pipeline/MV/trio.all_chr.MV.errors.{iter}.vcf'
 	resources:
 		runtime='15m'
 	shell:
@@ -519,9 +523,9 @@ rule get_MV_errors:
 
 rule get_errors_table:
 	input:
-		input_vcf = 'pipeline/MV/trio.MV.all_chr.errors.{iter}.vcf',
+		input_vcf = 'pipeline/MV/trio.all_chr.MV.errors.{iter}.vcf',
 	output:
-		'pipeline/MV/trio.MV.all_chr.errors.{iter}.table'
+		'pipeline/MV/trio.all_chr.MV.errors.{iter}.table'
 	resources:
 		runtime='15m'
 	shell:
@@ -529,11 +533,11 @@ rule get_errors_table:
 
 rule get_mut_assembly_depths:
         input:
-                input_vcf='pipeline/MV/trio.MV.all_chr.mutations.{iter}.vcf',
+                input_vcf='pipeline/MV/trio.all_chr.MV.mutations.{iter}.vcf',
                 all_reassembled = expand('pipeline/call_variants/{indiv}.{chromosome}.{{iter}}.reassembled.bam',chromosome=config['chroms'].keys(),indiv=config['names'].keys()),
                 ch_bqsr_bam = 'pipeline/BQSR/child.sorted.mark_dups.BQSR.{iter}.bam' if 'known_variants' in config.keys() else 'pipeline/mark_dups/child.sorted.mark_dups.{iter}.bam'
         output:
-                'pipeline/MV/trio.MV.all_chr.assembly_depths.mutations.{iter}.table'
+                'pipeline/MV/trio.all_chr.MV.assembly_depths.mutations.{iter}.table'
         resources:
                 runtime='4h'
         shell:r"""
@@ -559,11 +563,11 @@ rule get_mut_assembly_depths:
 
 rule get_poly_assembly_depths:
         input:
-                input_vcf='pipeline/MV/trio.MV.all_chr.polymorphisms.{iter}.vcf',
+                input_vcf='pipeline/MV/trio.all_chr.MV.polymorphisms.{iter}.vcf',
                 all_reassembled = expand('pipeline/call_variants/{indiv}.{chromosome}.{{iter}}.reassembled.bam',chromosome=config['chroms'].keys(),indiv=config['names'].keys()),
                 ch_bqsr_bam = 'pipeline/BQSR/child.sorted.mark_dups.BQSR.{iter}.bam' if 'known_variants' in config.keys() else 'pipeline/mark_dups/child.sorted.mark_dups.{iter}.bam'
         output:
-                'pipeline/MV/trio.MV.all_chr.assembly_depths.polymorphisms.{iter}.table'
+                'pipeline/MV/trio.all_chr.MV.assembly_depths.polymorphisms.{iter}.table'
         resources:
                 runtime='4h'
         shell:r"""
@@ -589,13 +593,13 @@ rule get_poly_assembly_depths:
 
 rule get_error_assembly_depths:
         input:
-                input_vcf='pipeline/MV/trio.MV.all_chr.errors.{iter}.vcf',
+                input_vcf='pipeline/MV/trio.all_chr.MV.errors.{iter}.vcf',
                 all_reassembled = expand('pipeline/call_variants/{indiv}.{chromosome}.{{iter}}.reassembled.bam',chromosome=config['chroms'].keys(),indiv=config['names'].keys()),
                 ch_bqsr_bam = 'pipeline/BQSR/child.sorted.mark_dups.BQSR.{iter}.bam' if 'known_variants' in config.keys() else 'pipeline/mark_dups/child.sorted.mark_dups.{iter}.bam'
         output:
-                'pipeline/MV/trio.MV.all_chr.assembly_depths.errors.{iter}.table'
+                'pipeline/MV/trio.all_chr.MV.assembly_depths.errors.{iter}.table'
         resources:
-                runtime='4h'
+                runtime='12h'
         shell:r"""
 {{
     echo "CHROM POS p1_reassembled p2_reassembled child_reassembled"
@@ -619,14 +623,14 @@ rule get_error_assembly_depths:
 
 rule make_output:
 	input:
-		mv_vcf='pipeline/MV/trio.MV.all_chr.{iter}.vcf',
+		mv_vcf='pipeline/MV/trio.all_chr.MV.{iter}.vcf',
 		mutation_vcf='pipeline/mutations/input_mutations.{iter}.phased.reformatted.vcf',
-		mutation_table='pipeline/MV/trio.MV.all_chr.mutations.{iter}.table',
-		polymorphism_table='pipeline/MV/trio.MV.all_chr.polymorphisms.{iter}.table',
-		error_table='pipeline/MV/trio.MV.all_chr.errors.{iter}.table',
-		reassembly_mut_table='pipeline/MV/trio.MV.all_chr.assembly_depths.mutations.{iter}.table',
-		reassembly_polymorphism_table='pipeline/MV/trio.MV.all_chr.assembly_depths.polymorphisms.{iter}.table',
-		reassembly_error_table='pipeline/MV/trio.MV.all_chr.assembly_depths.errors.{iter}.table'
+		mutation_table='pipeline/MV/trio.all_chr.MV.mutations.{iter}.table',
+		polymorphism_table='pipeline/MV/trio.all_chr.MV.polymorphisms.{iter}.table',
+		error_table='pipeline/MV/trio.all_chr.MV.errors.{iter}.table',
+		reassembly_mut_table='pipeline/MV/trio.all_chr.MV.assembly_depths.mutations.{iter}.table',
+		reassembly_polymorphism_table='pipeline/MV/trio.all_chr.MV.assembly_depths.polymorphisms.{iter}.table',
+		reassembly_error_table='pipeline/MV/trio.all_chr.MV.assembly_depths.errors.{iter}.table'
 	output:
 		config['outdir']+'/DETECT_output.{iter}.txt'
 	resources:

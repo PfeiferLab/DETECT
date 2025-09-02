@@ -5,7 +5,6 @@ from Bio import SeqIO
 import json
 import numpy as np
 import math
-import scipy.stats as st
 import argparse
 import sys
 seq = ['A','G','C','T']
@@ -41,17 +40,7 @@ mutation_input_type = ""
 
 chroms = list(config['chroms'].keys())
 
-try:
-   mutation_input = float(mutation_input)
-   if mutation_input >= 1:
-       print("Mutation Count Detected.")
-       mutation_input_type="count"
-   else:
-       print("Mutation Rate Detected.")
-       mutation_input_type="rate"
-except:
-    print("Mutation File Detected.")
-    mutation_input_type="file"
+mutation_input_type = config['mutation_input_type']
 
 mut_dict={}
 

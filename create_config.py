@@ -4,7 +4,8 @@ import argparse
 import sys
 import os
 import json
-import datetime
+import numpy as np
+
 parser = argparse.ArgumentParser(description="Creates a config file, which is then passed to the DETECT workflow")
 required_args = parser.add_argument_group('Required arguments')
 required_args.add_argument("-C","--coverages",dest="coverages",help="Comma delimited string with coverages of Dam,Sire,Offspring in empirical data",required = True)
@@ -17,11 +18,11 @@ optional_args.add_argument("-U","--mutation-input",dest="mutation_input",help="C
 optional_args.add_argument("-CL","--contig-list",dest="chrom_list",help="List of contigs you want DNMs to be detected on, one per line. Default: All contigs.",default="ALL",required=False)
 optional_args.add_argument("-FL","--fragment-length",dest="frag_len",help="Fragment lengths of empirical dataset. Default: 300",default=300,required=False)
 optional_args.add_argument("-RL","--read-length", dest="read_length",help="Read lengths of empirical dataset. Default: 100",default=100,required=False)
-optional_args.add_argument("-P","--pedigree",dest="pedigree",help="Comma delimited string with names of Dam,Sire,Offspring in VCF. Must be specified if -V is specified. Default: \"parent_1,parent_2,child\"",required=False)
+optional_args.add_argument("-P","--pedigree",dest="pedigree",help="Comma delimited string with names of Dam,Sire,Offspring in VCF. If not specified, a child will be formed from two random individuals in the VCF. Default: \"None\"",required=False)
 optional_args.add_argument("-SD","--frag-stdv",dest="frag_stdv",help="Fragment length standard deviation. Deafult: 30",default=30,required=False)
 #trio is locked on until --population can work too
-#optional_args.add_argument("--trio",action="store_true",help="Specifies if the input VCF is trio variation data. Either --trio or --population required if -V is specified. Default: None",required = False)
-#optional_args.add_argument("--population",action="store_true",help="Specifies if the input VCF is population variation data. Either --trio or --population required if -V is specified. Default: None",required = False)
+optional_args.add_argument("--trio",action="store_true",help="Specifies if the input VCF is trio variation data. Either --trio or --population required if -V is specified. Default: None",required = False)
+optional_args.add_argument("--population",action="store_true",help="Specifies if the input VCF is population variation data. Either --trio or --population required if -V is specified. Default: None",required = False)
 optional_args.add_argument("-WD","--working-directory",dest="working_directory",help="working directory in which to produce files. WARNING, depending on the coverage and size of genome, this workflow may take up significant space. Default: current directory",default=".",required=False)
 optional_args.add_argument("--cpus",dest="cpu_count",help="The max number of CPUs you would like to use per job in the workflow. Default: 1",default=1,required=False)
 optional_args.add_argument("--num-iterations",dest="num_iterations",help="The number of iterations you would like this to run, to get an idea of the distribution of recommended filters.",default=1,required=False)
@@ -64,7 +65,20 @@ if args.mutation_input == 0:
     print("Mutation Rate not specified.")
     sys.exit()
 
+try:
+   mutation_input = float(mutation_input)
+   if mutation_input >= 1:
+       print("Mutation Count Detected.")
+       mutation_input_type="count"
+   else:
+       print("Mutation Rate Detected.")
+       mutation_input_type="rate"
+except:
+    print("Mutation File Detected.")
+    mutation_input_type="file"
+
 output['mutation_input'] = args.mutation_input
+output['mutation_input_type'] = mutation_input_type
 
 #Adding -RL
 output["read_length"] = read_length
@@ -127,12 +141,24 @@ except:
     sys.exit()
 
 #Adding -P
-pedigree = pedigree.strip().split(",")
 output["names"] = {}
+if pedigree is not None:
+    pedigree = pedigree.strip().split(",")
+    output["names"]["parent_1"] = pedigree[0]
+    output["names"]["parent_2"] = pedigree[1]
+else:
+    for line in open(input_variants):
+        if "CHROM" in line:
+            samples = line.strip().split()[9:]
+            break
+    pedigree = np.random.choice(samples,2,replace=False)
 output["names"]["parent_1"] = pedigree[0]
 output["names"]["parent_2"] = pedigree[1]
-output["names"]["child"] = pedigree[2]
 
+if len(pedigree) == 3:
+    output["names"]["child"] = pedigree[2]
+else:
+    output["names"]["child"] = pedigree[0]+"_"+pedigree[1]+"_offspring"
 
 #Adding -C                                                                      
 coverages = coverages.strip().split(",")                                        
@@ -152,23 +178,18 @@ if args.known_variants != "NONE":
 
 #Setting Trio or Population Level VCF
 output["trio"] = 1
-#if args.trio:
-#    output["trio"] = 1
-#else:
-#    output["trio"] = 0
+if args.trio:
+    output["trio"] = 1
+if args.population:
+    output["population"] = 1
 
-#if args.population:
-#    output["population"] = 1
-#else:
-#    output["population"] = 0
+if args.trio and args.population:
+    print("VCF cannot be both a trio and a population!")
+    sys.exit()
 
-#if args.trio and args.population:
-#    print("VCF cannot be both a trio and a population!")
-#    sys.exit()
-
-#if not args.trio and not args.population and args.input_variants != "NONE":
-#    print("You must specify whether the VCF is a trio or a population!")
-#    sys.exit()
+if not args.trio and not args.population and args.input_variants != "NONE":
+    print("You must specify whether the VCF is a trio or a population!")
+    sys.exit()
 
 output["num_cores"] = int(args.cpu_count)
 
