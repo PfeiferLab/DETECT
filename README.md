@@ -1,6 +1,6 @@
 # DETECT (DNM Extraction Through Empirical Cutoff Thresholds)
 
-[DETECT logo.pdf](https://github.com/user-attachments/files/25193994/DETECT.logo.pdf)
+![DETECT logo](https://github.com/user-attachments/assets/5b1d31b1-84eb-4436-aa3b-c3d38e8e5be6)
 
 DETECT allows researchers to obtained best practice recommendations for computational filter criteria and thresholds mitigating artefacts in <i>de novo</i> mutation (DNM) detection tailored to their specific study design and species of interest.
 
