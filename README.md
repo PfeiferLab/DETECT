@@ -49,7 +49,7 @@ source activate DETECT
 * **Output File:** Best practice recommendations for computational filter criteria and thresholds.
 
 
-## Advanced Usage
+### Advanced Usage
 
 * If you are familiar with the structure of JSON files, DETECT takes a JSON file as its input. For an example of an input file, see DETECT/demo/demo_workdir/config/config.json for a template guide. 
 <br>
