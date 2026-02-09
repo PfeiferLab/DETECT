@@ -86,7 +86,21 @@ sbatch -n1 --job-name demo_detect_superjob \
 <br>
 
 
-## Understanding the Output File
+## Understanding DETECT's Output
+
+By default, DETECT evaluates a variety of computational filter criteria and thresholds to obtain species- and study design-specific best practice recommendations.
+
+| filter criterion* | filter description                                                                         | bounds  | applied to           |
+| ----------------- | ------------------------------------------------------------------------------------------ | ------- | -------------------- |
+| AD                | allele depth                                                                               | max     | sire, dam            |
+| AB                | allele balance                                                                             | min/max | offspring            |
+| DP                | depth of coverage                                                                          | min/max | sire, dam, offspring |
+| GQ                | genotype quality                                                                           | min     | sire, dam, offspring |
+| QUAL              | quality score                                                                              | min     | sire, dam, offspring |
+| parent.reassembly | scaled depth of coverage in the reassembled region during variant calling in the parent    | max     | sire, dam            |
+| child.reassembly  | scaled depth of coverage in the reassembled region during variant calling in the offspring | max     | offspring            |
+
+ 
 
 When DETECT finishes, it creates one, tab delimited output file per iteration. The columns are:
 
@@ -124,20 +138,6 @@ When DETECT finishes, it creates one, tab delimited output file per iteration. T
 
 The filternames are explained here:
 
-| Filtername        | Full Name                  | Meaning                                                                           | Ideal Value                      | Types of filter | Filter applications   |
-| ----------------- | -------------------------- | --------------------------------------------------------------------------------- | -------------------------------- | --------------- | --------------------- |
-| DP                | Depth                      | Sequencing depth of site                                                          | average genomic depth            | min/max         | parents and offspring |
-| GQ                | Genotype Quality           | Phred-scaled Genotype Quality of site                                             | as high as possible, maxed at 99 | min             | parents and offspring |
-| QUAL              | Quality                    | QUAL score for presence of variation at the site                                  | as high as possible              | min             | per site              |
-| AD                | Allele Depth               | number of reads with alternate alleles                                            | 0                                | max             | parents               |
-| AB                | Allele Balance             | ratio of alternate reads to total depth of site                                   | 0.5                              | min/max         | offspring             |
-| QD                | QualDepth                  | QUAL of site normalized by DP                                                     | as high as possible              | min             | per site              |
-| MQRankSum         | Mapping Quality Rank Sum   | quantifies bias in mapping quality of reads that map to variant                   | 0                                | min/max         | per site              |
-| ReadPosRankSum    | Read Position Rank Sum     | quantifies bias in the position of the variant on reads                           | 0                                | min/max         | per site              |
-| FS                | Fisher Strand              | quantifies forward/reverse strand bias                                            | 0                                | max             | per site              |
-| SOR               | Strand Odds Ratio          | quntifies forward/reverse strand bias                                             | 0                                | max             | per site              |
-| parent.reassembly | parental reassembly filter | quantifies presence of reassembly during variant calling                          | 0                                | max             | parents               |
-| child.reassembly  | child reassembly filter    | quantifies the difference in depth between the pre-calling BAM and reassembly BAM | 0                                | max             | offspring             |
 
 For a deeper explanation of each of the GATK Best Practices Hard Filter statistics(QD and below on the table above), check here: https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants  
 
