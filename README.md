@@ -90,15 +90,15 @@ sbatch -n1 --job-name demo_detect_superjob \
 
 By default, DETECT evaluates a variety of computational filter criteria and thresholds to obtain species- and study design-specific best practice recommendations.
 
-| filter criterion* | filter description                                                                         | bounds  | applied to           |
-| ----------------- | ------------------------------------------------------------------------------------------ | ------- | -------------------- |
-| AD                | allele depth                                                                               | max     | sire, dam            |
-| AB                | allele balance                                                                             | min/max | offspring            |
-| DP                | depth of coverage                                                                          | min/max | sire, dam, offspring |
-| GQ                | genotype quality                                                                           | min     | sire, dam, offspring |
-| QUAL              | quality score                                                                              | min     | sire, dam, offspring |
-| parent.reassembly | scaled depth of coverage in the reassembled region during variant calling in the parent    | max     | sire, dam            |
-| child.reassembly  | scaled depth of coverage in the reassembled region during variant calling in the offspring | max     | offspring            |
+| filter criterion* | filter description                                                                               | bounds  | applied to           |
+| ----------------- | ------------------------------------------------------------------------------------------------ | ------- | -------------------- |
+| ```AD```                | allele depth                                                                               | max     | sire, dam            |
+| ```AB```                | allele balance                                                                             | min/max | offspring            |
+| ```DP```                | depth of coverage                                                                          | min/max | sire, dam, offspring |
+| ```GQ```                | genotype quality                                                                           | min     | sire, dam, offspring |
+| ```QUAL```              | quality score                                                                              | min     | sire, dam, offspring |
+| ```parent.reassembly``` | scaled depth of coverage in the reassembled region during variant calling in the parent    | max     | sire, dam            |
+| ```child.reassembly```  | scaled depth of coverage in the reassembled region during variant calling in the offspring | max     | offspring            |
 
  
 
