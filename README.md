@@ -1,4 +1,7 @@
 # DETECT (DNM Extraction Through Empirical Cutoff Thresholds)
+
+[DETECT logo.pdf](https://github.com/user-attachments/files/25193994/DETECT.logo.pdf)
+
 DETECT allows researchers to obtained best practice recommendations for computational filter criteria and thresholds mitigating artefacts in <i>de novo</i> mutation (DNM) detection tailored to their specific study design and species of interest.
 
 
@@ -63,7 +66,7 @@ python DETECT/create_config.py \
 -WD DETECT/demo/demo_workdir/
 ```
 
-Then, you can submit the snakemake job that will submit all subjobs. Note that this is more of a template, and the command may need to be altered to run on your cluster based on its SLURM configuration:   
+Then, submit the Snakemake job that will submit all sub-jobs (note that the command may need to be altered according to the specific cluster environment / configuration):   
 ```
 sbatch -n1 --job-name demo_detect_superjob \
 -o DETECT/demo/demo_workdir/demo_detect.out \
