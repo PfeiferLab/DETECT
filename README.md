@@ -47,6 +47,11 @@ source activate DETECT
 ### Output
 
 * **Output File:** Best practice recommendations for computational filter criteria and thresholds.
+
+
+## Advanced Usage
+
+* If you are familiar with the structure of JSON files, DETECT takes a JSON file as its input. For an example of an input file, see DETECT/demo/demo_workdir/config/config.json for a template guide. 
 <br>
 
 
@@ -137,13 +142,11 @@ The filternames are explained here:
 For a deeper explanation of each of the GATK Best Practices Hard Filter statistics(QD and below on the table above), check here: https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants  
 
 For a closer look at the results per run, there are also output files in the run_outputs/ directory within your working directory. 
+
+<br>
+
 ## My Job has run out of walltime!
 In the case that your DETECT job has run out of walltime, do not worry! Snakemake will pick up where it left off.  
 Simply run this unlock command:  
 `snakemake --configfile <working_directory>/config/config.json -s <DETECT_directory>/DETECT/Snakefile --unlock`  
-
-And then resubmit your job. It should continue from the last completed step. If an error occurred in a step, please put a support ticket into the repository, and I will be happy to help ASAP.   
-
-
-## Advanced Usage:
-If you are familiar with the structure of JSON files, DETECT takes a JSON file as its input. For an example of an input file, see DETECT/demo/demo_workdir/config/config.json for a template guide. 
+and then resubmit your job. It should continue from the last completed step.
