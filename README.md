@@ -1,5 +1,6 @@
 # DETECT (DNM Extraction Through Empirical Cutoff Thresholds)
-DETECT is a simulation-based workflow that recommends filter thresholds that can be used to directly estimate mutation rate. By populating DNMs in a simulated trio at a specified mutation rate, we can determine filter thresholds that isolate as many DNMs as possible in the simulation, while also limiting the number of False Positives(FPs). These filter thresholds can then be applied to a real dataset with high confidence that you are isolating real mutations as well. DETECT has many options to tailor the simulation to real datasets including sequencing technology, coverage and variant datasets as input. DETECT has only been tested and is only functional on diploid, sexually reproducing organisms.
+DETECT allows researchers to obtained best practice recommendations for computational filter criteria and thresholds mitigating artefacts in <i>de novo</i> mutation (DNM) detection tailored to their specific study design and species of interest.
+
 
 ## Setting Up
 ### Environment Installation
@@ -10,37 +11,44 @@ source activate DETECT
 ```
 
 ## Quickstart
-### Required Inputs
-**Reference Genome:** Reference genome to be used in your real data workflow, where the simulated read data will come from. Must have a dictionary file (GATK CreateSequenceDictionary) and be bwa indexed (bwa index) e. g. reference.fa 
+### Inputs (required)
 
-**Mutation Rate:** Number of mutations to populate the VCF(if >1), mutation rate to use to populate mutations(if <1), or positions file where mutations will be placed (positions file/VCF).
+* **Reference Genome:** A reference assembly (.fasta) from which paired-end reads will be simulated. Must have an associated sequence dictionary file (.dict) and BWA index files (.amb, .ann, .bwt, .pac, .sa). 
 
-**Input Variants:** VCF file containing variants to be used as False Positives. Must be without mendelian violations (MVs), and must be indexed (e.g. GATK IndexFeatureFile). 
+* **Segregating Variants:** Segregating variants (.vcf). Must be without Mendelian violations and must be indexed (.idx).
 
-**Read Length:** Length of the reads used in the real dataset. e. g. 100  
+* **Pedigree:** Comma delimited string of sample identifiers and genetic relationships of each individual in the trio (e.g., “sire,dam,offspring“). Required if trio data (.vcf) is provided. If no filial information is provided, DETECT will “generate” an offspring based on either the parental haplotypes (if parental information is available), or two user-specified, or randomly selected, haplotypes sampled from the population (if parental information is unavailable).
 
-**Coverage:** Comma-delimited string of the coverages of the sire,dam,offspring. e. g. “30,40,50”  
+* **Coverage:** Comma-delimited string of the depth of coverages for the sire, dam, and offspring to be simulated (e.g., “30,40,50”)  
 
-**Output File:** Output file name of consolidated filter recommendations. 
+* **Read Length:** Length of the reads to be simulated (e.g., “150“)
 
-**Pedigree:** Comma delimited string of the names of sire, dam, and offspring in the VCF. Required if trio VCF provided. If population VCF provided, you can either choose two parents where a child will be "made" with haplotypes from the parent, or two random individuals will be chosen as parents (ex. “dad,mom,junior”)
+* **Mutation Rate:** Either a rate (or number) of DNMs that should be introduced at random into the simulated reads of the offspring, or a file (in .bed or .vcf format) containing the positions where DNMs should be spiked in.
 
-### Optional Inputs
 
-**Known Variants:** VCF file containing population-level variation to be used during BQSR. Default: None.
+### Inputs (optional)
 
-**Fragment Length:** Mean length of the fragment size distribution of the real data. Default: 300. (Mason Default)  
+* **Chromosome list:** A list of chromosomes from which paired-end reads will be simulated (default: all).  
 
-**Fragment Length Standard Deviation:** Standard deviation of the fragment size distribution of the real data. Default: 30 (Mason Default) 
+* **Known Variants:** Experimentally validated variants to facilitate base quality score recalibration (BQSR) of the simulated reads (default: none).
 
-**Chromosome list:** File of chromosome names to be simulated, one per line. Default: All contigs.  
+* **Fragment Length:** Mean length of the fragment size distribution (default: 300).  
 
-**CPU count:** The number of cpus you would like to run per job at maximum in multithreaded steps (Mapping reads and Sorting BAMs).
+* **Fragment Length Standard Deviation:** Standard deviation of the fragment size distribution (default: 30). 
 
-**Number of Iterations:** The number of simulations you wish to perform. Default: 1
+* **Number of Iterations:** The number of replicates performed within a single run (default: 1).
+
+* **Number of CPUs:** The number of CPUs per job (default: 1).
+
+
+### Output
+
+* **Output File:** Best practice recommendations for computational filter criteria and thresholds.
+<br>
+
 
 ## Demo Command/Job Submission:
-First, you must create the config file from which the workflow will read the user specifications:  
+First, create a config file from which the workflow will read the user specifications:  
 ```
 python DETECT/create_config.py \
 -R DETECT/demo/reference.fa \
