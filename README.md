@@ -78,6 +78,8 @@ sbatch -n1 --job-name demo_detect_superjob \
 -o DETECT/demo/demo_workdir/logs/{rulename}.{jobid}.out \
 -e DETECT/demo/demo_workdir/logs/{rulename}.{jobid}.err\" --forceall"
 ```
+<br>
+
 
 ## Understanding the Output File
 
