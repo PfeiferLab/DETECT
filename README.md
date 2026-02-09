@@ -100,48 +100,43 @@ By default, DETECT evaluates a variety of computational filter criteria and thre
 | ```parent.reassembly``` | scaled depth of coverage in the reassembled region during variant calling in the parent    | max     | sire, dam            |
 | ```child.reassembly```  | scaled depth of coverage in the reassembled region during variant calling in the offspring | max     | offspring            |
 
- 
+<br>
 
-When DETECT finishes, it creates one, tab delimited output file per iteration. The columns are:
+DETECT creates one tab-delimited output file per iteration containing the recommended filter criteria and thresholds. The columns are:
 
-**Filter**: Name of the filter.
+* **filter**: Filter criterion.
 
-**min/max**: denoting whether this is an upper or lower bound filter.
+* **min/max**: Denoting whether the recommended filter is an upper or lower bound filter.
 
-**average:** Average value of summary statistic across de novo mutations(DNMs) that survived the pipeline.
+* **average:** Average value of across identified de novo mutations (DNMs).
 
-**original_mutations:** the original number of DNMs populated into the simulation.
+* **original_mutations:** The number of DNMs introduced in the offspring during the simulation.
 
-**total_sites:** the total number of sites in the final Mendelian Violation(MV) VCF.
+* **total_sites:** The number of sites with Mendelian violations in the patterns of inheritance.
 
-**total_mutations:** the total number of DNMs that survived the pipeline.
+* **total_mutations:** The number of DNMs passing the recommended filter criterion and threshold.
 
-**total_mutation_mut_recall:** recall of DNMs relative to the number of DNMs that were originally populated into the simulation.
+* **total_mutation_mut_recall:** Recall (the number DNMs passing the recommended filter criterion and threshold divided by the number of DNMs introduced in the offspring during the simulation).
 
-**total_mutation_precision:** precision of DNMs relative to the total number of sites in the MV VCF.
+* **total_mutation_precision:** Precision (the number DNMs passing the recommended filter criterion and threshold divided by the number of sites with Mendelian violations in the patterns of inheritance).
 
-**total_polymorphisms:** total number of sites that are present in the MV VCF that are miscalled polymorphisms.
+* **total_polymorphisms:** The number of segregating variants with Mendelian violations in the patterns of inheritance (false positives).
 
-**total_other_sites:** total number of sites that are present in the MV VCF that are neither DNMs nor miscalled polymorphisms.
+* **total_other_sites:** The number of miscalled DNMs resulting from technical artefacts (false positives).
 
-**recommendation**: recommended filter values based on percentile cutoffs.
+* **recommendation**: Recommended filter threshold based on the percentile cutoff.
 
-**filter_mutations:** number of DNMs retained after the recommended filter is applied to the MV VCF.
+* **filter_mutations:** The number of DNMs passing all recommended filter criteria and thresholds.
 
-**filter_mutation_recall:** recall of DNMs after the recommended filter is applied to the MV VCF.
+* **filter_mutation_recall:** Recall (the number DNMs passing all recommended filter criteria and thresholds divided by the number of DNMs introduced in the offspring during the simulation).
 
-**filter_mutation_precision:** precision of DNMs after the recommended filter is applied to the MV VCF.
+* **filter_mutation_precision:** Precision (the number DNMs passing all recommended filter criteria and thresholds divided by the number of sites with Mendelian violations in the patterns of inheritance).
 
-**filter_polymorphisms:** number of sites that are polymorphisms after the recommended filter is aplied to the MV VCF.
+* **filter_polymorphisms:** The number of segregating variants with Mendelian violations in the patterns of inheritance remaining after the application of all recommended filter criteria and thresholds (false positives).
 
-**filter_other_sites:** number of sites that are neither DNMs nor miscalled polymorphisms after the recommended filter is applied to the MV VCF.
+* **filter_other_sites:** The number of miscalled DNMs resulting from technical artefacts remaining after the application of all recommended filter criteria and thresholds (false positives).
 
-The filternames are explained here:
-
-
-For a deeper explanation of each of the GATK Best Practices Hard Filter statistics(QD and below on the table above), check here: https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants  
-
-For a closer look at the results per run, there are also output files in the run_outputs/ directory within your working directory. 
+<i>For a closer look at the results per run, please refer to the output files in the run_outputs/ directory.</i> 
 
 <br>
 
