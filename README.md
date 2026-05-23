@@ -1,6 +1,6 @@
-## DETECT: a simulation framework optimizing <i>de novo</i> mutation detection across species and study designs
-
 ![DETECT logo](https://github.com/user-attachments/assets/5b1d31b1-84eb-4436-aa3b-c3d38e8e5be6)
+
+## DETECT: a simulation framework optimizing <i>de novo</i> mutation detection across species and study designs
 
 DETECT allows researchers to obtained best practice recommendations for computational filter criteria and thresholds mitigating artefacts in <i>de novo</i> mutation (DNM) detection tailored to their specific study design and species of interest.
 
@@ -13,7 +13,9 @@ mamba env create -n DETECT -f DETECT/DETECT.yml
 source activate DETECT
 ```
 
+
 ## Quickstart
+
 ### Inputs (required)
 
 * **Reference Genome:** A reference assembly (.fasta) from which paired-end reads will be simulated. Must have an associated sequence dictionary file (.dict) and BWA index files (.amb, .ann, .bwt, .pac, .sa). 
