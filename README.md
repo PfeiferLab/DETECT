@@ -1,4 +1,4 @@
-## DETECT (DNM Extraction Through Empirical Cutoff Thresholds)
+## DETECT: a simulation framework optimizing <i>de novo</i> mutation detection across species and study designs
 
 ![DETECT logo](https://github.com/user-attachments/assets/5b1d31b1-84eb-4436-aa3b-c3d38e8e5be6)
 
